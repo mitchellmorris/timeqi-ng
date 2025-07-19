@@ -1,5 +1,16 @@
-<h1 class="text-3xl font-bold underline">
-  Hello world!
-</h1>
-<p>login works!</p>
-<p-button label="Check" />
+
+<form [formGroup]="form">
+    <p-fieldset legend="Login">
+        <p-floatlabel>
+            <input pInputText name="email" formControlName="email">
+            <label>Email:</label>
+        </p-floatlabel>
+        <p-floatlabel>
+            <input pInputText name="password" formControlName="password" type="password">
+            <label>Password:</label>
+        </p-floatlabel>
+    </p-fieldset>
+    <div class="form-buttons">
+        <p-button label="Login" (click)="login()"></p-button>
+    </div>
+</form>
