@@ -5,7 +5,7 @@ import { FloatLabelModule } from 'primeng/floatlabel';
 import { FieldsetModule } from 'primeng/fieldset';
 import { FormGroup, FormBuilder, Validators, ReactiveFormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
-import { Auth } from '../providers/auth/auth';
+import { Auth } from '../../providers/auth/auth';
 // import { AuthService } from '../services/auth.service';
 
 @Component({
