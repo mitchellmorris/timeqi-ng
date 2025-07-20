@@ -1,16 +1,23 @@
 import { HttpClient } from '@angular/common/http';
-import { Injectable } from '@angular/core';
+import { inject, Injectable } from '@angular/core';
 import { environment } from '../../../environments/environment';
-import { BehaviorSubject, catchError, map, Observable, of, tap } from 'rxjs';
+import { BehaviorSubject, catchError, map, Observable, of, switchMap, tap } from 'rxjs';
 import { Organization } from '../../schemas/organization';
+import { Store } from '@ngxs/store';
+import { AddOrganizations } from './organizations.actions';
 
 @Injectable({
   providedIn: 'root'
 })
 export class Organizations {
+  readonly store = inject(Store);
   private apiUrl = environment?.apiUrl;
   _organizations$: BehaviorSubject<Organization[]> = new BehaviorSubject<Organization[]>([]);
-  organizations$: Observable<Organization[]> = this._organizations$.asObservable();
+  organizations$: Observable<Organization[]> = this._organizations$.asObservable().pipe(
+    tap(organizations => {
+        this.store.dispatch(new AddOrganizations(organizations));
+    })
+  );
 
   constructor(private http: HttpClient) {}
 
@@ -22,6 +29,7 @@ export class Organizations {
     return this.http.get(`${this.apiUrl}/user/${userId}`).pipe(
       map((response: any) => response.existingUser.organizations ?? []),
       tap(organizations => this._organizations$.next(organizations)),
+      switchMap(() => this.organizations$),
       catchError(error => {
         console.error('Error fetching organizations:', error);
         return of([]);

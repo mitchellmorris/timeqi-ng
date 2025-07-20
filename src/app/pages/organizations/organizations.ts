@@ -1,8 +1,8 @@
 import { Component, inject } from '@angular/core';
 import { Organizations as OrganizationsService } from '../../store/organizations/organizations';
 import { TableModule } from 'primeng/table';
-import { Organization } from '../organization/organization';
-import { mergeAll, Observable, of, Subscription } from 'rxjs';
+import { Organization } from '../../schemas/organization';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-organizations',
@@ -12,7 +12,6 @@ import { mergeAll, Observable, of, Subscription } from 'rxjs';
 })
 export class Organizations {
   readonly organizationsService = inject(OrganizationsService);
-  organizations$: Observable<Organization[]> = this.organizationsService.organizations$;
   organizations: Organization[] = [];
   organizationsSubscription!: Subscription;
   loading: boolean = true;
@@ -28,13 +27,11 @@ export class Organizations {
        * 'Organization[] | null' is not assignable to type 'Organization[]'.`
        * and I couldn't figure out how to fix it.
        */
-      this.organizationsSubscription = of(
-        this.organizations$, 
-        this.organizationsService.populateOrganizations(userId)
-      ).pipe(
-        mergeAll(),
-      ).subscribe({
+      this.organizationsSubscription = this.organizationsService
+        .populateOrganizations(userId)
+        .subscribe({
           next: (organizations) => {
+            // this.store.select(OrganizationsState.getState).subscribe(console.log);
             this.loading = false;
             this.organizations = organizations;
           }
