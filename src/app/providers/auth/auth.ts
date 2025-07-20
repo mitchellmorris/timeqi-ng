@@ -1,7 +1,6 @@
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { map, shareReplay, switchMap, tap } from 'rxjs/operators';
-import { User } from '../../schemas/user';
 import { addSeconds, isBefore } from 'date-fns';
 
 type SignInResponse = {
@@ -43,7 +42,7 @@ export class Auth {
   private setSession(authResult: AuthResult) {
       // Set the token and expiration time in local storage
       const expiresAt = addSeconds(new Date(), authResult.exp);
-
+      localStorage.setItem('user_id', authResult.sub);
       localStorage.setItem('id_token', authResult.access_token);
       localStorage.setItem("expires_at", JSON.stringify(expiresAt.valueOf()) );
   }          
@@ -51,9 +50,10 @@ export class Auth {
   logout() {
       localStorage.removeItem("id_token");
       localStorage.removeItem("expires_at");
+      localStorage.removeItem("user_id");
   }
 
-  public isLoggedIn() {
+  isLoggedIn() {
       return isBefore(new Date(), this.getExpiration());
   }
 
@@ -65,6 +65,10 @@ export class Auth {
       const expiration = localStorage.getItem("expires_at");
       const expiresAt = expiration ? JSON.parse(expiration) : null;
       return new Date(expiresAt);
-  }    
+  }
+  
+  getUserId() {
+      return localStorage.getItem("user_id");
+  }
 }
 

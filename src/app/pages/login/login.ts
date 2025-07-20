@@ -28,11 +28,11 @@ export class Login {
   constructor(private fb: FormBuilder,
     private authService: Auth,
     private router: Router) {
-
-    this.form = this.fb.group({
-      email: ['', Validators.required],
-      password: ['', Validators.required]
-    });
+      this.authService.logout(); // Ensure user is logged out on login page load
+      this.form = this.fb.group({
+        email: ['', Validators.required],
+        password: ['', Validators.required]
+      });
   }
 
   login() {
