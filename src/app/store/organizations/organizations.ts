@@ -12,12 +12,6 @@ import { AddOrganizations } from './organizations.actions';
 export class Organizations {
   readonly store = inject(Store);
   private apiUrl = environment?.apiUrl;
-  _organizations$: BehaviorSubject<Organization[]> = new BehaviorSubject<Organization[]>([]);
-  organizations$: Observable<Organization[]> = this._organizations$.asObservable().pipe(
-    tap(organizations => {
-        this.store.dispatch(new AddOrganizations(organizations));
-    })
-  );
 
   constructor(private http: HttpClient) {}
 
@@ -28,13 +22,10 @@ export class Organizations {
     }
     return this.http.get(`${this.apiUrl}/user/${userId}`).pipe(
       map((response: any) => response.existingUser.organizations ?? []),
-      tap(organizations => this._organizations$.next(organizations)),
-      switchMap(() => this.organizations$),
       catchError(error => {
         console.error('Error fetching organizations:', error);
         return of([]);
       })
     );
   }
-
 }

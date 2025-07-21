@@ -2,6 +2,8 @@ import { Injectable } from '@angular/core';
 import { State, Action, Selector, StateContext } from '@ngxs/store';
 import { AddOrganizations } from './organizations.actions';
 import { Organization } from '../../schemas/organization';
+import { Organizations as OrganizationsService } from './organizations';
+import { tap } from 'rxjs';
 
 export interface OrganizationsStateModel {
   organizations: Organization[];
@@ -18,7 +20,7 @@ export interface OrganizationsStateModel {
 @Injectable()
 export class OrganizationsState {
 
-  constructor() {}
+  constructor(private organizationsService: OrganizationsService) {}
 
   @Selector()
   static getState(state: OrganizationsStateModel) { return state; }
@@ -26,9 +28,11 @@ export class OrganizationsState {
   @Action(AddOrganizations) 
   addAll(ctx: StateContext<OrganizationsStateModel>, { payload }: AddOrganizations) {
     const stateModel = ctx.getState();
-    ctx.setState({
-      ...stateModel,
-      organizations: [...stateModel.organizations, ...payload]
-    });
+    return this.organizationsService.populateOrganizations(payload).pipe(
+      tap(organizations => ctx.setState({
+        ...stateModel,
+        organizations: [...stateModel.organizations, ...organizations]
+      }))
+    );
   }
 }
