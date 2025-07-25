@@ -10,6 +10,7 @@ import { authInterceptor } from './providers/auth/authInterceptor';
 import { withNgxsReduxDevtoolsPlugin } from '@ngxs/devtools-plugin';
 import { provideStore } from '@ngxs/store';
 import { OrganizationsState } from './store/organizations/organizations.state';
+import { UserState } from './store/user/user.state';
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -26,7 +27,10 @@ export const appConfig: ApplicationConfig = {
       }
     }), 
     provideStore(
-      [OrganizationsState],
+      [
+        OrganizationsState,
+        UserState
+      ],
       withNgxsReduxDevtoolsPlugin()
     )
   ]
