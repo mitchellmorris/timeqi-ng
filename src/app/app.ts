@@ -1,5 +1,7 @@
 import { Component, signal } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
+import { Store } from '@ngxs/store';
+import { SetUser } from './store/user/user.actions';
 
 @Component({
   selector: 'app-root',
@@ -8,5 +10,10 @@ import { RouterOutlet } from '@angular/router';
   styleUrl: './app.css'
 })
 export class App {
-  protected readonly title = signal('timeqi-ng');
+  constructor(store: Store) {
+    const userId = localStorage.getItem('user_id');
+    if (userId) {
+      store.dispatch(new SetUser());
+    }
+  }
 }

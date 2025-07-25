@@ -2,6 +2,7 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { map, shareReplay, switchMap, tap } from 'rxjs/operators';
 import { addSeconds, isBefore } from 'date-fns';
+import { environment } from '../../../environments/environment';
 
 type SignInResponse = {
   access_token: string;
@@ -20,16 +21,17 @@ type AuthResult = SignInResponse & ProfileResponse;
   providedIn: 'root'
 })
 export class Auth {
+  apiUrl = environment?.apiUrl;
   constructor(private http: HttpClient) {}
       
   login(email:string, password:string ) {
-    return this.http.post<{ access_token: string }>('//localhost:3000/auth/login', { email, password })
+    return this.http.post<{ access_token: string }>(`${this.apiUrl}/auth/login`, { email, password })
       .pipe(
         switchMap((res) => {
           const headers = new HttpHeaders({
             'Authorization': `Bearer ${res.access_token}`
           });
-          return this.http.get<ProfileResponse>('//localhost:3000/auth/profile', { headers }).pipe(
+          return this.http.get<ProfileResponse>(`${this.apiUrl}/auth/profile`, { headers }).pipe(
             map((profile: ProfileResponse) => {
               this.setSession({ access_token: res.access_token, ...profile });
             })

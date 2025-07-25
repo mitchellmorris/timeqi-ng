@@ -1,14 +1,11 @@
 import { Injectable } from '@angular/core';
-import { State, Action, Selector, StateContext } from '@ngxs/store';
+import { State, Action, Selector, StateContext, Store, Select } from '@ngxs/store';
 import { AddOrganizations } from './organizations.actions';
-import { Organization } from '../../schemas/organization';
+import { OrganizationsStateModel } from '../../schemas/organization';
 import { Organizations as OrganizationsService } from './organizations';
-import { tap } from 'rxjs';
+import { UserState } from '../user/user.state';
+import { catchError, filter, map, tap } from 'rxjs';
 
-export interface OrganizationsStateModel {
-  organizations: Organization[];
-  organization: Organization | null;
-}
 
 @State<OrganizationsStateModel>({
   name: 'organizations',
@@ -20,19 +17,30 @@ export interface OrganizationsStateModel {
 @Injectable()
 export class OrganizationsState {
 
-  constructor(private organizationsService: OrganizationsService) {}
+  constructor(
+    private store: Store,
+    private organizationsService: OrganizationsService
+  ) {}
 
   @Selector()
   static getState(state: OrganizationsStateModel) { return state; }
 
   @Action(AddOrganizations) 
-  addAll(ctx: StateContext<OrganizationsStateModel>, { payload }: AddOrganizations) {
-    const stateModel = ctx.getState();
-    return this.organizationsService.populateOrganizations(payload).pipe(
-      tap(organizations => ctx.setState({
-        ...stateModel,
-        organizations: [...stateModel.organizations, ...organizations]
-      }))
+  addAll(ctx: StateContext<OrganizationsStateModel>) {
+    const state = ctx.getState();
+    return this.store.select(UserState.getState).pipe(
+      filter(({ user }) => user !== null), // Ensure userState is not null
+      map(({ user }) => user !== null ? user.organizations || [] : []),
+      tap(organizations => {
+        ctx.setState({
+          ...state,
+          organizations
+        });
+      }),
+      catchError(error => {
+        console.error('Error fetching user organizations:', error);
+        return [];
+      })
     );
   }
 }
