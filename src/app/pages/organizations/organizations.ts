@@ -1,6 +1,6 @@
 import { Component, inject } from '@angular/core';
 import { TableModule } from 'primeng/table';
-import { PopulatedOrganization } from '../../schemas/organization';
+import { Organization } from '../../schemas/organization';
 import { map, Subscription } from 'rxjs';
 import { Store } from '@ngxs/store'; // Add this import
 import { OrganizationsState } from '../../store/organizations/organizations.state';
@@ -14,7 +14,7 @@ import { Router } from '@angular/router';
 })
 export class Organizations {
   readonly store = inject(Store);
-  organizations: PopulatedOrganization[] = [];
+  organizations: Partial<Organization>[] = [];
   organizations$ = this.store.select(OrganizationsState.getState).pipe(
     map(({ organizations }) => organizations),
   );

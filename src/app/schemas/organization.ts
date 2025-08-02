@@ -1,15 +1,12 @@
-import { PopulatedUser } from "./user";
-
-export interface PopulatedOrganization {
+import { User } from "./user";
+export interface Organization {
   _id: string;
   name: string;
-  sponsor: PopulatedUser;
-  users: PopulatedUser[];
-}
-export interface Organization extends PopulatedOrganization {
   projects: string[];
+  users: Partial<User>[];
+  sponsor: User;
 }
 export interface OrganizationsStateModel {
-  organizations: PopulatedOrganization[];
+  organizations: Partial<Organization>[];
   organization: Organization | null;
 }

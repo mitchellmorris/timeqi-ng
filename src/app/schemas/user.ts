@@ -1,19 +1,12 @@
-import { PopulatedOrganization } from "./organization";
-
-export interface LoginUser {
-	email: string;
-	password: string;
-}
-
-export interface PopulatedUser {
+import { Organization } from "./organization";
+export interface User {
   _id: string;
   name: string;
-}
-export interface User extends PopulatedUser {
   email: string;
-  organizations?: PopulatedOrganization[];
+  organizations?: Partial<Organization>[];
+	password: string;
 }
 export interface UserStateModel {
-  users: PopulatedUser[];
+  users: User[];
   user: User | null
 }
