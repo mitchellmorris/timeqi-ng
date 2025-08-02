@@ -1,6 +1,6 @@
-import { Organization } from "../../schemas/organization";
+import { PopulatedOrganization } from "../../schemas/organization";
 
-export class AddOrganizations {
-  static readonly type = '[Organizations Page] Add Populated Organizations';
-  constructor() { }
+export class SetUserOrganizations {
+  static readonly type = '[App] Set User Organizations';
+  constructor(public organizations: PopulatedOrganization[]) { }
 }

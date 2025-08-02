@@ -4,7 +4,7 @@ import { TableModule } from 'primeng/table';
 import { PopulatedOrganization } from '../../schemas/organization';
 import { map, Subscription } from 'rxjs';
 import { Store } from '@ngxs/store'; // Add this import
-import { AddOrganizations } from '../../store/organizations/organizations.actions';
+import { SetUserOrganizations } from '../../store/organizations/organizations.actions';
 import { OrganizationsState } from '../../store/organizations/organizations.state';
 
 @Component({
@@ -24,7 +24,6 @@ export class Organizations {
     this.store = store;
     const userId = localStorage.getItem('user_id');
     if (userId) {
-      this.store.dispatch(new AddOrganizations());
       /**
        * I DID NOT want to use mergeAll here.
        * I was hoping to just use the organizations$ observable directly,

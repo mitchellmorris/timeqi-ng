@@ -4,14 +4,12 @@
             <tr>
                 <th>Name</th>
                 <th>Sponsor</th>
-                <th>Users</th>
             </tr>
         </ng-template>
         <ng-template #body let-organization>
             <tr>
                 <td>{{ organization.name }}</td>
                 <td>{{ organization.sponsor.name }}</td>
-                <td>{{ organization.users.length }}</td>
             </tr>
         </ng-template>
     </p-table>

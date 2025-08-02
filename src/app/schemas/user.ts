@@ -11,7 +11,7 @@ export interface PopulatedUser {
 }
 export interface User extends PopulatedUser {
   email: string;
-  organizations: PopulatedOrganization[];
+  organizations?: PopulatedOrganization[];
 }
 export interface UserStateModel {
   users: PopulatedUser[];

@@ -3,7 +3,9 @@ import { State, Action, Selector, StateContext } from '@ngxs/store';
 import { SetUser } from './user.actions';
 import { User as UserService } from './user';
 import { tap } from 'rxjs';
-import { PopulatedUser, User, UserStateModel } from '../../schemas/user';
+import { User, UserStateModel } from '../../schemas/user';
+import { SetUserOrganizations } from '../organizations/organizations.actions';
+import { dissoc } from 'ramda';
 
 @State<UserStateModel>({
   name: 'users',
@@ -24,13 +26,24 @@ export class UserState {
 
   @Action(SetUser)
   setUser(ctx: StateContext<UserStateModel>) {
-    const stateModel = ctx.getState();
-    ctx.setState(stateModel);
+    const state = ctx.getState();
     return this.userService.setUser().pipe(
-      tap(user => ctx.setState({
-        ...stateModel,
-        user
-      }))
+      tap((user: User | null) => {
+        if (!user) {
+          console.warn('No user found, setting user to null.');
+          ctx.setState({
+            ...state,
+            user: null
+          });
+          return;
+        } else {
+          ctx.setState({
+            ...state,
+            user: dissoc('organizations', user)
+          });
+          ctx.dispatch(new SetUserOrganizations(user.organizations || []));
+        }
+      }),
     );
   }
 }
