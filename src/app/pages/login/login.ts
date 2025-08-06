@@ -42,7 +42,6 @@ export class Login {
       this.authService.login(val.email, val.password)
         .subscribe(
           () => {
-            console.log("User is logged in");
             this.router.navigateByUrl('/');
           }
         );

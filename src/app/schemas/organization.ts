@@ -1,9 +1,9 @@
+import { Project } from "./project";
 import { User } from "./user";
 export interface Organization {
   _id: string;
   name: string;
-  projects: string[];
-  users: Partial<User>[];
+  projects?: Partial<Project>[];
   sponsor: User;
 }
 export interface OrganizationsStateModel {

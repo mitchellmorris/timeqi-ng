@@ -1,6 +1,8 @@
 import { HttpClient } from '@angular/common/http';
 import { /*inject,*/ Injectable } from '@angular/core';
 import { environment } from '../../../environments/environment';
+import { Organization as OrganizationModel } from '../../schemas/organization';
+import { catchError, map, Observable, of } from 'rxjs';
 // import { BehaviorSubject, catchError, map, Observable, of, switchMap, tap } from 'rxjs';
 // import { Organization } from '../../schemas/organization';
 // import { Store } from '@ngxs/store';
@@ -15,6 +17,16 @@ export class Organizations {
   constructor(
     private http: HttpClient
   ) {}
+
+  getOrganization(id: string): Observable<OrganizationModel | null> {
+      return this.http.get<{ organization: OrganizationModel, [key: string]: any }>(`${this.apiUrl}/organization/${id}`).pipe(
+        map(({ existingOrganization }) => existingOrganization),
+        catchError(error => {
+          console.error('Error fetching user profile:', error);
+          return of(null);
+        })
+      );
+  }
 
   // populateOrganizations(userId: string): Observable<Organization[]> {
   //   if (!userId) {

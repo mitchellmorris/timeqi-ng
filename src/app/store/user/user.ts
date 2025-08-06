@@ -14,7 +14,7 @@ export class User {
     private http: HttpClient
   ) {}
   
-  setUser() {
+  getUser(): Observable<UserModel | null> {
     return this.http.get<{ user: UserModel, [key: string]: any }>(`${this.apiUrl}/user/profile`).pipe(
       map(({ user }) => user),
       catchError(error => {

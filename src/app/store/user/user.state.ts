@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { State, Action, Selector, StateContext } from '@ngxs/store';
 import { SetUser } from './user.actions';
 import { User as UserService } from './user';
-import { map, tap } from 'rxjs';
+import { map, mergeMap, tap } from 'rxjs';
 import { User, UserStateModel } from '../../schemas/user';
 import { SetUserOrganizations } from '../organizations/organizations.actions';
 import { dissoc } from 'ramda';
@@ -26,13 +26,13 @@ export class UserState {
 
   @Action(SetUser)
   setUser(ctx: StateContext<UserStateModel>) {
-    const state = ctx.getState();
-    return this.userService.setUser().pipe(
+    return this.userService.getUser().pipe(
       map(user => user
         ? { user: dissoc<User, 'organizations'>('organizations', user), organizations: user.organizations || [] }
         : { user: null, organizations: [] }
       ),
       tap(({ user, organizations }) => {
+        const state = ctx.getState();
         if (!user) {
           console.warn('No user found, setting user to null.');
           ctx.setState({
@@ -45,10 +45,10 @@ export class UserState {
             ...state,
             user
           });
-          ctx.dispatch(new SetUserOrganizations(organizations));
         }
       }),
-      map(({ user }) => user)
+      mergeMap(({ organizations }) => ctx.dispatch(new SetUserOrganizations(organizations))),
+      // map(({ user }) => user)
     );
   }
 }
