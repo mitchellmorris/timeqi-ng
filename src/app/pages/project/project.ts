@@ -1,7 +1,7 @@
 import { Component, inject } from '@angular/core';
 import { Store } from '@ngxs/store';
 import { TasksState } from '../../store/tasks/tasks.state';
-import { filter, map, Subscription } from 'rxjs';
+import { filter, map, Subscription, take } from 'rxjs';
 import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
 import { SetProject } from '../../store/projects/projects.actions';
 import { Task } from '../../schemas/task';
@@ -29,11 +29,13 @@ export class Project {
   readonly route = inject(ActivatedRoute);
   projectId = this.route.snapshot.paramMap.get('id');
   activeTaskId: string | null = null;
+  activeTaskLabel: string = '';
   isTaskOpen: boolean = false;
   tasks: Partial<Task>[] = [];
   tasks$ = this.store.select(TasksState.getState).pipe(
     filter(state => has('tasks', state)),
     map(({ tasks }) => tasks),
+    takeUntilDestroyed()
   );
   tasksSubscription!: Subscription;
   loading: boolean = true;
@@ -41,8 +43,7 @@ export class Project {
     {
       label: 'Edit',
       command: () => {
-        console.log('Edit command executed', this.activeTaskId);
-        // this.edit();
+        this.router.navigate(['project', this.projectId, 'edit', this.activeTaskId]);
       }
     },
     {
@@ -72,13 +73,17 @@ export class Project {
       if (event instanceof NavigationEnd) {
         const urlSegments = event.urlAfterRedirects.split('/');
         // Example: ['', 'project', '123', 'review', '456']
+        this.activeTaskId = urlSegments[4];
+        this.isTaskOpen = true;
         switch (event.urlAfterRedirects) {
           case `/project/${this.projectId}/review/${urlSegments[4]}`:
+            this.activeTaskLabel = "Review Task";
+            break;
           case `/project/${this.projectId}/edit/${urlSegments[4]}`:
-            this.activeTaskId = urlSegments[4];
-            this.isTaskOpen = true;
+            this.activeTaskLabel = "Edit Task";
             break;
           default:
+            this.activeTaskLabel = "";
             this.activeTaskId = null;
             this.isTaskOpen = false;
             break;

@@ -28,7 +28,7 @@
   <p>Loading ...</p>
 }
 <p-dialog 
-  header="Review Task" 
+  [header]="activeTaskLabel" 
   [modal]="true" 
   [(visible)]="isTaskOpen"
   (onHide)="router.navigate(['project', this.projectId])"
