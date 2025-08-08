@@ -45,7 +45,6 @@ export class ProjectsState {
         : { project: null, tasks: [] }
       ),
       tap(({ project }) => {
-        console.log('Setting project:', project);
         const state = ctx.getState();
         if (!project) {
           console.warn('No organization found, setting project to null.');

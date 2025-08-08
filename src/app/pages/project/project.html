@@ -16,9 +16,9 @@
                     label="Review" 
                     icon="pi pi-eye" 
                     [model]="taskActions" 
-                    (onClick)="reviewTask(task._id)"
-                    (onMenuShow)="actedUponTaskId = task._id" 
-                    (onMenuHide)="actedUponTaskId = null"
+                    (onClick)="router.navigate(['project', projectId, 'review', task._id])"
+                    (onMenuShow)="activeTaskId = task._id" 
+                    (onMenuHide)="activeTaskId = null"
                   ></p-splitbutton>
                 </td>
             </tr>
@@ -27,5 +27,13 @@
 } @else {
   <p>Loading ...</p>
 }
-<router-outlet />
+<p-dialog 
+  header="Review Task" 
+  [modal]="true" 
+  [(visible)]="isTaskOpen"
+  (onHide)="router.navigate(['project', this.projectId])"
+  >
+  hello
+  <router-outlet />
+</p-dialog>
 

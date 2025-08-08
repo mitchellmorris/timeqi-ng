@@ -1,6 +1,5 @@
 import { Component, inject } from '@angular/core';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
-import { Dialog } from 'primeng/dialog';
 import { ButtonModule } from 'primeng/button';
 
 
@@ -8,7 +7,6 @@ import { ButtonModule } from 'primeng/button';
   selector: 'app-task',
   imports: [
     RouterModule,
-    Dialog,
     ButtonModule,
   ],
   templateUrl: './task.html',

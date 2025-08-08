@@ -11,13 +11,15 @@ import { SplitButtonModule } from 'primeng/splitbutton';
 import { MenuItem } from 'primeng/api';
 import { RouterModule } from '@angular/router';
 import { Dialog } from 'primeng/dialog';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 @Component({
   selector: 'app-project',
   imports: [
     TableModule,
     SplitButtonModule,
-    RouterModule
+    RouterModule,
+    Dialog,
   ],
   templateUrl: './project.html',
   styleUrl: './project.css'
@@ -26,7 +28,8 @@ export class Project {
   readonly store = inject(Store);
   readonly route = inject(ActivatedRoute);
   projectId = this.route.snapshot.paramMap.get('id');
-  actedUponTaskId: string | null = null;
+  activeTaskId: string | null = null;
+  isTaskOpen: boolean = false;
   tasks: Partial<Task>[] = [];
   tasks$ = this.store.select(TasksState.getState).pipe(
     filter(state => has('tasks', state)),
@@ -38,20 +41,20 @@ export class Project {
     {
       label: 'Edit',
       command: () => {
-        console.log('Edit command executed', this.actedUponTaskId);
+        console.log('Edit command executed', this.activeTaskId);
         // this.edit();
       }
     },
     {
       label: 'Delete',
       command: () => {
-        console.log('Delete command executed', this.actedUponTaskId);
+        console.log('Delete command executed', this.activeTaskId);
         // this.delete();
       }
     }
   ];
 
-  constructor(private router: Router) {
+  constructor(public router: Router) {
     const userId = localStorage.getItem('user_id');
     if (userId && this.projectId) {
       this.store.dispatch(new SetProject(this.projectId));
@@ -64,18 +67,24 @@ export class Project {
     } else {
       console.warn(userId ? 'No user ID found in local storage.' : 'No project ID found in route parameters.');
     }
-    // Reset actedUponTaskId on navigation
-    this.router.events.subscribe(event => {
+    // Reset activeTaskId on navigation
+    this.router.events.pipe(takeUntilDestroyed()).subscribe(event => {
       if (event instanceof NavigationEnd) {
-        // Adjust this path to match your route structure
-        if (event.urlAfterRedirects === `/project/${this.projectId}`) {
-          this.actedUponTaskId = null;
+        const urlSegments = event.urlAfterRedirects.split('/');
+        // Example: ['', 'project', '123', 'review', '456']
+        switch (event.urlAfterRedirects) {
+          case `/project/${this.projectId}/review/${urlSegments[4]}`:
+          case `/project/${this.projectId}/edit/${urlSegments[4]}`:
+            this.activeTaskId = urlSegments[4];
+            this.isTaskOpen = true;
+            break;
+          default:
+            this.activeTaskId = null;
+            this.isTaskOpen = false;
+            break;
         }
       }
     });
   }
-
-  reviewTask(taskId: string) {
-    this.router.navigate(['project', this.projectId, 'review', taskId]);
-  }
 }
+
