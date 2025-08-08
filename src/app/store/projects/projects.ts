@@ -18,7 +18,7 @@ export class Projects {
       return this.http.get<{ project: Project, [key: string]: any }>(`${this.apiUrl}/project/${id}`).pipe(
         map(({ existingProject }) => existingProject),
         catchError(error => {
-          console.error('Error fetching user profile:', error);
+          console.error('Error fetching project:', error);
           return of(null);
         })
       );

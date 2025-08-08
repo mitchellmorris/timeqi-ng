@@ -1,7 +1,11 @@
 import { Injectable } from '@angular/core';
-import { State, Action, Selector, StateContext } from '@ngxs/store';
-import { SetProjectTasks } from './tasks.actions';
-import { TasksStateModel } from '../../schemas/task';
+import { State, Action, Selector, StateContext, Store } from '@ngxs/store';
+import { SetProjectTasks, SetTask } from './tasks.actions';
+import { Task, TasksStateModel } from '../../schemas/task';
+import { Tasks as TasksService } from './tasks';
+import { map, mergeMap, tap } from 'rxjs';
+import { dissoc } from 'ramda';
+import { SetTaskEntries } from '../entries/entries.actions';
 
 @State<TasksStateModel>({
   name: 'tasks',
@@ -13,6 +17,11 @@ import { TasksStateModel } from '../../schemas/task';
 @Injectable()
 export class TasksState {
 
+  constructor(
+    private tasksService: TasksService,
+    private store: Store,
+  ) {}
+
   @Selector()
   static getState(state: TasksStateModel) { return state; }
 
@@ -23,5 +32,34 @@ export class TasksState {
       ...state,
       tasks: action.tasks
     });
+  }
+
+  @Action(SetTask)
+  setTask(ctx: StateContext<TasksStateModel>, action: SetTask) {
+    return this.tasksService.getTask(action.id).pipe(
+      map(task => task
+        ? { task: dissoc<Task, 'entries'>('entries', task), entries: task.entries || [] }
+        : { task: null, entries: [] }
+      ),
+      tap(({ task }) => {
+        const state = ctx.getState();
+        if (!task) {
+          console.warn('No task found, setting task to null.');
+          ctx.setState({
+            ...state,
+            task: null
+          });
+        } else {
+          ctx.setState({
+            ...state,
+            task
+          });
+        }
+      }),
+      mergeMap(({ entries, task }) => {
+        const dispatches = [ctx.dispatch(new SetTaskEntries(entries))];
+        return Promise.all(dispatches);
+      })
+    );
   }
 }
