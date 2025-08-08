@@ -4,6 +4,7 @@ export interface Project {
   _id: string;
   name: string;
   sponsor: User;
+  organization: string;
   tasks?: Partial<Task>[];
 }
 export interface ProjectsStateModel {

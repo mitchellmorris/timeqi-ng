@@ -1,11 +1,12 @@
 import { Injectable } from '@angular/core';
-import { State, Action, Selector, StateContext, } from '@ngxs/store';
-import { SetOrganizationProjects, SetProject } from '../projects/projects.actions';
+import { State, Action, Selector, StateContext, Store, } from '@ngxs/store';
+import { SetOrganizationProjects, SetProject, SetProjectOrgProjects } from '../projects/projects.actions';
 import { Project, ProjectsStateModel } from '../../schemas/project';
 import { Projects as ProjectsService } from './projects';
 import { map, mergeMap, tap } from 'rxjs';
 import { dissoc } from 'ramda';
 import { SetProjectTasks } from '../tasks/tasks.actions';
+import { SetProjectOrganization } from '../organizations/organizations.actions';
 
 
 @State<ProjectsStateModel>({
@@ -18,13 +19,17 @@ import { SetProjectTasks } from '../tasks/tasks.actions';
 @Injectable()
 export class ProjectsState {
 
-  constructor(private projectsService: ProjectsService) {}
+  constructor(
+    private projectsService: ProjectsService,
+    private store: Store,
+  ) {}
 
   @Selector()
   static getState(state: ProjectsStateModel) { return state; }
 
-  @Action(SetOrganizationProjects) 
-  setOrganizationProjects(ctx: StateContext<ProjectsStateModel>, action: SetOrganizationProjects) {
+  @Action(SetProjectOrgProjects)
+  @Action(SetOrganizationProjects)
+  setOrganizationProjects(ctx: StateContext<ProjectsStateModel>, action: SetOrganizationProjects | SetProjectOrgProjects) {
     const state = ctx.getState();
     ctx.setState({
       ...state,
@@ -55,7 +60,15 @@ export class ProjectsState {
           });
         }
       }),
-      mergeMap(({ tasks }) => ctx.dispatch(new SetProjectTasks(tasks)))
+      mergeMap(({ tasks, project }) => {
+        const dispatches = [ctx.dispatch(new SetProjectTasks(tasks))];
+        // Get organization from global OrganizationsState
+        const organization = this.store.selectSnapshot<any>(state => state.organizations.organization);
+        if (project && project.organization && !organization) {
+          dispatches.push(ctx.dispatch(new SetProjectOrganization(project.organization)));
+        }
+        return Promise.all(dispatches);
+      })
     );
   }
 }

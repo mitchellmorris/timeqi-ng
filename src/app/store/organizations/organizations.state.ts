@@ -1,11 +1,11 @@
-import { Injectable } from '@angular/core';
+import { inject, Injectable } from '@angular/core';
 import { State, Action, Selector, StateContext, } from '@ngxs/store';
-import { SetOrganiganization, SetUserOrganizations } from './organizations.actions';
+import { SetOrganiganization, SetProjectOrganization, SetUserOrganizations } from './organizations.actions';
 import { Organization, OrganizationsStateModel } from '../../schemas/organization';
 import { Organizations as OrganizationsService } from './organizations';
 import { map, merge, mergeMap, tap } from 'rxjs';
 import { dissoc } from 'ramda';
-import { SetOrganizationProjects } from '../projects/projects.actions';
+import { SetOrganizationProjects, SetProject, SetProjectOrgProjects } from '../projects/projects.actions';
 
 
 @State<OrganizationsStateModel>({
@@ -20,6 +20,7 @@ export class OrganizationsState {
 
   constructor(private orgsService: OrganizationsService) {}
 
+
   @Selector()
   static getState(state: OrganizationsStateModel) { return state; }
 
@@ -31,9 +32,10 @@ export class OrganizationsState {
       organizations: action.organizations
     });
   }
-
+  @Action(SetProjectOrganization)
   @Action(SetOrganiganization)
-  setOrganiganization(ctx: StateContext<OrganizationsStateModel>, action: SetOrganiganization) {
+  setOrganiganization(ctx: StateContext<OrganizationsStateModel>, action: SetOrganiganization | SetProjectOrganization) {
+    // this.setOrganization$(ctx, action);
     return this.orgsService.getOrganization(action.id).pipe(
       map(organization => organization
         ? { organization: dissoc<Organization, 'projects'>('projects', organization), projects: organization.projects || [] }
@@ -54,7 +56,11 @@ export class OrganizationsState {
           });
         }
       }),
-      mergeMap(({ projects }) => ctx.dispatch(new SetOrganizationProjects(projects)))
+      mergeMap(({ projects }) => ctx.dispatch(
+        action instanceof SetProjectOrganization
+          ? new SetProjectOrgProjects(projects)
+          : new SetOrganizationProjects(projects)
+      ))
     );
   }
 }

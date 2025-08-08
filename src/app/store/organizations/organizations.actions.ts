@@ -8,3 +8,7 @@ export class SetOrganiganization {
   static readonly type = '[Org] Set Organization';
   constructor(public id: string) { }
 }
+export class SetProjectOrganization {
+  static readonly type = '[Project] Set Organization';
+  constructor(public id: string) { }
+}
