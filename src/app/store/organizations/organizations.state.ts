@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { State, Action, Selector, StateContext, } from '@ngxs/store';
-import { SetUserOrganization, SetUserOrganizations } from './organizations.actions';
+import { SetOrganiganization, SetUserOrganizations } from './organizations.actions';
 import { Organization, OrganizationsStateModel } from '../../schemas/organization';
 import { Organizations as OrganizationsService } from './organizations';
 import { map, merge, mergeMap, tap } from 'rxjs';
@@ -32,8 +32,8 @@ export class OrganizationsState {
     });
   }
 
-  @Action(SetUserOrganization)
-  setUserOrganization(ctx: StateContext<OrganizationsStateModel>, action: SetUserOrganization) {
+  @Action(SetOrganiganization)
+  setOrganiganization(ctx: StateContext<OrganizationsStateModel>, action: SetOrganiganization) {
     return this.orgsService.getOrganization(action.id).pipe(
       map(organization => organization
         ? { organization: dissoc<Organization, 'projects'>('projects', organization), projects: organization.projects || [] }

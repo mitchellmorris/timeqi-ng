@@ -1,6 +1,6 @@
 import { Component, inject } from '@angular/core';
 import { Store } from '@ngxs/store';
-import { SetUserOrganization } from '../../store/organizations/organizations.actions';
+import { SetOrganiganization } from '../../store/organizations/organizations.actions';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ProjectsState } from '../../store/projects/projects.state';
 import { map, Subscription } from 'rxjs';
@@ -28,7 +28,7 @@ export class Organization {
     const userId = localStorage.getItem('user_id');
     const organizationId = this.route.snapshot.paramMap.get('id');
     if (userId && organizationId) {
-      this.store.dispatch(new SetUserOrganization(organizationId));
+      this.store.dispatch(new SetOrganiganization(organizationId));
       this.projectsSubscription = this.projects$.subscribe((projects) => {
         if (projects.length > 0) {
           this.loading = false;

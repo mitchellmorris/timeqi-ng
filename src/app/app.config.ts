@@ -12,6 +12,7 @@ import { provideStore } from '@ngxs/store';
 import { OrganizationsState } from './store/organizations/organizations.state';
 import { UserState } from './store/user/user.state';
 import { ProjectsState } from './store/projects/projects.state';
+import { TasksState } from './store/tasks/tasks.state';
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -31,7 +32,8 @@ export const appConfig: ApplicationConfig = {
       [
         UserState,
         OrganizationsState,
-        ProjectsState
+        ProjectsState,
+        TasksState
       ],
       withNgxsReduxDevtoolsPlugin()
     )
