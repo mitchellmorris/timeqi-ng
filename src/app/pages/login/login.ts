@@ -6,6 +6,8 @@ import { FieldsetModule } from 'primeng/fieldset';
 import { FormGroup, FormBuilder, Validators, ReactiveFormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { Auth } from '../../providers/auth/auth';
+import { SetUser } from '../../store/user/user.actions';
+import { Store } from '@ngxs/store';
 // import { AuthService } from '../services/auth.service';
 
 @Component({
@@ -25,9 +27,12 @@ export class Login {
 
   form: FormGroup;
 
-  constructor(private fb: FormBuilder,
+  constructor(
+    private fb: FormBuilder,
     private authService: Auth,
-    private router: Router) {
+    private router: Router,
+    private store: Store
+  ) {
       this.authService.logout(); // Ensure user is logged out on login page load
       this.form = this.fb.group({
         email: ['', Validators.required],
@@ -37,11 +42,11 @@ export class Login {
 
   login() {
     const val = this.form.value;
-
     if (val.email && val.password) {
       this.authService.login(val.email, val.password)
         .subscribe(
           () => {
+            this.store.dispatch(new SetUser());
             this.router.navigateByUrl('/');
           }
         );
