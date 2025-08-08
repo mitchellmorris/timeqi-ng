@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, OnDestroy } from '@angular/core';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { Store } from '@ngxs/store';
 import { ButtonModule } from 'primeng/button';
@@ -19,7 +19,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
   templateUrl: './task.html',
   styleUrl: './task.css'
 })
-export class Task {
+export class Task implements OnDestroy {
   readonly store = inject(Store);
   readonly route = inject(ActivatedRoute);
   taskId = this.route.snapshot.paramMap.get('taskId');
@@ -44,5 +44,8 @@ export class Task {
     } else {
       console.warn(userId ? 'No user ID found in local storage.' : 'No task ID found in route parameters.');
     }
+  }
+  ngOnDestroy() {
+    this.store.dispatch(new SetTask(null)); // Clear task state on component destruction
   }
 }

@@ -7,5 +7,5 @@ export class SetProjectTasks {
 
 export class SetTask {
   static readonly type = '[Project] Set Task';
-  constructor(public id: string) { }
+  constructor(public id: string | null) { }
 }

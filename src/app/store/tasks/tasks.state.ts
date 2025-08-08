@@ -36,6 +36,14 @@ export class TasksState {
 
   @Action(SetTask)
   setTask(ctx: StateContext<TasksStateModel>, action: SetTask) {
+    if (!action.id) {
+      ctx.setState({
+        ...ctx.getState(),
+        task: null
+      });
+      ctx.dispatch(new SetTaskEntries([]))
+      return;
+    }
     return this.tasksService.getTask(action.id).pipe(
       map(task => task
         ? { task: dissoc<Task, 'entries'>('entries', task), entries: task.entries || [] }
