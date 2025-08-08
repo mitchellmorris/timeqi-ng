@@ -4,6 +4,7 @@ import { Organizations } from './pages/organizations/organizations';
 import { Organization } from './pages/organization/organization';
 import { Project } from './pages/project/project';
 import { authGuard } from './providers/auth/auth-guard';
+import { Task } from './pages/task/task';
 
 export const routes: Routes = [
   {
@@ -23,6 +24,11 @@ export const routes: Routes = [
   {
     path: 'project/:id',
     component: Project,
-    canActivate: [authGuard]
+    canActivate: [authGuard],
+    children: [{
+      path: 'review/:taskId',
+      component: Task,
+      canActivate: [authGuard]
+    }]
   }
 ];

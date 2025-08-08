@@ -1,1 +1,31 @@
-<p>project works!</p>
+@if (!loading) {
+    <p-table [value]="tasks" [tableStyle]="{ 'min-width': '50rem' }">
+        <ng-template #header>
+            <tr>
+                <th>Name</th>
+                <th>Assignee</th>
+                <th>Actions</th>
+            </tr>
+        </ng-template>
+        <ng-template #body let-task>
+            <tr>
+                <td>{{ task.name }}</td>
+                <td>{{ task.assignee.name }}</td>
+                <td>
+                  <p-splitbutton 
+                    label="Review" 
+                    icon="pi pi-eye" 
+                    [model]="taskActions" 
+                    (onClick)="reviewTask(task._id)"
+                    (onMenuShow)="actedUponTaskId = task._id" 
+                    (onMenuHide)="actedUponTaskId = null"
+                  ></p-splitbutton>
+                </td>
+            </tr>
+        </ng-template>
+    </p-table>
+} @else {
+  <p>Loading ...</p>
+}
+<router-outlet />
+
