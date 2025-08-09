@@ -47,6 +47,18 @@ export class Project {
       }
     },
     {
+      separator: true
+    },
+    {
+      label: 'Add Task Above'
+    },
+    {
+      label: 'Add Task Below'
+    },
+    {
+      separator: true
+    },
+    {
       label: 'Delete',
       command: () => {
         console.log('Delete command executed', this.activeTaskId);

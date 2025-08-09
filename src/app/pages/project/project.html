@@ -1,5 +1,10 @@
+<div class="m-8">
 @if (!loading) {
-    <p-table [value]="tasks" [tableStyle]="{ 'min-width': '50rem' }">
+    <p-table 
+      [value]="tasks"
+      showGridlines
+      stripedRows
+      >
         <ng-template #header>
             <tr>
                 <th>Name</th>
@@ -27,6 +32,7 @@
 } @else {
   <p>Loading ...</p>
 }
+</div>
 <p-dialog 
   [header]="activeTaskLabel" 
   [modal]="true" 
