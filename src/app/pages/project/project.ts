@@ -37,7 +37,6 @@ export class Project {
     map(({ tasks }) => tasks),
     takeUntilDestroyed()
   );
-  tasksSubscription!: Subscription;
   loading: boolean = true;
   taskActions: MenuItem[] = [
     {
@@ -70,8 +69,7 @@ export class Project {
   constructor(public router: Router) {
     const userId = localStorage.getItem('user_id');
     if (userId && this.projectId) {
-      this.store.dispatch(new SetProject(this.projectId));
-      this.tasksSubscription = this.tasks$.subscribe((tasks) => {
+      this.tasks$.subscribe((tasks) => {
         if (tasks.length > 0) {
           this.loading = false;
           this.tasks = tasks;

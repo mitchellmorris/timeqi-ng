@@ -6,11 +6,14 @@ import { Project } from './pages/project/project';
 import { authGuard } from './providers/auth/auth-guard';
 import { Task } from './pages/task/task';
 import { EditTask } from './pages/task/edit-task/edit-task';
+import { TimeOff } from './pages/project/time-off/time-off';
+import { projectResolver } from './pages/project/projectResolvers';
 
 export const routes: Routes = [
   {
     path: 'login',
     component: Login,
+    data: { showSidebar: false }
   },
   {
     path: '',
@@ -34,6 +37,17 @@ export const routes: Routes = [
       path: 'edit/:taskId',
       component: EditTask,
       canActivate: [authGuard]
-    }]
+    }],
+    resolve: {
+      projectsState: projectResolver
+    }
+  },
+  {
+    path: 'project/:id/time-off',
+    component: TimeOff,
+    canActivate: [authGuard],
+    resolve: {
+      projectsState: projectResolver
+    }
   }
 ];

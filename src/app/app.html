@@ -1,1 +1,11 @@
-<router-outlet />
+<div class="flex flex-row">
+  @if (showSidebar) {
+    <div class="flex-none w-64">
+      <app-sidebar></app-sidebar>
+    </div>
+  }
+  <div class="flex-1">
+    <router-outlet></router-outlet>
+  </div>
+</div>
+
