@@ -1,1 +1,14 @@
-<p>edit-task works!</p>
+<p-fluid class="card flex flex-wrap gap-4">
+  <form [formGroup]="form" (ngSubmit)="onSubmit()">
+      <div class="flex-auto mb-4">
+          <label for="name">Task Name</label>
+          <input pInputText id="name" formControlName="name" />
+      </div>
+      <div class="flex-auto mb-4">
+        <p-button type="submit" label="Submit" />
+      </div>
+      <div class="flex-auto mb-4">
+        <p-button label="Close" (onClick)="router.navigate(['../../'], { relativeTo: this.route })"></p-button>
+      </div>
+  </form>
+</p-fluid>
