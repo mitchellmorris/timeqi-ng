@@ -3,7 +3,7 @@ import { Store } from '@ngxs/store';
 import { SetOrganiganization } from '../../store/organizations/organizations.actions';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ProjectsState } from '../../store/projects/projects.state';
-import { map, Subscription } from 'rxjs';
+import { filter, first, map, Subscription, take, takeUntil } from 'rxjs';
 import { Project } from '../../schemas/project';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
@@ -17,8 +17,10 @@ export class Organization {
   readonly store = inject(Store);
   projects: Partial<Project>[] = [];
   projects$ = this.store.select(ProjectsState.getState).pipe(
+    filter(({ projects }) => projects.length > 0),
     map(({ projects }) => projects),
-    takeUntilDestroyed()
+    first(projects => projects.length === 1),
+    takeUntilDestroyed(),
   );
   projectsSubscription!: Subscription;
   loading: boolean = true;
@@ -38,7 +40,6 @@ export class Organization {
           if (projects.length === 1) {
             // Redirect to the single organization's page
             this.router.navigate(['/project', projects[0]._id]);
-            this.projectsSubscription.unsubscribe();
           }
         }
       });

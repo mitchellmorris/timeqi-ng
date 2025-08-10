@@ -35,6 +35,7 @@ export class Sidebar implements OnInit {
   ngOnInit() {
     combineLatest([this.organizations$, this.projects$])
       .subscribe(([{ organization, organizations }, { project, projects }]: [OrganizationsStateModel, ProjectsStateModel]) => {
+        // Redefine to register with zone
         this.menuItems = [{
           separator: true
         }];

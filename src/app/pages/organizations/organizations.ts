@@ -1,7 +1,7 @@
 import { Component, inject } from '@angular/core';
 import { TableModule } from 'primeng/table';
 import { Organization } from '../../schemas/organization';
-import { map, Subscription } from 'rxjs';
+import { filter, first, map, Subscription, take } from 'rxjs';
 import { Store } from '@ngxs/store'; // Add this import
 import { OrganizationsState } from '../../store/organizations/organizations.state';
 import { Router } from '@angular/router';
@@ -17,8 +17,10 @@ export class Organizations {
   readonly store = inject(Store);
   organizations: Partial<Organization>[] = [];
   organizations$ = this.store.select(OrganizationsState.getState).pipe(
+    filter(({ organizations }) => organizations.length > 0),
     map(({ organizations }) => organizations),
-    takeUntilDestroyed()
+    takeUntilDestroyed(),
+    first(organizations => organizations.length === 1),
   );
   organizationsSubscription!: Subscription;
   loading: boolean = true;
@@ -33,7 +35,6 @@ export class Organizations {
           if (organizations.length === 1) {
             // Redirect to the single organization's page
             this.router.navigate(['/organization', organizations[0]._id]);
-            this.organizationsSubscription.unsubscribe();
           }
         }
       });
