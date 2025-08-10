@@ -6,8 +6,10 @@ import { Project } from './pages/project/project';
 import { authGuard } from './providers/auth/auth-guard';
 import { Task } from './pages/task/task';
 import { EditTask } from './pages/task/edit-task/edit-task';
-import { TimeOff } from './pages/project/time-off/time-off';
+import { TimeOff } from './pages/project/settings/time-off/time-off';
 import { projectResolver } from './pages/project/projectResolvers';
+import { Settings } from './pages/project/settings/settings';
+import { General as ProjectSettings } from './pages/project/settings/general/general';
 
 export const routes: Routes = [
   {
@@ -29,25 +31,30 @@ export const routes: Routes = [
     path: 'project/:id',
     component: Project,
     canActivate: [authGuard],
-    children: [{
-      path: 'review/:taskId',
-      component: Task,
-      canActivate: [authGuard]
-    },{
-      path: 'edit/:taskId',
-      component: EditTask,
-      canActivate: [authGuard]
-    }],
     resolve: {
       projectsState: projectResolver
-    }
+    },
+    children: [{
+      path: 'review/:taskId',
+      component: Task
+    },{
+      path: 'edit/:taskId',
+      component: EditTask
+    }]
   },
   {
-    path: 'project/:id/time-off',
-    component: TimeOff,
+    path: 'project/:id/settings',
+    component: Settings,
     canActivate: [authGuard],
     resolve: {
       projectsState: projectResolver
-    }
+    },
+    children: [{
+      path: '',
+      component: ProjectSettings
+    },{
+      path: 'time-off',
+      component: TimeOff
+    }]
   }
 ];

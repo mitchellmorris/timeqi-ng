@@ -21,9 +21,9 @@ import { Organizations } from '../../store/organizations/organizations';
 export class Sidebar implements OnInit {
   readonly store = inject(Store);
   readonly zone = inject(NgZone);
-  // @Select(OrganizationsState) organizations$!: Observable<OrganizationsStateModel>;
-  // @Select(ProjectsState) projects$!: Observable<ProjectsStateModel>;
+  private organizationId: string | null = null;
   organizations$ = this.store.select(state => state.organizations).pipe(
+    filter(({ organization }) => !!organization && organization._id !== this.organizationId),
     takeUntilDestroyed()
   );
   projects$ = this.store.select(state => state.projects).pipe(
@@ -33,42 +33,42 @@ export class Sidebar implements OnInit {
   constructor(private cdRef: ChangeDetectorRef) {}
 
   ngOnInit() {
-    combineLatest([this.organizations$, this.projects$]).subscribe(([{ organization, organizations }, { project, projects }]: [OrganizationsStateModel, ProjectsStateModel]) => {
-      this.menuItems = [{
-        separator: true
-      }];
-      if (!!organization) {
-        const orgItems = [];
-        if (projects.length > 1) {
-          orgItems.push({
-            label: "Projects",
-            icon: 'pi pi-folder',
-            routerLink: ['organization', organization._id]
-          });
-        }
-        // Insert menuItem at index 1
-        this.menuItems.push({
+    combineLatest([this.organizations$, this.projects$])
+      .subscribe(([{ organization, organizations }, { project, projects }]: [OrganizationsStateModel, ProjectsStateModel]) => {
+        this.menuItems = [{
+          separator: true
+        }];
+        if (!!organization) {
+          this.organizationId = organization._id;
+          const orgItems: MenuItem[] = [];
+          if (projects.length > 1) {
+            orgItems.push({
+              label: "Projects",
+              icon: 'pi pi-folder',
+              routerLink: ['organization', organization._id]
+            });
+          }
+          this.menuItems.push({
             label: organization.name,
             items: orgItems
-        });
-      }
-      this.menuItems.push({
-        separator: true
-      });
-      if (!!project) {
-          this.menuItems.push({
-            label: `Project: ${project.name}`,
-            items: [{
-              label: "Tasks",
-              icon: 'pi pi-list',
-              routerLink: ['project', project._id]
-            }, {
-              label: "Time Off",
-              icon: 'pi pi-calendar',
-              routerLink: ['project', project._id, 'time-off']
-            }],
+          }, {
+            separator: true
           });
-      }
-    });
+          if (!!project) {
+            this.menuItems.push({
+              label: `Project: ${project.name}`,
+              items: [{
+                label: "Tasks",
+                icon: 'pi pi-list',
+                routerLink: ['project', project._id]
+              }, {
+                label: "Settings",
+                icon: 'pi pi-cog',
+                routerLink: ['project', project._id, 'settings']
+              }],
+            });
+          }
+        }
+      });
   }
 }

@@ -3,7 +3,6 @@ import { Store } from '@ngxs/store';
 import { TasksState } from '../../store/tasks/tasks.state';
 import { filter, map, Subscription, take } from 'rxjs';
 import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
-import { SetProject } from '../../store/projects/projects.actions';
 import { Task } from '../../schemas/task';
 import { has } from 'ramda';
 import { TableModule } from 'primeng/table';
