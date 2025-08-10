@@ -5,6 +5,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { ProjectsState } from '../../store/projects/projects.state';
 import { map, Subscription } from 'rxjs';
 import { Project } from '../../schemas/project';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 @Component({
   selector: 'app-organization',
@@ -17,6 +18,7 @@ export class Organization {
   projects: Partial<Project>[] = [];
   projects$ = this.store.select(ProjectsState.getState).pipe(
     map(({ projects }) => projects),
+    takeUntilDestroyed()
   );
   projectsSubscription!: Subscription;
   loading: boolean = true;
@@ -36,6 +38,7 @@ export class Organization {
           if (projects.length === 1) {
             // Redirect to the single organization's page
             this.router.navigate(['/project', projects[0]._id]);
+            this.projectsSubscription.unsubscribe();
           }
         }
       });
