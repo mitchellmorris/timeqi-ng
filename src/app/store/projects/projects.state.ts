@@ -7,6 +7,7 @@ import { map, mergeMap, tap } from 'rxjs';
 import { dissoc } from 'ramda';
 import { SetProjectTasks } from '../tasks/tasks.actions';
 import { SetProjectOrganization } from '../organizations/organizations.actions';
+import { UpsertProjectTimeOff } from '../time-off/time-off.actions';
 
 
 @State<ProjectsStateModel>({
@@ -65,6 +66,10 @@ export class ProjectsState {
         const organization = this.store.selectSnapshot<any>(state => state.organizations.organization);
         if (project && project.organization && !organization) {
           dispatches.push(ctx.dispatch(new SetProjectOrganization(project.organization)));
+        }
+        // If the project has timeOff, dispatch UpsertProjectTimeOff
+        if (project && project.timeOff && project.timeOff.length) {
+          dispatches.push(ctx.dispatch(new UpsertProjectTimeOff(project.timeOff)));
         }
         return Promise.all(dispatches);
       })

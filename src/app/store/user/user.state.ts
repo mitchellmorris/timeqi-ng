@@ -6,6 +6,7 @@ import { map, mergeMap, tap } from 'rxjs';
 import { User, UserStateModel } from '../../schemas/user';
 import { SetUserOrganizations } from '../organizations/organizations.actions';
 import { dissoc } from 'ramda';
+import { UpsertUserTimeOff } from '../time-off/time-off.actions';
 
 @State<UserStateModel>({
   name: 'users',
@@ -28,8 +29,8 @@ export class UserState {
   setUser(ctx: StateContext<UserStateModel>) {
     return this.userService.getUser().pipe(
       map(user => user
-        ? { user: dissoc<User, 'organizations'>('organizations', user), organizations: user.organizations || [] }
-        : { user: null, organizations: [] }
+        ? { user: dissoc<User, 'organizations'>('organizations', user), organizations: user.organizations || [], timeOff: user.timeOff || [] }
+        : { user: null, organizations: [], timeOff: [] }
       ),
       tap(({ user, organizations }) => {
         const state = ctx.getState();
@@ -47,7 +48,10 @@ export class UserState {
           });
         }
       }),
-      mergeMap(({ organizations }) => ctx.dispatch(new SetUserOrganizations(organizations))),
+      mergeMap(({ organizations, timeOff }) => ctx.dispatch([
+        new SetUserOrganizations(organizations),
+        ...(timeOff.length ? [new UpsertUserTimeOff(timeOff)] : [])
+      ])),
       // map(({ user }) => user)
     );
   }

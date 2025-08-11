@@ -6,6 +6,7 @@ import { Organizations as OrganizationsService } from './organizations';
 import { map, merge, mergeMap, tap } from 'rxjs';
 import { dissoc } from 'ramda';
 import { SetOrganizationProjects, SetProject, SetProjectOrgProjects } from '../projects/projects.actions';
+import { UpsertOrgTimeOff } from '../time-off/time-off.actions';
 
 
 @State<OrganizationsStateModel>({
@@ -38,8 +39,8 @@ export class OrganizationsState {
     // this.setOrganization$(ctx, action);
     return this.orgsService.getOrganization(action.id).pipe(
       map(organization => organization
-        ? { organization: dissoc<Organization, 'projects'>('projects', organization), projects: organization.projects || [] }
-        : { organization: null, projects: [] }
+        ? { organization: dissoc<Organization, 'projects'>('projects', organization), projects: organization.projects || [], timeOff: organization.timeOff || [] }
+        : { organization: null, projects: [], timeOff: [] }
       ),
       tap(({ organization }) => {
         const state = ctx.getState();
@@ -56,11 +57,13 @@ export class OrganizationsState {
           });
         }
       }),
-      mergeMap(({ projects }) => ctx.dispatch(
-        action instanceof SetProjectOrganization
-          ? new SetProjectOrgProjects(projects)
-          : new SetOrganizationProjects(projects)
-      ))
+      mergeMap(({ projects, timeOff }) => ctx.dispatch([
+          action instanceof SetProjectOrganization
+            ? new SetProjectOrgProjects(projects)
+            : new SetOrganizationProjects(projects),
+          ...(timeOff.length ? [new UpsertOrgTimeOff(timeOff)] : [])
+        ]),
+      )
     );
   }
 }
