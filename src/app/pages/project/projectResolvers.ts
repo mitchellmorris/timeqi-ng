@@ -8,7 +8,7 @@ import { ProjectsStateModel } from '../../schemas/project';
 
 export const projectResolver: ResolveFn<ProjectsStateModel> = (route: ActivatedRouteSnapshot, state: RouterStateSnapshot) => {
   const store = inject(Store);
-  const projects = store.selectSignal(ProjectsState.getState)
+  const projects = store.selectSignal(ProjectsState.getState);
   const projectId = route.paramMap.get('id')!;
   return store.dispatch(new SetProject(projectId)).pipe(
     map(() => projects())
