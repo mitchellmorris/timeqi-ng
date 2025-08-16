@@ -4,7 +4,7 @@ export class SetUserOrganizations {
   static readonly type = '[App] Set User Organizations';
   constructor(public organizations: PartialOrganization[]) { }
 }
-export class SetOrganiganization {
+export class SetOrganization {
   static readonly type = '[Org] Set Organization';
   constructor(public id: string) { }
 }

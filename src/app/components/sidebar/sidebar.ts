@@ -45,26 +45,32 @@ export class Sidebar implements OnInit {
               routerLink: ['organization', organization._id]
             });
           }
-          this.menuItems.push({
+          orgItems.push({
+            label: "Settings",
+            icon: 'pi pi-cog',
+            routerLink: ['organization', organization._id, 'settings']
+          });
+          this.menuItems.splice(1, 0, {
             label: organization.name,
             items: orgItems
           }, {
             separator: true
           });
-          if (!!project) {
-            this.menuItems.push({
-              label: `Project: ${project.name}`,
+          if (!!project || projects.length === 1) {
+            const _project = project || projects[0];
+            this.menuItems.splice(3, 0, {
+              label: `Project: ${_project.name}`,
               items: [{
                 label: "Tasks",
                 icon: 'pi pi-list',
-                routerLink: ['project', project._id]
+                routerLink: ['project', _project._id]
               }, {
                 label: "Settings",
                 icon: 'pi pi-cog',
-                routerLink: ['project', project._id, 'settings']
+                routerLink: ['project', _project._id, 'settings']
               }],
             });
-          }
+          } 
         }
       });
   }

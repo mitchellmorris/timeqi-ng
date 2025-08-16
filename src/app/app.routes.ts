@@ -8,8 +8,10 @@ import { Task } from './pages/task/task';
 import { EditTask } from './pages/task/edit-task/edit-task';
 import { TimeOff } from './pages/project/settings/time-off/time-off';
 import { projectResolver } from './pages/project/projectResolvers';
-import { Settings } from './pages/project/settings/settings';
-import { General as ProjectSettings } from './pages/project/settings/general/general';
+import { Settings as ProjectSettings } from './pages/project/settings/settings';
+import { General as ProjectGeneralSetting } from './pages/project/settings/general/general';
+import { Settings as OrganizationSettings } from './pages/organization/settings/settings';
+import { organizationResolver } from './pages/organization/organizationResolvers';
 
 export const routes: Routes = [
   {
@@ -25,7 +27,18 @@ export const routes: Routes = [
   {
     path: 'organization/:id',
     component: Organization,
-    canActivate: [authGuard]
+    canActivate: [authGuard],
+    resolve: {
+      organizationState: organizationResolver
+    },
+  },
+  {
+    path: 'organization/:id/settings',
+    component: OrganizationSettings,
+    canActivate: [authGuard],
+    resolve: {
+      organizationState: organizationResolver
+    },
   },
   {
     path: 'project/:id',
@@ -44,14 +57,14 @@ export const routes: Routes = [
   },
   {
     path: 'project/:id/settings',
-    component: Settings,
+    component: ProjectSettings,
     canActivate: [authGuard],
     resolve: {
       projectsState: projectResolver
     },
     children: [{
       path: '',
-      component: ProjectSettings
+      component: ProjectGeneralSetting
     },{
       path: 'time-off',
       component: TimeOff

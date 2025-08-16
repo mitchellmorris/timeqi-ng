@@ -1,6 +1,6 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, DestroyRef } from '@angular/core';
 import { Store } from '@ngxs/store';
-import { SetOrganiganization } from '../../store/organizations/organizations.actions';
+import { SetOrganization } from '../../store/organizations/organizations.actions';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ProjectsState } from '../../store/projects/projects.state';
 import { filter, first, map, Subscription, take, takeUntil } from 'rxjs';
@@ -27,13 +27,15 @@ export class Organization {
 
   constructor(
     private route: ActivatedRoute,
-    private router: Router
+    private router: Router,
+    private destroyRef: DestroyRef
   ) {
     const userId = localStorage.getItem('user_id');
     const organizationId = this.route.snapshot.paramMap.get('id');
     if (userId && organizationId) {
-      this.store.dispatch(new SetOrganiganization(organizationId));
-      this.projectsSubscription = this.projects$.subscribe((projects) => {
+      this.projectsSubscription = this.projects$.pipe(
+        takeUntilDestroyed(this.destroyRef)
+      ).subscribe((projects) => {
         if (projects.length > 0) {
           this.loading = false;
           this.projects = projects;
