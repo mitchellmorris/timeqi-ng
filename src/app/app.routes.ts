@@ -6,10 +6,10 @@ import { Project } from './pages/project/project';
 import { authGuard } from './providers/auth/auth-guard';
 import { Task } from './pages/task/task';
 import { EditTask } from './pages/task/edit-task/edit-task';
-import { TimeOff } from './pages/project/settings/time-off/time-off';
+import { Scheduling } from './pages/project/settings/scheduling/scheduling';
 import { projectResolver } from './pages/project/projectResolvers';
 import { Settings as ProjectSettings } from './pages/project/settings/settings';
-import { General as ProjectGeneralSetting } from './pages/project/settings/general/general';
+import { General as ProjectGeneralSettings } from './pages/project/settings/general/general';
 import { Settings as OrganizationSettings } from './pages/organization/settings/settings';
 import { organizationResolver } from './pages/organization/organizationResolvers';
 import { General as OrgGeneralSettings } from './pages/organization/settings/general/general';
@@ -73,10 +73,10 @@ export const routes: Routes = [
     },
     children: [{
       path: '',
-      component: ProjectGeneralSetting
+      component: ProjectGeneralSettings
     },{
-      path: 'time-off',
-      component: TimeOff
+      path: 'scheduling',
+      component: Scheduling
     }]
   }
 ];

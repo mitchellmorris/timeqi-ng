@@ -1,18 +1,18 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { TimeOff } from './time-off';
+import { Scheduling } from './scheduling';
 
-describe('TimeOff', () => {
-  let component: TimeOff;
-  let fixture: ComponentFixture<TimeOff>;
+describe('Scheduling', () => {
+  let component: Scheduling;
+  let fixture: ComponentFixture<Scheduling>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [TimeOff]
+      imports: [Scheduling]
     })
     .compileComponents();
 
-    fixture = TestBed.createComponent(TimeOff);
+    fixture = TestBed.createComponent(Scheduling);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

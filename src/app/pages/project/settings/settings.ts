@@ -1,8 +1,7 @@
-import { Component, inject } from '@angular/core';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { ActivatedRoute, NavigationEnd, Router, RouterModule } from '@angular/router';
+import { Component, inject, DestroyRef } from '@angular/core';
+import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { TabsModule } from 'primeng/tabs';
-import { filter, map } from 'rxjs';
+import { getTabIndexByUrlByLastSegment$ } from '../../../providers/utils/routerUtils';
 
 @Component({
   selector: 'app-settings',
@@ -17,20 +16,17 @@ export class Settings {
   readonly route = inject(ActivatedRoute);
   tabs = [
       { route: "../settings", label: 'General', icon: 'pi pi-cog' },
-      { route: "time-off", label: 'Time Off', icon: 'pi pi-calendar' },
+      { route: "scheduling", label: 'Scheduling', icon: 'pi pi-calendar' },
   ];
   tab = 0;
 
-  constructor(private router: Router) {
-    this.router.events.pipe(
-      filter(event => event instanceof NavigationEnd),
-      map((event: NavigationEnd) => event.url),
-      takeUntilDestroyed(),
-    )
-    .subscribe(url => {
-      const lastSegment = url.split('?')[0].split('/').pop() || null;
-      const tabs = ['settings', 'time-off'];
-      this.tab = tabs.indexOf(lastSegment ?? '') !== -1 ? tabs.indexOf(lastSegment ?? '') : 0;
-    });
+  constructor(
+    private router: Router,
+    private destroyRef: DestroyRef
+  ) {
+    getTabIndexByUrlByLastSegment$(this.router, this.tabs, this.destroyRef)
+      .subscribe(index => {
+        this.tab = index;
+      });
   }
 }

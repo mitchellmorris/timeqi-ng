@@ -7,10 +7,10 @@ import { TimeOffPicker } from '../../../../components/time-off-picker/time-off-p
   imports: [
     TimeOffPicker
   ],
-  templateUrl: './time-off.html',
-  styleUrl: './time-off.css'
+  templateUrl: './scheduling.html',
+  styleUrl: './scheduling.css'
 })
-export class TimeOff {
+export class Scheduling {
   constructor() {
     // You can use this.projectsState to access the resolved project state
   }
