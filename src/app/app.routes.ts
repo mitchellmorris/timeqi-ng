@@ -12,6 +12,8 @@ import { Settings as ProjectSettings } from './pages/project/settings/settings';
 import { General as ProjectGeneralSetting } from './pages/project/settings/general/general';
 import { Settings as OrganizationSettings } from './pages/organization/settings/settings';
 import { organizationResolver } from './pages/organization/organizationResolvers';
+import { General as OrgGeneralSettings } from './pages/organization/settings/general/general';
+import { Scheduling as OrgScheduling } from './pages/organization/settings/scheduling/scheduling';
 
 export const routes: Routes = [
   {
@@ -39,6 +41,13 @@ export const routes: Routes = [
     resolve: {
       organizationState: organizationResolver
     },
+    children: [{
+      path: '',
+      component: OrgGeneralSettings
+    },{
+      path: 'scheduling',
+      component: OrgScheduling
+    }],
   },
   {
     path: 'project/:id',
