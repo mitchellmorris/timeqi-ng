@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { environment } from '../../../environments/environment';
 import { catchError, map, Observable, of } from 'rxjs';
-import { Task } from '../../schemas/task';
+import { Task } from '@betavc/timeqi-sh';
 import { HttpClient } from '@angular/common/http';
 
 @Injectable({

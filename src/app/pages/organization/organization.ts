@@ -4,7 +4,7 @@ import { SetOrganiganization } from '../../store/organizations/organizations.act
 import { ActivatedRoute, Router } from '@angular/router';
 import { ProjectsState } from '../../store/projects/projects.state';
 import { filter, first, map, Subscription, take, takeUntil } from 'rxjs';
-import { Project } from '../../schemas/project';
+import { Project, PartialProject } from '@betavc/timeqi-sh';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 @Component({
@@ -15,7 +15,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 })
 export class Organization {
   readonly store = inject(Store);
-  projects: Partial<Project>[] = [];
+  projects: PartialProject[] = [];
   projects$ = this.store.select(ProjectsState.getState).pipe(
     filter(({ projects }) => projects.length > 0),
     map(({ projects }) => projects),

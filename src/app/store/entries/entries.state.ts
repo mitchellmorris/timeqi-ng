@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { State, Action, Selector, StateContext } from '@ngxs/store';
-import { EntriesStateModel } from '../../schemas/entry';
+import { EntriesStateModel } from '@betavc/timeqi-sh';
 import { SetTaskEntries } from './entries.actions';
 
 @State<EntriesStateModel>({

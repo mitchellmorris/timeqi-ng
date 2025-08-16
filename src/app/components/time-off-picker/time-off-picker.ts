@@ -1,12 +1,12 @@
 import { Component, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { Select, Store } from '@ngxs/store';
+import { Store } from '@ngxs/store';
 import { DatePickerModule } from 'primeng/datepicker';
 import { TimeOffState } from '../../store/time-off/time-off.state';
 import { map, Observable } from 'rxjs';
-import { TimeOff, TimeOffStateModel } from '../../schemas/time-off';
+import { PartialTimeOff } from '@betavc/timeqi-sh';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { TableModule } from 'primeng/table';
+import { TableModule, TableRowSelectEvent } from 'primeng/table';
 import { DialogModule } from 'primeng/dialog';
 
 @Component({
@@ -25,20 +25,28 @@ export class TimeOffPicker {
   timeOffLabel: string = "Add Time Off";
   isTimeOffOpened: boolean = false;
   timeOffDate: Date | null = null;
-  allTimeOff: Partial<TimeOff>[] = [];
-  timeOff$: Observable<Partial<TimeOff>[]> = this.store.select(TimeOffState.getState).pipe(
-    map(({ timeoff }) => timeoff),
+  allTimeOff: PartialTimeOff[] = [];
+  timeOff$: Observable<PartialTimeOff[]> = this.store.select(TimeOffState.getState).pipe(
+    map(({ timeoffs }) => timeoffs),
     takeUntilDestroyed(),
   )
 
   constructor() {
     this.timeOff$.subscribe(allTimeOff => {
-        this.allTimeOff = allTimeOff;
+      console.log('All Time Off:', allTimeOff);
+      this.allTimeOff = allTimeOff;
     });
   }
 
   addTimeOff() {
     this.isTimeOffOpened = true;
   }
+
+  onRowSelect(event: TableRowSelectEvent<PartialTimeOff>) {
+    const timeOff = event.data;
+    console.log('Selected Time Off:', timeOff);
+    this.isTimeOffOpened = true;
+  }
+
 
 }

@@ -1,7 +1,7 @@
 import { inject, Injectable } from '@angular/core';
 import { State, Action, Selector, StateContext, } from '@ngxs/store';
 import { SetOrganiganization, SetProjectOrganization, SetUserOrganizations } from './organizations.actions';
-import { Organization, OrganizationsStateModel } from '../../schemas/organization';
+import { Organization, OrganizationsStateModel, PartialProject, PartialTimeOff } from '@betavc/timeqi-sh';
 import { Organizations as OrganizationsService } from './organizations';
 import { map, merge, mergeMap, tap } from 'rxjs';
 import { dissoc } from 'ramda';
@@ -39,7 +39,7 @@ export class OrganizationsState {
     // this.setOrganization$(ctx, action);
     return this.orgsService.getOrganization(action.id).pipe(
       map(organization => organization
-        ? { organization: dissoc<Organization, 'projects'>('projects', organization), projects: organization.projects || [], timeOff: organization.timeOff || [] }
+        ? { organization: dissoc<Organization, 'projects'>('projects', organization), projects: organization.projects as PartialProject[] || [], timeOff: organization.timeOff as PartialTimeOff[] || [] }
         : { organization: null, projects: [], timeOff: [] }
       ),
       tap(({ organization }) => {

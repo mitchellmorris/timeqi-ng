@@ -1,10 +1,10 @@
 import { HttpClient } from '@angular/common/http';
 import { /*inject,*/ Injectable } from '@angular/core';
 import { environment } from '../../../environments/environment';
-import { Organization as OrganizationModel } from '../../schemas/organization';
+import { Organization as OrganizationModel } from '@betavc/timeqi-sh';
 import { catchError, map, Observable, of } from 'rxjs';
 // import { BehaviorSubject, catchError, map, Observable, of, switchMap, tap } from 'rxjs';
-// import { Organization } from '../../schemas/organization';
+// import { Organization } from '@betavc/timeqi-sh';
 // import { Store } from '@ngxs/store';
 
 @Injectable({

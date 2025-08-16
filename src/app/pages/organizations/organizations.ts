@@ -1,6 +1,6 @@
 import { Component, inject } from '@angular/core';
 import { TableModule } from 'primeng/table';
-import { Organization } from '../../schemas/organization';
+import { Organization, PartialOrganization } from '@betavc/timeqi-sh';
 import { filter, first, map, Subscription, take } from 'rxjs';
 import { Store } from '@ngxs/store'; // Add this import
 import { OrganizationsState } from '../../store/organizations/organizations.state';
@@ -15,7 +15,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 })
 export class Organizations {
   readonly store = inject(Store);
-  organizations: Partial<Organization>[] = [];
+  organizations: PartialOrganization[] = [];
   organizations$ = this.store.select(OrganizationsState.getState).pipe(
     filter(({ organizations }) => organizations.length > 0),
     map(({ organizations }) => organizations),

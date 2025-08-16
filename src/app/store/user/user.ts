@@ -3,7 +3,7 @@ import { Injectable } from '@angular/core';
 import { StateContext, Store } from '@ngxs/store';
 import { environment } from '../../../environments/environment';
 import { catchError, map, Observable, of, tap } from 'rxjs';
-import { UserStateModel, User as UserModel } from '../../schemas/user'; // Assuming you have a User model defined
+import { UserStateModel, User as UserModel } from '@betavc/timeqi-sh'; // Assuming you have a User model defined
 
 @Injectable({
   providedIn: 'root'

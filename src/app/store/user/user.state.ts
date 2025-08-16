@@ -3,7 +3,7 @@ import { State, Action, Selector, StateContext } from '@ngxs/store';
 import { SetUser } from './user.actions';
 import { User as UserService } from './user';
 import { map, mergeMap, tap } from 'rxjs';
-import { User, UserStateModel } from '../../schemas/user';
+import { PartialOrganization, PartialTimeOff, User, UserStateModel } from '@betavc/timeqi-sh';
 import { SetUserOrganizations } from '../organizations/organizations.actions';
 import { dissoc } from 'ramda';
 import { UpsertUserTimeOff } from '../time-off/time-off.actions';
@@ -49,8 +49,8 @@ export class UserState {
         }
       }),
       mergeMap(({ organizations, timeOff }) => ctx.dispatch([
-        new SetUserOrganizations(organizations),
-        ...(timeOff.length ? [new UpsertUserTimeOff(timeOff)] : [])
+        new SetUserOrganizations(organizations as PartialOrganization[]),
+        ...(timeOff.length ? [new UpsertUserTimeOff(timeOff as PartialTimeOff[])] : [])
       ])),
       // map(({ user }) => user)
     );

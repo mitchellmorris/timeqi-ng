@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { State, Action, Selector, StateContext, Store, } from '@ngxs/store';
 import { SetOrganizationProjects, SetProject, SetProjectOrgProjects } from '../projects/projects.actions';
-import { Project, ProjectsStateModel } from '../../schemas/project';
+import { PartialTask, PartialTimeOff, Project, ProjectsStateModel } from '@betavc/timeqi-sh';
 import { Projects as ProjectsService } from './projects';
 import { map, mergeMap, tap } from 'rxjs';
 import { dissoc } from 'ramda';
@@ -61,15 +61,15 @@ export class ProjectsState {
         }
       }),
       mergeMap(({ tasks, project }) => {
-        const dispatches = [ctx.dispatch(new SetProjectTasks(tasks))];
+        const dispatches = [ctx.dispatch(new SetProjectTasks(tasks as PartialTask[]))];
         // Get organization from global OrganizationsState
         const organization = this.store.selectSnapshot<any>(state => state.organizations.organization);
         if (project && project.organization && !organization) {
-          dispatches.push(ctx.dispatch(new SetProjectOrganization(project.organization)));
+          dispatches.push(ctx.dispatch(new SetProjectOrganization(project.organization as string)));
         }
         // If the project has timeOff, dispatch UpsertProjectTimeOff
         if (project && project.timeOff && project.timeOff.length) {
-          dispatches.push(ctx.dispatch(new UpsertProjectTimeOff(project.timeOff)));
+          dispatches.push(ctx.dispatch(new UpsertProjectTimeOff(project.timeOff as PartialTimeOff[])));
         }
         return Promise.all(dispatches);
       })

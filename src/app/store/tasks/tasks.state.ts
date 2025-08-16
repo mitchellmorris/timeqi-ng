@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { State, Action, Selector, StateContext, Store } from '@ngxs/store';
 import { SetProjectTasks, SetTask } from './tasks.actions';
-import { Task, TasksStateModel } from '../../schemas/task';
+import { PartialEntry, Task, TasksStateModel } from '@betavc/timeqi-sh';
 import { Tasks as TasksService } from './tasks';
 import { map, mergeMap, tap } from 'rxjs';
 import { dissoc } from 'ramda';
@@ -65,7 +65,7 @@ export class TasksState {
         }
       }),
       mergeMap(({ entries, task }) => {
-        const dispatches = [ctx.dispatch(new SetTaskEntries(entries))];
+        const dispatches = [ctx.dispatch(new SetTaskEntries(entries as PartialEntry[]))];
         return Promise.all(dispatches);
       })
     );

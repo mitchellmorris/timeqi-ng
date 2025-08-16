@@ -1,8 +1,8 @@
-import { Task } from "../../schemas/task";
+import { PartialTask, Task } from '@betavc/timeqi-sh';
 
 export class SetProjectTasks {
   static readonly type = '[Project] Set Project Tasks';
-  constructor(public tasks: Partial<Task>[]) { }
+  constructor(public tasks: PartialTask[]) { }
 }
 
 export class SetTask {

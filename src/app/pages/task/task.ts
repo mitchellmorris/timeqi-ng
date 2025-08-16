@@ -3,7 +3,7 @@ import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { Store } from '@ngxs/store';
 import { ButtonModule } from 'primeng/button';
 import { SetTask } from '../../store/tasks/tasks.actions';
-import { Entry } from '../../schemas/entry';
+import { Entry, PartialEntry } from '@betavc/timeqi-sh';
 import { EntriesState } from '../../store/entries/entries.state';
 import { filter, map, Subscription } from 'rxjs';
 import { has } from 'ramda';
@@ -23,7 +23,7 @@ export class Task implements OnDestroy {
   readonly store = inject(Store);
   readonly route = inject(ActivatedRoute);
   taskId = this.route.snapshot.paramMap.get('taskId');
-  entries: Partial<Entry>[] = [];
+  entries: PartialEntry[] = [];
   entries$ = this.store.select(EntriesState.getState).pipe(
     filter(state => has('entries', state)),
     map(({ entries }) => entries),

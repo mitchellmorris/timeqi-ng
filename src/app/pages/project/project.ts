@@ -1,9 +1,9 @@
 import { Component, inject } from '@angular/core';
 import { Store } from '@ngxs/store';
 import { TasksState } from '../../store/tasks/tasks.state';
-import { filter, map, Subscription, take } from 'rxjs';
+import { filter, map } from 'rxjs';
 import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
-import { Task } from '../../schemas/task';
+import { PartialTask, Task } from '@betavc/timeqi-sh';
 import { has } from 'ramda';
 import { TableModule } from 'primeng/table';
 import { SplitButtonModule } from 'primeng/splitbutton';
@@ -30,7 +30,7 @@ export class Project {
   activeTaskId: string | null = null;
   activeTaskLabel: string = '';
   isTaskOpen: boolean = false;
-  tasks: Partial<Task>[] = [];
+  tasks: PartialTask[] = [];
   tasks$ = this.store.select(TasksState.getState).pipe(
     filter(state => has('tasks', state)),
     map(({ tasks }) => tasks),

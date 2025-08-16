@@ -1,6 +1,6 @@
-import { Entry } from "../../schemas/entry";
+import { PartialEntry } from '@betavc/timeqi-sh';
 
 export class SetTaskEntries {
   static readonly type = '[Task] Set Task Entries';
-  constructor(public entries: Partial<Entry>[]) { }
+  constructor(public entries: PartialEntry[]) { }
 }

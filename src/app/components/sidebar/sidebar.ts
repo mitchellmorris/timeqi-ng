@@ -1,14 +1,10 @@
 import { Component, inject, OnInit, ChangeDetectorRef, NgZone } from '@angular/core';
-import { Select, Store } from '@ngxs/store';
+import { Store } from '@ngxs/store';
 import { MenuItem } from 'primeng/api';
 import { MenuModule } from 'primeng/menu';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { combineLatest, filter, Observable } from 'rxjs';
-import { Project, ProjectsStateModel } from '../../schemas/project';
-import { Organization, OrganizationsStateModel } from '../../schemas/organization';
-import { OrganizationsState } from '../../store/organizations/organizations.state';
-import { ProjectsState } from '../../store/projects/projects.state';
-import { Organizations } from '../../store/organizations/organizations';
+import { combineLatest, filter } from 'rxjs';
+import { ProjectsStateModel, OrganizationsStateModel } from '@betavc/timeqi-sh';
 
 @Component({
   selector: 'app-sidebar',

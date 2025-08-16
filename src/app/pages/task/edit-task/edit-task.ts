@@ -4,7 +4,7 @@ import { Store } from '@ngxs/store';
 import { SetTask } from '../../../store/tasks/tasks.actions';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { TasksState } from '../../../store/tasks/tasks.state';
-import { Task } from '../../../schemas/task';
+import { Task } from '@betavc/timeqi-sh';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { InputTextModule } from 'primeng/inputtext';
 import { FluidModule } from 'primeng/fluid';
