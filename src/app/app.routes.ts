@@ -38,9 +38,6 @@ export const routes: Routes = [
     path: 'organization/:id/settings',
     component: OrganizationSettings,
     canActivate: [authGuard],
-    resolve: {
-      organizationState: organizationResolver
-    },
     children: [{
       path: '',
       component: OrgGeneralSettings
@@ -48,6 +45,9 @@ export const routes: Routes = [
       path: 'scheduling',
       component: OrgScheduling
     }],
+    resolve: {
+      organizationState: organizationResolver
+    },
   },
   {
     path: 'project/:id',
