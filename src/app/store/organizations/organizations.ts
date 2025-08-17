@@ -28,6 +28,16 @@ export class Organizations {
       );
   }
 
+  saveOrganization(id: string, organization: Partial<OrganizationModel>): Observable<OrganizationModel | null> {
+    return this.http.put<OrganizationModel>(`${this.apiUrl}/organization/${id}`, organization).pipe(
+      map((response: any) => response.updatedOrganization),
+      catchError(error => {
+        console.error('Error saving organization:', error);
+        return of(null);
+      })
+    );
+  }
+
   // populateOrganizations(userId: string): Observable<Organization[]> {
   //   if (!userId) {
   //     console.warn('User ID is required to fetch organizations.');

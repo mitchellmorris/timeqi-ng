@@ -1,4 +1,4 @@
-import { PartialOrganization } from '@betavc/timeqi-sh';
+import { PartialOrganization, SchedulingSettings } from '@betavc/timeqi-sh';
 
 export class SetUserOrganizations {
   static readonly type = '[App] Set User Organizations';
@@ -11,4 +11,9 @@ export class SetOrganization {
 export class SetProjectOrganization {
   static readonly type = '[Project] Set Organization';
   constructor(public id: string) { }
+}
+
+export class SaveOrganizationSchedule {
+  static readonly type = '[Org] Save Org. Scheduling';
+  constructor(public id: string, public organization: Partial<SchedulingSettings>) { }
 }

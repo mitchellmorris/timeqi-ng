@@ -11,6 +11,7 @@ import { Store } from '@ngxs/store';
 import { OrganizationsState } from '../../../../store/organizations/organizations.state';
 import { Weekday, DEFAULT_WORKDAYS } from '@betavc/timeqi-sh';
 import { CheckboxModule } from 'primeng/checkbox';
+import { SaveOrganizationSchedule } from '../../../../store/organizations/organizations.actions';
 // console.log(weekdays);
 @Component({
   selector: 'app-time-off',
@@ -30,6 +31,7 @@ export class Scheduling {
   readonly route = inject(ActivatedRoute);
   readonly destroyRef = inject(DestroyRef);
   readonly store = inject(Store);
+  id = this.route.snapshot.params['id'];
   form: FormGroup = this.fb.group({
     weekdays: [[], Validators.required],
     workshift: [8, [Validators.required, Validators.min(1)]],
@@ -62,6 +64,8 @@ export class Scheduling {
     if (this.form.valid) {
       // Handle form submission
       console.log(this.form.value);
+      this.store.dispatch(new SaveOrganizationSchedule(this.id, this.form.value));
+
     }
   }
 }

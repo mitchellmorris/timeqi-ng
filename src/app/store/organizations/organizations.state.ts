@@ -1,9 +1,10 @@
 import { inject, Injectable } from '@angular/core';
 import { State, Action, Selector, StateContext, } from '@ngxs/store';
-import { SetOrganization, SetProjectOrganization, SetUserOrganizations } from './organizations.actions';
+import { SaveOrganizationSchedule, SetOrganization, SetProjectOrganization, SetUserOrganizations } from './organizations.actions';
 import { Organization, OrganizationsStateModel, PartialProject, PartialTimeOff } from '@betavc/timeqi-sh';
 import { Organizations as OrganizationsService } from './organizations';
-import { map, merge, mergeMap, tap } from 'rxjs';
+import { map, merge, mergeMap, tap, of } from 'rxjs';
+import { catchError } from 'rxjs/operators';
 import { dissoc } from 'ramda';
 import { SetOrganizationProjects, SetProject, SetProjectOrgProjects } from '../projects/projects.actions';
 import { UpsertOrgTimeOff } from '../time-off/time-off.actions';
@@ -64,6 +65,26 @@ export class OrganizationsState {
           ...(timeOff.length ? [new UpsertOrgTimeOff(timeOff)] : [])
         ]),
       )
+    );
+  }
+  @Action(SaveOrganizationSchedule)
+  saveOrganizationSchedule(ctx: StateContext<OrganizationsStateModel>, action: SaveOrganizationSchedule) {
+    const state = ctx.getState();
+    if (!state.organization) {
+      console.warn('No organization found to save schedule.');
+      return;
+    }
+    return this.orgsService.saveOrganization(state.organization._id, action.organization).pipe(
+      map(updatedOrganization => {
+        ctx.setState({
+          ...state,
+          organization: updatedOrganization
+        });
+      }),
+      catchError(error => {
+        console.error('Error saving organization schedule:', error);
+        return of(null);
+      })
     );
   }
 }
