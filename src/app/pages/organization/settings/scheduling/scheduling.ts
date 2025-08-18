@@ -9,7 +9,7 @@ import { filter, map } from 'rxjs';
 import { has } from 'ramda';
 import { Store } from '@ngxs/store';
 import { OrganizationsState } from '../../../../store/organizations/organizations.state';
-import { Weekday, DEFAULT_WORKDAYS } from '@betavc/timeqi-sh';
+import { Weekday, WEEKDAYS } from '@betavc/timeqi-sh';
 import { CheckboxModule } from 'primeng/checkbox';
 import { SaveOrganizationSchedule } from '../../../../store/organizations/organizations.actions';
 // console.log(weekdays);
@@ -41,7 +41,7 @@ export class Scheduling {
     map(({ organization }) => organization),
     takeUntilDestroyed()
   );
-  weekdays: Weekday[] = DEFAULT_WORKDAYS;
+  weekdays: Weekday[] = WEEKDAYS;
   constructor() {
     this.organizationState$.subscribe((organization) => {
       if (organization) {

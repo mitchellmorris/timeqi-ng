@@ -1,0 +1,51 @@
+<form [formGroup]="form" (ngSubmit)="onSubmit()">
+  <div class="mb-4">
+    <label class="text-2xl" for="shift">
+        Work Hours per Day
+    </label>
+  </div>
+  <ng-content select="[workshift]"></ng-content>
+  <div class="mb-4">
+    <p-inputnumber 
+      formControlName="workshift" 
+      inputId="shift" 
+      [min]="0" 
+      [max]="24" 
+      [invalid]="form.get('workshift')?.invalid && (form.get('workshift')?.touched || form.get('workshift')?.dirty)" 
+    />
+  </div>
+  <h3 class="text-2xl mb-4">Workweek</h3>
+  <ng-content select="[workweek]"></ng-content>
+
+    <div class="flex flex-wrap mb-4 gap-4">
+      @for (day of weekdays; track $index) {
+      <div class="flex items-center">
+        <p-checkbox 
+          name="weekday" 
+          inputId="{{day}}" 
+          formControlName="weekdays" 
+          [value]="day" 
+          [invalid]="form.get('weekdays')?.invalid && (form.get('weekdays')?.touched || form.get('weekdays')?.dirty)" 
+        />
+        <label [for]="day" class="ml-2">{{day}}</label>
+      </div>
+      }
+    </div>
+    
+    <div class="flex justify-end mb-4 gap-2">
+      @if (form.dirty) {
+      <p-button
+        size="large"
+        variant="outlined"
+        label="Cancel" />
+      }
+      <button 
+        pButton 
+        type="submit" 
+        size="large" 
+        label="Save" 
+        class="p-button-primary"
+        [disabled]="form.invalid || form.pristine"
+      ></button>
+    </div>
+</form>
