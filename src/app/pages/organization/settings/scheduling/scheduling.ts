@@ -63,7 +63,6 @@ export class Scheduling {
     }
     if (this.form.valid) {
       // Handle form submission
-      console.log(this.form.value);
       this.store.dispatch(new SaveOrganizationSchedule(this.id, this.form.value));
 
     }

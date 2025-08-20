@@ -1,6 +1,7 @@
 import { Component, DestroyRef, EventEmitter, inject, Input, Output, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
-import { WEEKDAYS, DEFAULT_WORKDAYS, SchedulingSettings, Weekday } from '@betavc/timeqi-sh';
+import { WEEKDAYS, DEFAULT_WORKDAYS } from '@betavc/timeqi-sh/utils';
+import { SchedulingSettings, Weekday } from '@betavc/timeqi-sh/models';
 import { ButtonModule } from 'primeng/button';
 import { CheckboxModule } from 'primeng/checkbox';
 import { InputNumberModule } from 'primeng/inputnumber';
@@ -49,6 +50,7 @@ export class WorkshiftSchedular implements OnInit {
       return;
     }
     const value = this.form.value as SchedulingSettings;
+    this.form.markAsPristine();
     this.formSubmit.emit(value);
   }
 }

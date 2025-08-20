@@ -13,3 +13,8 @@ export class SetProject {
   static readonly type = '[Project] Set Project';
   constructor(public id: string) { }
 }
+
+export class SaveProjectSchedule {
+  static readonly type = '[Project] Save Project Scheduling';
+  constructor(public id: string, public project: Partial<Project>) { }
+}

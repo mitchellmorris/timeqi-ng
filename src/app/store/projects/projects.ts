@@ -15,13 +15,23 @@ export class Projects {
   ) {}
 
   getProject(id: string): Observable<Project | null> {
-      return this.http.get<{ project: Project, [key: string]: any }>(`${this.apiUrl}/project/${id}`).pipe(
-        map(({ existingProject }) => existingProject),
-        catchError(error => {
-          console.error('Error fetching project:', error);
-          return of(null);
-        })
-      );
+    return this.http.get<{ project: Project, [key: string]: any }>(`${this.apiUrl}/project/${id}`).pipe(
+      map(({ existingProject }) => existingProject),
+      catchError(error => {
+        console.error('Error fetching project:', error);
+        return of(null);
+      })
+    );
+  }
+
+  saveProject(id: string, project: Partial<Project>): Observable<Project | null> {
+    return this.http.put<Project>(`${this.apiUrl}/project/${id}`, project).pipe(
+      map((response: any) => response.updatedProject),
+      catchError(error => {
+        console.error('Error saving project:', error);
+        return of(null);
+      })
+    );
   }
   
 }

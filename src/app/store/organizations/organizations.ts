@@ -19,13 +19,13 @@ export class Organizations {
   ) {}
 
   getOrganization(id: string): Observable<OrganizationModel | null> {
-      return this.http.get<{ organization: OrganizationModel, [key: string]: any }>(`${this.apiUrl}/organization/${id}`).pipe(
-        map(({ existingOrganization }) => existingOrganization),
-        catchError(error => {
-          console.error('Error fetching user profile:', error);
-          return of(null);
-        })
-      );
+    return this.http.get<{ organization: OrganizationModel, [key: string]: any }>(`${this.apiUrl}/organization/${id}`).pipe(
+      map(({ existingOrganization }) => existingOrganization),
+      catchError(error => {
+        console.error('Error fetching user profile:', error);
+        return of(null);
+      })
+    );
   }
 
   saveOrganization(id: string, organization: Partial<OrganizationModel>): Observable<OrganizationModel | null> {

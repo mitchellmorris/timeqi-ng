@@ -1,9 +1,9 @@
 import { Injectable } from '@angular/core';
 import { State, Action, Selector, StateContext, Store, } from '@ngxs/store';
-import { SetOrganizationProjects, SetProject, SetProjectOrgProjects } from '../projects/projects.actions';
+import { SaveProjectSchedule, SetOrganizationProjects, SetProject, SetProjectOrgProjects } from '../projects/projects.actions';
 import { PartialTask, PartialTimeOff, Project, ProjectsStateModel } from '@betavc/timeqi-sh';
 import { Projects as ProjectsService } from './projects';
-import { map, mergeMap, tap } from 'rxjs';
+import { catchError, map, mergeMap, of, tap } from 'rxjs';
 import { dissoc } from 'ramda';
 import { SetProjectTasks } from '../tasks/tasks.actions';
 import { SetProjectOrganization } from '../organizations/organizations.actions';
@@ -74,5 +74,26 @@ export class ProjectsState {
         return Promise.all(dispatches);
       })
     );
+  }
+  @Action(SaveProjectSchedule)
+  saveProjectSchedule(ctx: StateContext<ProjectsStateModel>, action: SaveProjectSchedule) {
+      const state = ctx.getState();
+      if (!state.project) {
+        console.warn('No project found to save schedule.');
+        return;
+      }
+      action.project.updatedAt = new Date().toISOString();
+      return this.projectsService.saveProject(state.project._id, action.project).pipe(
+        map(updatedProject => {
+          ctx.setState({
+            ...state,
+            project: updatedProject
+          });
+        }),
+        catchError(error => {
+          console.error('Error saving project schedule:', error);
+          return of(null);
+        })
+      );
   }
 }

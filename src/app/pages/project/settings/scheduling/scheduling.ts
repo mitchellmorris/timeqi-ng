@@ -7,6 +7,7 @@ import { getState$ } from '../../../../providers/utils/state';
 import { take } from 'rxjs';
 import { Project, SchedulingSettings } from '@betavc/timeqi-sh';
 import { WorkshiftSchedular } from '../../../../components/workshift-schedular/workshift-schedular';
+import { SaveProjectSchedule } from '../../../../store/projects/projects.actions';
 
 @Component({
   selector: 'app-time-off',
@@ -34,6 +35,9 @@ export class Scheduling {
   }
   
   onSubmit(formData: SchedulingSettings) {
-    console.log(formData);
+    this.store.dispatch(new SaveProjectSchedule(
+      this.id,
+      formData
+    ));
   }
 }
