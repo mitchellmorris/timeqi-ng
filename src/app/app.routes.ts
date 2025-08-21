@@ -17,14 +17,14 @@ import { Scheduling as OrgScheduling } from './pages/organization/settings/sched
 
 export const routes: Routes = [
   {
-    path: 'login',
-    component: Login,
-    data: { showSidebar: false }
-  },
-  {
     path: '',
     component: Organizations,
     canActivate: [authGuard]
+  },
+  {
+    path: 'login',
+    component: Login,
+    data: { showSidebar: false }
   },
   {
     path: 'organization/:id',
@@ -38,16 +38,16 @@ export const routes: Routes = [
     path: 'organization/:id/settings',
     component: OrganizationSettings,
     canActivate: [authGuard],
-    children: [{
-      path: '',
-      component: OrgGeneralSettings
-    },{
-      path: 'scheduling',
-      component: OrgScheduling
-    }],
     resolve: {
       organizationState: organizationResolver
     },
+    children: [{
+        path: '',
+        component: OrgGeneralSettings
+      },{
+        path: 'scheduling',
+        component: OrgScheduling
+      }],
   },
   {
     path: 'project/:id',

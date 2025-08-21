@@ -44,18 +44,10 @@ export class Project {
         this.router.navigate(['project', this.projectId, 'edit', this.activeTaskId]);
       }
     },
-    {
-      separator: true
-    },
-    {
-      label: 'Add Task Above'
-    },
-    {
-      label: 'Add Task Below'
-    },
-    {
-      separator: true
-    },
+    { separator: true },
+    { label: 'Add Task Above' },
+    { label: 'Add Task Below' },
+    { separator: true },
     {
       label: 'Delete',
       command: () => {
