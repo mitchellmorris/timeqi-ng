@@ -1,7 +1,20 @@
-import { DestroyRef } from '@angular/core';
+import { DestroyRef, Injectable } from '@angular/core';
 import { Router, NavigationEnd } from '@angular/router';
 import { filter, map } from 'rxjs';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+
+@Injectable({providedIn: 'root'})
+export class RouterUtils {
+  constructor(private router: Router, private destroyRef: DestroyRef) {}
+
+  navigationEndUrl$() {
+    return navigationEndUrl$(this.router, this.destroyRef);
+  }
+
+  getTabIndexByUrlByLastSegment$(tabs: { route: string; label: string; icon: string; }[]) {
+    return getTabIndexByUrlByLastSegment$(this.router, tabs, this.destroyRef);
+  }
+}
 
 export function navigationEndUrl$(router: Router, destroyRef: DestroyRef) {
   return router.events.pipe(
