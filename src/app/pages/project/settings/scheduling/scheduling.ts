@@ -24,13 +24,13 @@ export class Scheduling {
   readonly route = inject(ActivatedRoute);
   readonly stateUtils = inject(StateUtils);
   id = this.route.snapshot.params['projectId'];
-  project$: Observable<Project | null> = this.stateUtils.getState$(
+  project$: Observable<Project> = this.stateUtils.getState$(
     ProjectsState.getState,
     'project'
   ).pipe(
     first((project): project is Project => project !== null)
   );
-  project = toSignal(this.project$, { initialValue: null });
+  project = toSignal<SchedulingSettings>(this.project$, { initialValue: null });
   
   onSubmit(formData: SchedulingSettings) {
     this.store.dispatch(new SaveProjectSchedule(

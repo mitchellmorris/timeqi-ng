@@ -30,7 +30,7 @@ export class Scheduling {
   ).pipe(
     first((organization): organization is Organization => organization !== null)
   );
-  organization = toSignal(this.organization$, { initialValue: null });
+  organization = toSignal<SchedulingSettings>(this.organization$, { initialValue: null });
     
   onSubmit(formData: SchedulingSettings) {
     this.store.dispatch(new SaveOrganizationSchedule(
