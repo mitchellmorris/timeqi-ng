@@ -3,7 +3,7 @@
 
   <p>This page lets you manage all organization-wide preferences in one place. Here you can update your organization’s basic information, such as its name and contact details, as well as define core settings that affect scheduling across all projects. Configure your standard workweek, company holidays, and other defaults so that timelines, availability, and reporting stay consistent throughout the system. Changes made here apply to the entire organization and provide a unified foundation for project planning and management.</p>
   
-  <p-tabs [value]="tab">
+  <p-tabs [value]="tab()">
       <p-tablist>
           @for(tab of tabs; track $index ){
               <p-tab [value]="tab.route" [routerLink]="tab.route" class="flex items-center !gap-2 text-inherit" [value]="$index">

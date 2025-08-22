@@ -1,5 +1,5 @@
 @if (!loading) {
-    <p-table [value]="organizations" [tableStyle]="{ 'min-width': '50rem' }">
+    <p-table [value]="organizations()" [tableStyle]="{ 'min-width': '50rem' }">
         <ng-template #header>
             <tr>
                 <th>Name</th>

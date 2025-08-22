@@ -3,7 +3,7 @@
 <p class="mb-4">Set the default scheduling parameters for your project. These settings will be applied to all tasks within the project unless overridden at the task level.</p>
 
 <app-workshift-schedular
-  [data]="project"
+  [data]="project()"
   (formSubmit)="onSubmit($event)"
 >
   <div workshift>

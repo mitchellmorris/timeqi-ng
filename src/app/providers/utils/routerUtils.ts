@@ -8,29 +8,21 @@ export class RouterUtils {
   constructor(private router: Router, private destroyRef: DestroyRef) {}
 
   navigationEndUrl$() {
-    return navigationEndUrl$(this.router, this.destroyRef);
+    return this.router.events.pipe(
+      filter(event => event instanceof NavigationEnd),
+      map((event: NavigationEnd) => event.url),
+      takeUntilDestroyed(this.destroyRef),
+    );
   }
 
   getTabIndexByUrlByLastSegment$(tabs: { route: string; label: string; icon: string; }[]) {
-    return getTabIndexByUrlByLastSegment$(this.router, tabs, this.destroyRef);
+    const segments = tabs.map(tab => tab.route.split('/').pop() || '');
+    return this.navigationEndUrl$().pipe(
+      map(url => {
+        const lastSegment = url.split('?')[0].split('/').pop() || null;
+        return segments.indexOf(lastSegment ?? '') !== -1 ? segments.indexOf(lastSegment ?? '') : 0;
+      }),
+      takeUntilDestroyed(this.destroyRef)
+    );
   }
-}
-
-export function navigationEndUrl$(router: Router, destroyRef: DestroyRef) {
-  return router.events.pipe(
-    filter(event => event instanceof NavigationEnd),
-    map((event: NavigationEnd) => event.url),
-    takeUntilDestroyed(destroyRef),
-  );
-}
-
-export function getTabIndexByUrlByLastSegment$(router: Router, tabs: { route: string; label: string; icon: string; }[], destroyRef: DestroyRef) {
-  const segments = tabs.map(tab => tab.route.split('/').pop() || '');
-  return navigationEndUrl$(router, destroyRef).pipe(
-    map(url => {
-      const lastSegment = url.split('?')[0].split('/').pop() || null;
-      return segments.indexOf(lastSegment ?? '') !== -1 ? segments.indexOf(lastSegment ?? '') : 0;
-    }),
-    takeUntilDestroyed(destroyRef)
-  );
 }

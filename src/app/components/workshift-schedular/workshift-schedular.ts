@@ -21,7 +21,10 @@ import { InputNumberModule } from 'primeng/inputnumber';
 export class WorkshiftSchedular implements OnInit {
   readonly fb = inject(FormBuilder);
   readonly destroyRef = inject(DestroyRef);
-  @Input() data: SchedulingSettings | null = null;
+  @Input() data: SchedulingSettings = {
+    weekdays: DEFAULT_WORKDAYS,
+    workshift: 8
+  };
   @Output() formSubmit = new EventEmitter<SchedulingSettings>();
   form: FormGroup = this.fb.group({
     weekdays: [[], Validators.required],
@@ -30,17 +33,9 @@ export class WorkshiftSchedular implements OnInit {
   weekdays: Weekday[] = WEEKDAYS;
   
   ngOnInit() {
-    if (!this.data) {
-      this.data = {
-        weekdays: DEFAULT_WORKDAYS,
-        workshift: 8
-      };
-    }
     this.form.patchValue({
-      weekdays: this.data?.weekdays && this.data.weekdays.length ? 
-        this.data.weekdays : 
-        DEFAULT_WORKDAYS,
-      workshift: this.data.workshift || 8
+      weekdays: this.data.weekdays,
+      workshift: this.data.workshift
     });
     this.form.markAsPristine();
   }

@@ -8,6 +8,7 @@ import { Task } from './pages/task/task';
 import { EditTask } from './pages/task/edit-task/edit-task';
 import { Scheduling } from './pages/project/settings/scheduling/scheduling';
 import { projectResolver } from './pages/project/projectResolvers';
+import { taskResolver } from './pages/task/taskResolver'
 import { Settings as ProjectSettings } from './pages/project/settings/settings';
 import { General as ProjectGeneralSettings } from './pages/project/settings/general/general';
 import { Settings as OrganizationSettings } from './pages/organization/settings/settings';
@@ -60,6 +61,9 @@ export const routes: Routes = [
     children: [{
         path: 'task/:taskId',
         component: Task,
+        resolve: {
+          taskState: taskResolver
+        },
         children: [{
           path: '',
           component: ReviewTask,

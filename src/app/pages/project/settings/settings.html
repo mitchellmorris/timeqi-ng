@@ -1,6 +1,6 @@
 <div class="m-8">
   <h1 class="text-4xl mb-4">Project Settings</h1>
-  <p-tabs [value]="tab">
+  <p-tabs [value]="tab()">
       <p-tablist>
           @for(tab of tabs; track $index ){
               <p-tab [value]="tab.route" [routerLink]="tab.route" class="flex items-center !gap-2 text-inherit" [value]="$index">

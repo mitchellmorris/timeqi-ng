@@ -1,14 +1,14 @@
-import { Component, inject, OnDestroy } from '@angular/core';
+import { Component, effect, inject, OnDestroy } from '@angular/core';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { Store } from '@ngxs/store';
 import { ButtonModule } from 'primeng/button';
 import { SetTask } from '../../store/tasks/tasks.actions';
-import { Entry, PartialEntry } from '@betavc/timeqi-sh';
+import { PartialEntry } from '@betavc/timeqi-sh';
 import { TabsModule } from 'primeng/tabs';
 import { EntriesState } from '../../store/entries/entries.state';
-import { filter, map, Subscription } from 'rxjs';
-import { has } from 'ramda';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { toSignal } from '@angular/core/rxjs-interop';
+import { StateUtils } from '../../providers/utils/state';
+import { RouterUtils } from '../../providers/utils/routerUtils';
 
 
 @Component({
@@ -24,32 +24,31 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 export class Task implements OnDestroy {
   readonly store = inject(Store);
   readonly route = inject(ActivatedRoute);
+  readonly stateUtils = inject(StateUtils);
+  readonly routerUtils = inject(RouterUtils);
   taskId = this.route.snapshot.paramMap.get('taskId');
-  entries: PartialEntry[] = [];
-  entries$ = this.store.select(EntriesState.getState).pipe(
-    filter(state => has('entries', state)),
-    map(({ entries }) => entries),
-    takeUntilDestroyed()
-  );
-  entriesSubscription!: Subscription;
+  // entries: PartialEntry[] = [];
+  entries$ = this.stateUtils.getState$(EntriesState.getState, 'entries');
+  entries = toSignal(this.entries$, { initialValue: [] as PartialEntry[] });
   loading: boolean = true;
   tabs = [
       { route: "../task", label: 'Review', icon: 'pi pi-eye' },
       { route: "edit", label: 'Edit', icon: 'pi pi-pen-to-square' },
       { route: "scheduling", label: 'Scheduling', icon: 'pi pi-calendar' },
   ];
-  tab = 0;
+  tab$ = this.routerUtils.getTabIndexByUrlByLastSegment$(this.tabs);
+  tab = toSignal(this.tab$, {initialValue: 0});
   constructor(public router: Router) {
+    effect(() => {
+      if (this.entries().length > 0) {
+        this.loading = false;
+      }
+    });
+    this.route.data.subscribe(data => {
+      console.log(data);
+    });
     const userId = localStorage.getItem('user_id');
-    if (userId && this.taskId) {
-      this.store.dispatch(new SetTask(this.taskId));
-      this.entriesSubscription = this.entries$.subscribe((entries) => {
-        if (entries.length > 0) {
-          this.loading = false;
-          this.entries = entries;
-        }
-      });
-    } else {
+    if (!!userId && !!this.taskId) {
       console.warn(userId ? 'No user ID found in local storage.' : 'No task ID found in route parameters.');
     }
   }
@@ -57,3 +56,4 @@ export class Task implements OnDestroy {
     this.store.dispatch(new SetTask(null)); // Clear task state on component destruction
   }
 }
+

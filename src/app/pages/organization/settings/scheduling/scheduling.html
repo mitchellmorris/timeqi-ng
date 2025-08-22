@@ -1,69 +1,24 @@
 
-  <h2 class="text-3xl mb-4">Organizational Scheduling</h2>
+<h2 class="text-3xl mb-4">Organizational Scheduling</h2>
 
-  <p class="mb-4">Set the default scheduling parameters for your organization. These settings will be applied to all projects within the organization unless overridden at the project level.</p>
+<p class="mb-4">Set the default scheduling parameters for your organization. These settings will be applied to all projects within the organization unless overridden at the project level.</p>
 
-  <form [formGroup]="form" (ngSubmit)="onSubmit()">
-    <div class="mb-4">
-      <label class="text-2xl" for="shift">
-          Work Hours per Day
-      </label>
-    </div>
-
+<app-workshift-schedular
+  [data]="organization()"
+  (formSubmit)="onSubmit($event)"
+>
+  <div workshift>
     <p class="mb-4">Define the number of work hours per day for your organization. This will be the default setting applied to all projects within the organization.</p>
-
-    <div class="mb-4">
-      <p-inputnumber 
-        formControlName="workshift" 
-        inputId="shift" 
-        [min]="0" 
-        [max]="24" 
-        [invalid]="form.get('workshift')?.invalid && (form.get('workshift')?.touched || form.get('workshift')?.dirty)" 
-      />
-    </div>
-
-    <h3 class="text-2xl mb-4">Workweek</h3>
-
+  </div>
+  <div workweek>
     <p class="mb-4">Define your organization's workweek schedule.  This will be the default schedule applied to all projects within the organization.</p>
+  </div>
+</app-workshift-schedular>
 
-    <div class="flex flex-wrap mb-4 gap-4">
-      @for (day of weekdays; track $index) {
-      <div class="flex items-center">
-        <p-checkbox 
-          name="weekday" 
-          inputId="{{day}}" 
-          formControlName="weekdays" 
-          [value]="day" 
-          [invalid]="form.get('weekdays')?.invalid && (form.get('weekdays')?.touched || form.get('weekdays')?.dirty)" 
-        />
-        <label [for]="day" class="ml-2">{{day}}</label>
-      </div>
-      }
-    </div>
-    
-    <div class="flex justify-end mb-4 gap-2">
-      @if (form.dirty) {
-      <p-button
-        size="large"
-        variant="outlined"
-        label="Cancel" />
-      }
-      <button 
-        pButton 
-        type="submit" 
-        size="large" 
-        label="Save" 
-        class="p-button-primary"
-        [disabled]="form.invalid || form.pristine"
-      ></button>
-    </div>
+<hr class="my-6 border-t border-gray-700" />
 
-  </form>
+<h3 class="text-2xl mb-4">Holiday Schedule</h3>
 
-  <hr class="my-6 border-t border-gray-700" />
+<p>Manage your organization's holiday schedule. This will be the default holiday schedule applied to all projects within the organization.</p>
 
-  <h3 class="text-2xl mb-4">Holiday Schedule</h3>
-
-  <p>Manage your organization's holiday schedule. This will be the default holiday schedule applied to all projects within the organization.</p>
-
-  <app-time-off-picker></app-time-off-picker>
+<app-time-off-picker></app-time-off-picker>

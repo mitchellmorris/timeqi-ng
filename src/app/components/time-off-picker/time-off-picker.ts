@@ -5,9 +5,10 @@ import { DatePickerModule } from 'primeng/datepicker';
 import { TimeOffState } from '../../store/time-off/time-off.state';
 import { map, Observable } from 'rxjs';
 import { PartialTimeOff } from '@betavc/timeqi-sh';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 import { TableModule, TableRowSelectEvent } from 'primeng/table';
 import { DialogModule } from 'primeng/dialog';
+import { StateUtils } from '../../providers/utils/state';
 
 @Component({
   selector: 'app-time-off-picker',
@@ -22,21 +23,12 @@ import { DialogModule } from 'primeng/dialog';
 })
 export class TimeOffPicker {
   readonly store = inject(Store);
+  readonly stateUtils = inject(StateUtils); 
   timeOffLabel: string = "Add Time Off";
   isTimeOffOpened: boolean = false;
   timeOffDate: Date | null = null;
-  allTimeOff: PartialTimeOff[] = [];
-  timeOff$: Observable<PartialTimeOff[]> = this.store.select(TimeOffState.getState).pipe(
-    map(({ timeoffs }) => timeoffs),
-    takeUntilDestroyed(),
-  )
-
-  constructor() {
-    this.timeOff$.subscribe(allTimeOff => {
-      console.log('All Time Off:', allTimeOff);
-      this.allTimeOff = allTimeOff;
-    });
-  }
+  timeOff$: Observable<PartialTimeOff[]> = this.stateUtils.getState$(TimeOffState.getState, 'timeoffs');
+  timeoffs = toSignal(this.timeOff$, { initialValue: [] as PartialTimeOff[] });
 
   addTimeOff() {
     this.isTimeOffOpened = true;

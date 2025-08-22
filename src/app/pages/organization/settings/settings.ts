@@ -1,7 +1,9 @@
 import { Component, inject, DestroyRef } from '@angular/core';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { TabsModule } from 'primeng/tabs';
-import { getTabIndexByUrlByLastSegment$ } from '../../../providers/utils/routerUtils';
+import { RouterUtils } from '../../../providers/utils/routerUtils';
+import { Observable } from 'rxjs';
+import { toSignal } from '@angular/core/rxjs-interop';
 
 @Component({
   selector: 'app-settings',
@@ -13,20 +15,12 @@ import { getTabIndexByUrlByLastSegment$ } from '../../../providers/utils/routerU
   styleUrl: './settings.css'
 })
 export class Settings {
-  readonly route = inject(ActivatedRoute);
+  readonly routerUtils = inject(RouterUtils);
   tabs = [
       { route: "../settings", label: 'General', icon: 'pi pi-cog' },
       { route: "scheduling", label: 'Scheduling', icon: 'pi pi-calendar' },
   ];
-  tab = 0;
-
-  constructor(
-    private router: Router,
-    private destroyRef: DestroyRef
-  ) {
-    getTabIndexByUrlByLastSegment$(this.router, this.tabs, this.destroyRef)
-      .subscribe(index => {
-        this.tab = index;
-      });
-  }
+  tab$ = this.routerUtils.getTabIndexByUrlByLastSegment$(this.tabs);
+  tab = toSignal(this.tab$, {initialValue: 0});
 }
+

@@ -7,33 +7,28 @@ import { DestroyRef, Inject, inject, Injectable } from '@angular/core';
 @Injectable({ providedIn: 'root' })
 export class StateUtils {
   constructor(private store: Store, private destroyRef: DestroyRef) {}
-  // Factory function
-  getState$(
-    action: TypedSelector<unknown>,
+
+  getStateSnapshot(
+    action: TypedSelector<any>,
     stateKey: string = '',
   ) {
-    return getState$(this.store, action, stateKey, this.destroyRef);
+    const state = this.store.selectSnapshot(action);
+    return stateKey ? state[stateKey] : state;
   }
-}
-
-// Factory function
-export function getState$(
-  store: Store, 
-  action: TypedSelector<unknown>, 
-  stateKey: string = '', 
-  destroyRef: DestroyRef | null = null
-) {
-  let state$ = store.select(action);
-  if (stateKey) {
-    state$ = state$.pipe(
-      filter(state => has(stateKey, state)),
-      map(state => state[stateKey]),
-    );
-  }
-  if (destroyRef) {
+  // Factory function
+  getState$(
+    action: TypedSelector<any>,
+    stateKey: string = '',
+  ) {
+    let state$ = this.store.select(action);
+    if (stateKey) {
+      state$ = state$.pipe(
+        filter(state => has(stateKey, state)),
+        map(state => state[stateKey]),
+      );
+    }
     return state$.pipe(
-      takeUntilDestroyed(destroyRef)
+      takeUntilDestroyed(this.destroyRef)
     );
   }
-  return state$;
 }
