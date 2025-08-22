@@ -76,11 +76,12 @@ export class Project {
         // Example: ['', 'project', '123', 'review', '456']
         this.activeTaskId = urlSegments[4];
         this.isTaskOpen = true;
+        console.log('Active Task ID:', this.activeTaskId);
         switch (event.urlAfterRedirects) {
-          case `/project/${this.projectId}/review/${urlSegments[4]}`:
+          case `/project/${this.projectId}/task/${urlSegments[4]}`:
             this.activeTaskLabel = "Review Task";
             break;
-          case `/project/${this.projectId}/edit/${urlSegments[4]}`:
+          case `/project/${this.projectId}/task/${urlSegments[4]}/edit`:
             this.activeTaskLabel = "Edit Task";
             break;
           default:

@@ -14,6 +14,7 @@ import { Settings as OrganizationSettings } from './pages/organization/settings/
 import { organizationResolver } from './pages/organization/organizationResolvers';
 import { General as OrgGeneralSettings } from './pages/organization/settings/general/general';
 import { Scheduling as OrgScheduling } from './pages/organization/settings/scheduling/scheduling';
+import { ReviewTask } from './pages/task/review-task/review-task';
 
 export const routes: Routes = [
   {
@@ -57,12 +58,16 @@ export const routes: Routes = [
       projectsState: projectResolver
     },
     children: [{
-      path: 'review/:taskId',
-      component: Task
-    },{
-      path: 'edit/:taskId',
-      component: EditTask
-    }]
+        path: 'task/:taskId',
+        component: Task,
+        children: [{
+          path: '',
+          component: ReviewTask,
+        }, {
+          path: 'edit',
+          component: EditTask
+        }]
+      }]
   },
   {
     path: 'project/:id/settings',
@@ -72,11 +77,11 @@ export const routes: Routes = [
       projectsState: projectResolver
     },
     children: [{
-      path: '',
-      component: ProjectGeneralSettings
-    },{
-      path: 'scheduling',
-      component: Scheduling
-    }]
+        path: '',
+        component: ProjectGeneralSettings
+      },{
+        path: 'scheduling',
+        component: Scheduling
+      }]
   }
 ];

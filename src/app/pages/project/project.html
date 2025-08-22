@@ -21,7 +21,7 @@
                   label="Review" 
                   icon="pi pi-eye" 
                   [model]="taskActions" 
-                  (onClick)="router.navigate(['project', projectId, 'review', task._id])"
+                  (onClick)="router.navigate(['project', projectId, 'task', task._id])"
                   (onMenuShow)="activeTaskId = task._id" 
                   (onMenuHide)="activeTaskId = null"
                 ></p-splitbutton>
@@ -38,6 +38,7 @@
   [modal]="true" 
   [(visible)]="isTaskOpen"
   (onHide)="router.navigate(['project', this.projectId])"
+  [style]="{ width: '50rem' }"
   >
   <router-outlet />
 </p-dialog>

@@ -4,6 +4,7 @@ import { Store } from '@ngxs/store';
 import { ButtonModule } from 'primeng/button';
 import { SetTask } from '../../store/tasks/tasks.actions';
 import { Entry, PartialEntry } from '@betavc/timeqi-sh';
+import { TabsModule } from 'primeng/tabs';
 import { EntriesState } from '../../store/entries/entries.state';
 import { filter, map, Subscription } from 'rxjs';
 import { has } from 'ramda';
@@ -15,6 +16,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
   imports: [
     RouterModule,
     ButtonModule,
+    TabsModule,
   ],
   templateUrl: './task.html',
   styleUrl: './task.css'
@@ -31,6 +33,12 @@ export class Task implements OnDestroy {
   );
   entriesSubscription!: Subscription;
   loading: boolean = true;
+  tabs = [
+      { route: "../task", label: 'Review', icon: 'pi pi-eye' },
+      { route: "edit", label: 'Edit', icon: 'pi pi-pen-to-square' },
+      { route: "scheduling", label: 'Scheduling', icon: 'pi pi-calendar' },
+  ];
+  tab = 0;
   constructor(public router: Router) {
     const userId = localStorage.getItem('user_id');
     if (userId && this.taskId) {
