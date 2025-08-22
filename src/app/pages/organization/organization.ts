@@ -32,7 +32,7 @@ export class Organization {
     private router: Router
   ) {
     const userId = localStorage.getItem('user_id');
-    const organizationId = this.route.snapshot.paramMap.get('id');
+    const organizationId = this.route.snapshot.paramMap.get('organizationId');
     if (!userId || !organizationId) {
       console.warn(userId ? 'No user ID found in local storage.' : 'No organization ID found in route parameters.');
     }

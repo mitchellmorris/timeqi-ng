@@ -26,7 +26,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 export class Project {
   readonly store = inject(Store);
   readonly route = inject(ActivatedRoute);
-  projectId = this.route.snapshot.paramMap.get('id');
+  projectId = this.route.snapshot.paramMap.get('projectId');
   activeTaskId: string | null = null;
   activeTaskLabel: string = '';
   isTaskOpen: boolean = false;

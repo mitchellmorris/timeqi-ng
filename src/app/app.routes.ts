@@ -29,7 +29,7 @@ export const routes: Routes = [
     data: { showSidebar: false }
   },
   {
-    path: 'organization/:id',
+    path: 'organization/:organizationId',
     component: Organization,
     canActivate: [authGuard],
     resolve: {
@@ -37,7 +37,7 @@ export const routes: Routes = [
     },
   },
   {
-    path: 'organization/:id/settings',
+    path: 'organization/:organizationId/settings',
     component: OrganizationSettings,
     canActivate: [authGuard],
     resolve: {
@@ -52,7 +52,7 @@ export const routes: Routes = [
       }],
   },
   {
-    path: 'project/:id',
+    path: 'project/:projectId',
     component: Project,
     canActivate: [authGuard],
     resolve: {
@@ -74,7 +74,7 @@ export const routes: Routes = [
       }]
   },
   {
-    path: 'project/:id/settings',
+    path: 'project/:projectId/settings',
     component: ProjectSettings,
     canActivate: [authGuard],
     resolve: {

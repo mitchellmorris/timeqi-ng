@@ -7,8 +7,8 @@ import { OrganizationsState } from '../../../../store/organizations/organization
 import { Organization, SchedulingSettings } from '@betavc/timeqi-sh';
 import { StateUtils } from '../../../../providers/utils/state';
 import { first, Observable } from 'rxjs';
-import { SaveProjectSchedule } from '../../../../store/projects/projects.actions';
 import { WorkshiftSchedular } from '../../../../components/workshift-schedular/workshift-schedular';
+import { SaveOrganizationSchedule } from '../../../../store/organizations/organizations.actions';
 // console.log(weekdays);
 @Component({
   selector: 'app-time-off',
@@ -23,7 +23,7 @@ export class Scheduling {
   readonly store = inject(Store);
   readonly route = inject(ActivatedRoute);
   readonly stateUtils = inject(StateUtils);
-  id = this.route.snapshot.params['id'];
+  id = this.route.snapshot.params['organizationId'];
   organization$: Observable<Organization> = this.stateUtils.getState$(
     OrganizationsState.getState, 
     'organization'
@@ -33,7 +33,7 @@ export class Scheduling {
   organization = toSignal(this.organization$, { initialValue: null });
     
   onSubmit(formData: SchedulingSettings) {
-    this.store.dispatch(new SaveProjectSchedule(
+    this.store.dispatch(new SaveOrganizationSchedule(
       this.id,
       formData
     ));

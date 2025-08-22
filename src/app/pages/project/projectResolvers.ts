@@ -10,7 +10,7 @@ import { StateUtils } from '../../providers/utils/state';
 export const projectResolver: ResolveFn<ProjectsStateModel> = (route: ActivatedRouteSnapshot, state: RouterStateSnapshot) => {
   const store = inject(Store);
   const stateUtils = inject(StateUtils);
-  const projectId = route.paramMap.get('id')!;
+  const projectId = route.paramMap.get('projectId')!;
   return store.dispatch(new SetProject(projectId)).pipe(
     map(() => stateUtils.getStateSnapshot(ProjectsState.getState)),
     filter(({ project }) => !!project)

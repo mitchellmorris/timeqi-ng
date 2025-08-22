@@ -23,7 +23,7 @@ export class Scheduling {
   readonly store = inject(Store);
   readonly route = inject(ActivatedRoute);
   readonly stateUtils = inject(StateUtils);
-  id = this.route.snapshot.params['id'];
+  id = this.route.snapshot.params['projectId'];
   project$: Observable<Project | null> = this.stateUtils.getState$(
     ProjectsState.getState,
     'project'
