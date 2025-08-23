@@ -32,7 +32,7 @@ export class UserState {
         ? { user: dissoc<User, 'organizations'>('organizations', user), organizations: user.organizations || [], timeOff: user.timeOff || [] }
         : { user: null, organizations: [], timeOff: [] }
       ),
-      tap(({ user, organizations }) => {
+      tap(({ user }) => {
         const state = ctx.getState();
         if (!user) {
           console.warn('No user found, setting user to null.');
