@@ -5,7 +5,7 @@ import { RouterUtils } from '../../../providers/utils/routerUtils';
 import { toSignal } from '@angular/core/rxjs-interop';
 
 @Component({
-  selector: 'app-settings',
+  selector: 'app-project-settings',
   imports: [
     RouterModule,
     TabsModule,

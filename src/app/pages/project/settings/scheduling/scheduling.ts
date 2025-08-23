@@ -11,7 +11,7 @@ import { SaveProjectSchedule } from '../../../../store/projects/projects.actions
 import { toSignal } from '@angular/core/rxjs-interop';
 
 @Component({
-  selector: 'app-time-off',
+  selector: 'app-project-scheduling',
   imports: [
     TimeOffPicker,
     WorkshiftSchedular

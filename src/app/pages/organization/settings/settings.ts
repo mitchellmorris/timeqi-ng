@@ -6,7 +6,7 @@ import { Observable } from 'rxjs';
 import { toSignal } from '@angular/core/rxjs-interop';
 
 @Component({
-  selector: 'app-settings',
+  selector: 'app-organization-settings',
   imports: [
     RouterModule,
     TabsModule

@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 
 @Component({
-  selector: 'app-general',
+  selector: 'app-project-general',
   imports: [],
   templateUrl: './general.html',
   styleUrl: './general.css'

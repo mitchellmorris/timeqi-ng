@@ -11,7 +11,7 @@ import { WorkshiftSchedular } from '../../../../components/workshift-schedular/w
 import { SaveOrganizationSchedule } from '../../../../store/organizations/organizations.actions';
 // console.log(weekdays);
 @Component({
-  selector: 'app-time-off',
+  selector: 'app-organization-scheduling',
   imports: [
     TimeOffPicker,
     WorkshiftSchedular
