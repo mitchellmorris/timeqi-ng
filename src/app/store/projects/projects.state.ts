@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { State, Action, Selector, StateContext, Store, } from '@ngxs/store';
-import { SaveProjectSchedule, SetOrganizationProjects, SetProject, SetProjectOrgProjects } from '../projects/projects.actions';
+import { SaveProjectSchedule, SetOrganizationProjects, SetProject, SetProjectOrgProjects, SetTaskProject } from '../projects/projects.actions';
 import { PartialTask, PartialTimeOff, Project, ProjectsStateModel } from '@betavc/timeqi-sh';
 import { Projects as ProjectsService } from './projects';
 import { catchError, map, mergeMap, of, tap } from 'rxjs';
@@ -38,6 +38,7 @@ export class ProjectsState {
     });
   }
 
+  @Action(SetTaskProject)
   @Action(SetProject)
   setProject(ctx: StateContext<ProjectsStateModel>, action: SetProject) {
     return this.projectsService.getProject(action.id).pipe(

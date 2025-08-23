@@ -6,6 +6,8 @@ import { Tasks as TasksService } from './tasks';
 import { map, mergeMap, tap } from 'rxjs';
 import { dissoc } from 'ramda';
 import { SetTaskEntries } from '../entries/entries.actions';
+import { SetTaskOrganization } from '../organizations/organizations.actions';
+import { SetTaskProject } from '../projects/projects.actions';
 
 @State<TasksStateModel>({
   name: 'tasks',
@@ -66,6 +68,16 @@ export class TasksState {
       }),
       mergeMap(({ entries, task }) => {
         const dispatches = [ctx.dispatch(new SetTaskEntries(entries as PartialEntry[]))];
+        // Get organization from global OrganizationsState
+        const organization = this.store.selectSnapshot<any>(state => state.organizations.organization);
+        if (task && task.organization && !organization) {
+          dispatches.push(ctx.dispatch(new SetTaskOrganization(task.organization as string)));
+        }
+        // Get organization from global OrganizationsState
+        const project = this.store.selectSnapshot<any>(state => state.projects.project);
+        if (task && task.project && !project) {
+          dispatches.push(ctx.dispatch(new SetTaskProject(task.project as string)));
+        }
         return Promise.all(dispatches);
       })
     );

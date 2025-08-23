@@ -12,6 +12,10 @@ export class SetProjectOrganization {
   static readonly type = '[Project] Set Organization';
   constructor(public id: string) { }
 }
+export class SetTaskOrganization {
+  static readonly type = '[Task] Set Organization';
+  constructor(public id: string) { }
+}
 
 export class SaveOrganizationSchedule {
   static readonly type = '[Org] Save Org. Scheduling';

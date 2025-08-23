@@ -1,6 +1,6 @@
 import { inject, Injectable } from '@angular/core';
 import { State, Action, Selector, StateContext, } from '@ngxs/store';
-import { SaveOrganizationSchedule, SetOrganization, SetProjectOrganization, SetUserOrganizations } from './organizations.actions';
+import { SaveOrganizationSchedule, SetOrganization, SetProjectOrganization, SetTaskOrganization, SetUserOrganizations } from './organizations.actions';
 import { Organization, OrganizationsStateModel, PartialProject, PartialTimeOff } from '@betavc/timeqi-sh';
 import { Organizations as OrganizationsService } from './organizations';
 import { map, merge, mergeMap, tap, of } from 'rxjs';
@@ -34,6 +34,7 @@ export class OrganizationsState {
       organizations: action.organizations
     });
   }
+  @Action(SetTaskOrganization)
   @Action(SetProjectOrganization)
   @Action(SetOrganization)
   SetOrganization(ctx: StateContext<OrganizationsStateModel>, action: SetOrganization | SetProjectOrganization) {
@@ -46,7 +47,6 @@ export class OrganizationsState {
       tap(({ organization }) => {
         const state = ctx.getState();
         if (!organization) {
-          console.warn('No organization found, setting organization to null.');
           ctx.setState({
             ...state,
             organization: null
