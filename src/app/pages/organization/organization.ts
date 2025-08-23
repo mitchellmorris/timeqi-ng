@@ -11,6 +11,9 @@ import { StateUtils } from '../../providers/utils/state';
 @Component({
   selector: 'app-organization',
   imports: [],
+  providers: [
+    StateUtils
+  ],
   templateUrl: './organization.html',
   styleUrl: './organization.css'
 })

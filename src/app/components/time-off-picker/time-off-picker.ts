@@ -18,6 +18,9 @@ import { StateUtils } from '../../providers/utils/state';
     FormsModule,
     DialogModule
   ],
+  providers: [
+    StateUtils
+  ],
   templateUrl: './time-off-picker.html',
   styleUrl: './time-off-picker.css'
 })

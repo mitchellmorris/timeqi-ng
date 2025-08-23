@@ -16,6 +16,9 @@ import { toSignal } from '@angular/core/rxjs-interop';
     TimeOffPicker,
     WorkshiftSchedular
   ],
+  providers: [
+    StateUtils
+  ],
   templateUrl: './scheduling.html',
   styleUrl: './scheduling.css'
 })

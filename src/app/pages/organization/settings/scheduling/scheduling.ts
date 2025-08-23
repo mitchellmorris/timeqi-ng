@@ -16,6 +16,9 @@ import { SaveOrganizationSchedule } from '../../../../store/organizations/organi
     TimeOffPicker,
     WorkshiftSchedular
   ],
+  providers: [
+    StateUtils
+  ],
   templateUrl: './scheduling.html',
   styleUrl: './scheduling.css'
 })

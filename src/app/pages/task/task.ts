@@ -18,6 +18,10 @@ import { RouterUtils } from '../../providers/utils/routerUtils';
     ButtonModule,
     TabsModule,
   ],
+  providers: [
+    RouterUtils,
+    StateUtils
+  ],
   templateUrl: './task.html',
   styleUrl: './task.css'
 })
@@ -30,7 +34,6 @@ export class Task implements OnDestroy {
   // entries: PartialEntry[] = [];
   entries$ = this.stateUtils.getState$(EntriesState.getState, 'entries');
   entries = toSignal(this.entries$, { initialValue: [] as PartialEntry[] });
-  loading: boolean = true;
   tabs = [
       { route: "../task", label: 'Review', icon: 'pi pi-eye' },
       { route: "edit", label: 'Edit', icon: 'pi pi-pen-to-square' },
@@ -38,20 +41,6 @@ export class Task implements OnDestroy {
   ];
   tab$ = this.routerUtils.getTabIndexByUrlByLastSegment$(this.tabs);
   tab = toSignal(this.tab$, {initialValue: 0});
-  constructor(public router: Router) {
-    effect(() => {
-      if (this.entries().length > 0) {
-        this.loading = false;
-      }
-    });
-    this.route.data.subscribe(data => {
-      console.log(data);
-    });
-    const userId = localStorage.getItem('user_id');
-    if (!!userId && !!this.taskId) {
-      console.warn(userId ? 'No user ID found in local storage.' : 'No task ID found in route parameters.');
-    }
-  }
   ngOnDestroy() {
     this.store.dispatch(new SetTask(null)); // Clear task state on component destruction
   }

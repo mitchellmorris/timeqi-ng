@@ -11,6 +11,9 @@ import { toSignal } from '@angular/core/rxjs-interop';
     RouterModule,
     TabsModule
   ],
+  providers: [
+    RouterUtils
+  ],
   templateUrl: './settings.html',
   styleUrl: './settings.css'
 })

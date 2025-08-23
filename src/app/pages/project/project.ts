@@ -20,6 +20,9 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
     RouterModule,
     Dialog,
   ],
+  providers: [
+    StateUtils
+  ],
   templateUrl: './project.html',
   styleUrl: './project.css'
 })

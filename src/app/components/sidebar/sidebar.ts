@@ -12,6 +12,9 @@ import { StateUtils } from '../../providers/utils/state';
   imports: [
     MenuModule
   ],
+  providers: [
+    StateUtils
+  ],
   templateUrl: './sidebar.html',
   styleUrl: './sidebar.css'
 })

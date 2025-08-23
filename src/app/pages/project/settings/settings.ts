@@ -8,7 +8,10 @@ import { toSignal } from '@angular/core/rxjs-interop';
   selector: 'app-settings',
   imports: [
     RouterModule,
-    TabsModule
+    TabsModule,
+  ],
+  providers: [
+    RouterUtils
   ],
   templateUrl: './settings.html',
   styleUrl: './settings.css'
