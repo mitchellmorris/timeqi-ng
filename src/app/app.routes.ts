@@ -57,21 +57,7 @@ export const routes: Routes = [
     canActivate: [authGuard],
     resolve: {
       projectsState: projectResolver
-    },
-    children: [{
-        path: 'task/:taskId',
-        component: Task,
-        resolve: {
-          taskState: taskResolver
-        },
-        children: [{
-          path: '',
-          component: ReviewTask,
-        }, {
-          path: 'edit',
-          component: EditTask
-        }]
-      }]
+    }
   },
   {
     path: 'project/:projectId/settings',
@@ -86,6 +72,21 @@ export const routes: Routes = [
       },{
         path: 'scheduling',
         component: Scheduling
+      }]
+  },
+  {
+    path: 'task/:taskId',
+    component: Task,
+    canActivate: [authGuard],
+    resolve: {
+      taskState: taskResolver
+    },
+    children: [{
+        path: '',
+        component: ReviewTask,
+      }, {
+        path: 'edit',
+        component: EditTask
       }]
   }
 ];
