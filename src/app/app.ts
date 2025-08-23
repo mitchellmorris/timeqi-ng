@@ -1,9 +1,11 @@
-import { Component, signal } from '@angular/core';
-import { ActivatedRoute, NavigationEnd, Router, RouterOutlet } from '@angular/router';
+import { Component, inject } from '@angular/core';
+import { ActivatedRoute, Router, RouterOutlet } from '@angular/router';
 import { Store } from '@ngxs/store';
 import { SetUser } from './store/user/user.actions';
-import { filter, map, mergeMap } from 'rxjs';
+import { map } from 'rxjs';
 import { Sidebar } from './components/sidebar/sidebar';
+import { RouterUtils } from './providers/utils/routerUtils';
+import { toSignal } from '@angular/core/rxjs-interop';
 
 @Component({
   selector: 'app-root',
@@ -15,23 +17,19 @@ import { Sidebar } from './components/sidebar/sidebar';
   styleUrl: './app.css'
 })
 export class App {
-  showSidebar: boolean = false;
-  constructor(private store: Store, private router: Router, private activatedRoute: ActivatedRoute) {
-    const userId = localStorage.getItem('user_id');
-    if (userId) {
+  readonly activatedRoute = inject(ActivatedRoute);
+  readonly router = inject(Router);
+  readonly routerUtils = inject(RouterUtils);
+  showSidebar = toSignal(this.routerUtils.getRouteData$('showSidebar').pipe(
+    map(show => show !== false) // Default to true if not specified
+  ), { initialValue: false });
+  userId = localStorage.getItem('user_id');
+
+  constructor(
+    private store: Store
+  ) {
+    if (this.userId) {
       this.store.dispatch(new SetUser());
     }
-    this.router.events.pipe(
-      filter(event => event instanceof NavigationEnd),
-      map(() => this.activatedRoute),
-      map(route => {
-        while (route.firstChild) route = route.firstChild;
-        return route;
-      }),
-      filter(route => route.outlet === 'primary'),
-      mergeMap(route => route.data)
-    ).subscribe(data => {
-      this.showSidebar = data['showSidebar'] !== false; // Default to true if not specified
-    });
   }
 }

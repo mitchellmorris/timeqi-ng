@@ -25,4 +25,18 @@ export class RouterUtils {
       takeUntilDestroyed(this.destroyRef)
     );
   }
+
+  getRouteData$(key: string) {
+    return this.router.events.pipe(
+      filter(event => event instanceof NavigationEnd),
+      map(() => this.router.routerState.root),
+      map(route => {
+        while (route.firstChild) route = route.firstChild;
+        return route;
+      }),
+      filter(route => route.outlet === 'primary'),
+      map(route => route.snapshot.data[key]),
+      takeUntilDestroyed(this.destroyRef)
+    );
+  }
 }
