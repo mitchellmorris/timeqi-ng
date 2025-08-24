@@ -46,18 +46,16 @@ export class Sidebar {
       });
       // Submenu for organization
       const orgItems: MenuItem[] = [];
-      if (projects.length > 1) {
         orgItems.push({
           label: "Projects",
-          icon: 'pi pi-folder',
+          icon: 'pi pi-briefcase',
           routerLink: ['organization', organization._id]
         });
-      }
-      orgItems.push({
-        label: "Settings",
-        icon: 'pi pi-cog',
-        routerLink: ['organization', organization._id, 'settings']
-      });
+        orgItems.push({
+          label: "Settings",
+          icon: 'pi pi-cog',
+          routerLink: ['organization', organization._id, 'settings']
+        });
       // Add Organization with submenu
       menuItems.splice(1, 0, {
         label: organization.name,

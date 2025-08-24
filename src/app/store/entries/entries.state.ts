@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { State, Action, Selector, StateContext } from '@ngxs/store';
 import { EntriesStateModel } from '@betavc/timeqi-sh';
-import { SetTaskEntries } from './entries.actions';
+import { CleanTaskEntries, SetTaskEntries } from './entries.actions';
 
 @State<EntriesStateModel>({
   name: 'entries',
@@ -24,6 +24,14 @@ export class EntriesState {
     ctx.setState({
       ...state,
       entries: action.entries
+    });
+  }
+
+  @Action(CleanTaskEntries)
+  cleanTaskEntries(ctx: StateContext<EntriesStateModel>) {
+    ctx.setState({
+      entries: [],
+      entry: null
     });
   }
 }

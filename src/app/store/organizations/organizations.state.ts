@@ -6,8 +6,9 @@ import { Organizations as OrganizationsService } from './organizations';
 import { map, merge, mergeMap, tap, of } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 import { dissoc } from 'ramda';
-import { SetOrganizationProjects, SetProject, SetProjectOrgProjects } from '../projects/projects.actions';
+import { NullifyOrgProject, SetOrganizationProjects, SetProject, SetProjectOrgProjects, SetTaskOrgProjects } from '../projects/projects.actions';
 import { UpsertOrgTimeOff } from '../time-off/time-off.actions';
+import { CleanOrgTasks } from '../tasks/tasks.actions';
 
 
 @State<OrganizationsStateModel>({
@@ -41,8 +42,11 @@ export class OrganizationsState {
     // this.setOrganization$(ctx, action);
     return this.orgsService.getOrganization(action.id).pipe(
       map(organization => organization
-        ? { organization: dissoc<Organization, 'projects'>('projects', organization), projects: organization.projects as PartialProject[] || [], timeOff: organization.timeOff as PartialTimeOff[] || [] }
-        : { organization: null, projects: [], timeOff: [] }
+        ? { 
+          organization: dissoc<Organization, 'projects'>('projects', organization), 
+          projects: organization.projects as PartialProject[] || [], 
+          timeOff: organization.timeOff as PartialTimeOff[] || [] 
+        } : { organization: null, projects: [], timeOff: [] }
       ),
       tap(({ organization }) => {
         const state = ctx.getState();
@@ -58,13 +62,22 @@ export class OrganizationsState {
           });
         }
       }),
-      mergeMap(({ projects, timeOff }) => ctx.dispatch([
-          action instanceof SetProjectOrganization
-            ? new SetProjectOrgProjects(projects)
-            : new SetOrganizationProjects(projects),
-          ...(timeOff.length ? [new UpsertOrgTimeOff(timeOff)] : [])
-        ]),
-      )
+      mergeMap(({ projects, timeOff }) => {
+        const dispatches = [];
+        if (action instanceof SetProjectOrganization) {
+          dispatches.push(new SetProjectOrgProjects(projects));
+        } else if (action instanceof SetTaskOrganization) {
+          dispatches.push(new SetTaskOrgProjects(projects));
+        } else {
+          // For now we are just nullifying the project if there's more than one
+          dispatches.push(new NullifyOrgProject());
+          dispatches.push(new SetOrganizationProjects(projects));
+        }
+        if (timeOff.length) {
+          dispatches.push(new UpsertOrgTimeOff(timeOff));
+        }
+        return ctx.dispatch(dispatches);
+      })
     );
   }
   @Action(SaveOrganizationSchedule)

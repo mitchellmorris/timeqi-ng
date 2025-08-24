@@ -1,11 +1,11 @@
 import { Injectable } from '@angular/core';
 import { State, Action, Selector, StateContext, Store, } from '@ngxs/store';
-import { SaveProjectSchedule, SetOrganizationProjects, SetProject, SetProjectOrgProjects, SetTaskProject } from '../projects/projects.actions';
+import { NullifyOrgProject, SaveProjectSchedule, SetOrganizationProjects, SetProject, SetProjectOrgProjects, SetTaskProject } from '../projects/projects.actions';
 import { PartialTask, PartialTimeOff, Project, ProjectsStateModel } from '@betavc/timeqi-sh';
 import { Projects as ProjectsService } from './projects';
 import { catchError, map, mergeMap, of, tap } from 'rxjs';
 import { dissoc } from 'ramda';
-import { SetProjectTasks } from '../tasks/tasks.actions';
+import { CleanOrgTasks, NullifyProjectTask, SetProjectTasks } from '../tasks/tasks.actions';
 import { SetProjectOrganization } from '../organizations/organizations.actions';
 import { UpsertProjectTimeOff } from '../time-off/time-off.actions';
 
@@ -28,6 +28,7 @@ export class ProjectsState {
   @Selector()
   static getState(state: ProjectsStateModel) { return state; }
 
+  @Action(SetProjectOrgProjects)
   @Action(SetProjectOrgProjects)
   @Action(SetOrganizationProjects)
   setOrganizationProjects(ctx: StateContext<ProjectsStateModel>, action: SetOrganizationProjects | SetProjectOrgProjects) {
@@ -62,17 +63,21 @@ export class ProjectsState {
         }
       }),
       mergeMap(({ tasks, project }) => {
-        const dispatches = [ctx.dispatch(new SetProjectTasks(tasks as PartialTask[]))];
+        const dispatches = [];
+        dispatches.push(new SetProjectTasks(tasks as PartialTask[]));
         // Get organization from global OrganizationsState
         const organization = this.store.selectSnapshot<any>(state => state.organizations.organization);
         if (project && project.organization && !organization) {
-          dispatches.push(ctx.dispatch(new SetProjectOrganization(project.organization as string)));
+          dispatches.push(new SetProjectOrganization(project.organization as string));
         }
         // If the project has timeOff, dispatch UpsertProjectTimeOff
         if (project && project.timeOff && project.timeOff.length) {
-          dispatches.push(ctx.dispatch(new UpsertProjectTimeOff(project.timeOff as PartialTimeOff[])));
+          dispatches.push(new UpsertProjectTimeOff(project.timeOff as PartialTimeOff[]));
         }
-        return Promise.all(dispatches);
+        if (action instanceof SetProject) {
+          dispatches.push(new NullifyProjectTask());
+        }
+        return ctx.dispatch(dispatches);
       })
     );
   }
@@ -96,5 +101,16 @@ export class ProjectsState {
           return of(null);
         })
       );
+  }
+  @Action(NullifyOrgProject)
+  removeOrgProject(ctx: StateContext<ProjectsStateModel>, action: NullifyOrgProject) {
+    const state = ctx.getState();
+    if (state.project) {
+      ctx.setState({
+        ...state,
+        project: null
+      });
+      this.store.dispatch(new CleanOrgTasks());
+    }
   }
 }

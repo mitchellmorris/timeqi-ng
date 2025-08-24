@@ -1,11 +1,11 @@
 import { Injectable } from '@angular/core';
 import { State, Action, Selector, StateContext, Store } from '@ngxs/store';
-import { SetProjectTasks, SetTask } from './tasks.actions';
+import { CleanOrgTasks, NullifyProjectTask, SetProjectTasks, SetTask } from './tasks.actions';
 import { PartialEntry, Task, TasksStateModel } from '@betavc/timeqi-sh';
 import { Tasks as TasksService } from './tasks';
 import { map, mergeMap, tap } from 'rxjs';
 import { dissoc } from 'ramda';
-import { SetTaskEntries } from '../entries/entries.actions';
+import { CleanTaskEntries, SetTaskEntries } from '../entries/entries.actions';
 import { SetTaskOrganization } from '../organizations/organizations.actions';
 import { SetTaskProject } from '../projects/projects.actions';
 
@@ -43,7 +43,7 @@ export class TasksState {
         ...ctx.getState(),
         task: null
       });
-      ctx.dispatch(new SetTaskEntries([]))
+      ctx.dispatch(new CleanTaskEntries());
       return;
     }
     return this.tasksService.getTask(action.id).pipe(
@@ -81,5 +81,20 @@ export class TasksState {
         return Promise.all(dispatches);
       })
     );
+  }
+  @Action(NullifyProjectTask)
+  nullifyProjectTask(ctx: StateContext<TasksStateModel>) {
+    ctx.setState({
+      ...ctx.getState(),
+      task: null
+    });
+    ctx.dispatch(new CleanTaskEntries());
+  }
+  @Action(CleanOrgTasks)
+  cleanOrgTasks(ctx: StateContext<TasksStateModel>) {
+    ctx.setState({
+      tasks: [],
+      task: null
+    });
   }
 }

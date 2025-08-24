@@ -4,3 +4,7 @@ export class SetTaskEntries {
   static readonly type = '[Task] Set Task Entries';
   constructor(public entries: PartialEntry[]) { }
 }
+export class CleanTaskEntries {
+  static readonly type = '[Task] Clean Task Entries';
+  constructor() { }
+}
