@@ -9,7 +9,10 @@ export class SetProjectTasks {
   static readonly type = '[Project] Set Project Tasks';
   constructor(public tasks: PartialTask[]) { }
 }
-
+/**
+ * taskResolver.ts
+ * Resolves the task for the given ID.
+ */
 export class SetTask {
   static readonly type = '[Project] Set Task';
   constructor(public id: string | null) { }

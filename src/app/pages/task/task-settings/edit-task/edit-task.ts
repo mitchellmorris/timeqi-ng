@@ -1,14 +1,16 @@
-import { Component, inject, OnDestroy } from '@angular/core';
+import { Component, effect, inject, OnDestroy } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Store } from '@ngxs/store';
 import { SetTask } from '../../../../store/tasks/tasks.actions';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 import { TasksState } from '../../../../store/tasks/tasks.state';
 import { Task } from '@betavc/timeqi-sh';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { InputTextModule } from 'primeng/inputtext';
 import { FluidModule } from 'primeng/fluid';
 import { ButtonModule } from 'primeng/button';
+import { StateUtils } from '../../../../providers/utils/state';
+import { filter } from 'rxjs';
 
 @Component({
   selector: 'app-edit-task',
@@ -25,30 +27,20 @@ export class EditTask {
   readonly store = inject(Store);
   readonly route = inject(ActivatedRoute);
   readonly fb = inject(FormBuilder);
+  readonly stateUtils = inject(StateUtils);
   taskId = this.route.snapshot.paramMap.get('taskId');
-  task: Task | null = null;
-  loading: boolean = true;
+  task$ = this.stateUtils.getState$(TasksState.getState, 'task');
+  task = toSignal(this.task$, { initialValue: null });
   form: FormGroup = this.fb.group({
       name: ['', Validators.required],
       // Add more fields as needed based on your Task schema
   });
-
   constructor(public router: Router) {
-    const userId = localStorage.getItem('user_id');
-    if (userId && this.taskId) {
-      this.store.dispatch(new SetTask(this.taskId)).pipe(
-        takeUntilDestroyed()
-      ).subscribe(() => {
-        // get task snapshot from store and set loading to false
-        this.task = this.store.selectSnapshot(TasksState.getState).task;
-        this.loading = false;
-        if (this.task) {
-          this.form.patchValue(this.task);
-        }
-      });
-    } else {
-      console.warn(userId ? 'No user ID found in local storage.' : 'No task ID found in route parameters.');
-    }
+    effect(() => {
+      if (this.task()) {
+        this.form.patchValue(this.task());
+      }
+    });
   }
   onSubmit() {
     if (this.form.valid) {
