@@ -1,14 +1,13 @@
-import { inject, Injectable } from '@angular/core';
-import { State, Action, Selector, StateContext, } from '@ngxs/store';
-import { SaveOrganizationSchedule, SetOrganization, SetProjectOrganization, SetTaskOrganization, SetUserOrganizations } from './organizations.actions';
+import { Injectable } from '@angular/core';
+import { State, Action, Selector, StateContext, Store, } from '@ngxs/store';
+import { SaveOrganizationSchedule, SetOrganization, SetProjectOrganization, SetUserOrganizations } from './organizations.actions';
 import { Organization, OrganizationsStateModel, PartialProject, PartialTimeOff } from '@betavc/timeqi-sh';
 import { Organizations as OrganizationsService } from './organizations';
-import { map, merge, mergeMap, tap, of } from 'rxjs';
+import { map, mergeMap, tap, of } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 import { dissoc } from 'ramda';
-import { NullifyOrgProject, SetOrganizationProjects, SetProject, SetProjectOrgProjects, SetTaskOrgProjects } from '../projects/projects.actions';
+import { NullifyOrgProject, SetOrganizationProjects, SetProjectOrgProjects } from '../projects/projects.actions';
 import { UpsertOrgTimeOff } from '../time-off/time-off.actions';
-import { CleanOrgTasks } from '../tasks/tasks.actions';
 
 
 @State<OrganizationsStateModel>({
@@ -21,7 +20,10 @@ import { CleanOrgTasks } from '../tasks/tasks.actions';
 @Injectable()
 export class OrganizationsState {
 
-  constructor(private orgsService: OrganizationsService) {}
+  constructor(
+    private store: Store,
+    private orgsService: OrganizationsService
+  ) {}
 
 
   @Selector()
@@ -35,17 +37,19 @@ export class OrganizationsState {
       organizations: action.organizations
     });
   }
-  @Action(SetTaskOrganization)
+  
   @Action(SetProjectOrganization)
   @Action(SetOrganization)
   SetOrganization(ctx: StateContext<OrganizationsStateModel>, action: SetOrganization | SetProjectOrganization) {
-    // this.setOrganization$(ctx, action);
-    return this.orgsService.getOrganization(action.id).pipe(
+    const state = this.store.selectSnapshot(state => state);
+    const organizationId = state.organizations.organization ? state.organizations.organization._id : null;
+    const getOrg$ = organizationId === action.id ? of(state.organizations.organization) : this.orgsService.getOrganization(action.id);
+    return getOrg$.pipe(
       map(organization => organization
         ? { 
           organization: dissoc<Organization, 'projects'>('projects', organization), 
-          projects: organization.projects as PartialProject[] || [], 
-          timeOff: organization.timeOff as PartialTimeOff[] || [] 
+          projects: organization.projects as PartialProject[] || state.projects.projects,
+          timeOff: organization.timeOff as PartialTimeOff[] || state.timeoff.timeoffs
         } : { organization: null, projects: [], timeOff: [] }
       ),
       tap(({ organization }) => {
@@ -66,10 +70,9 @@ export class OrganizationsState {
         const dispatches = [];
         if (action instanceof SetProjectOrganization) {
           dispatches.push(new SetProjectOrgProjects(projects));
-        } else if (action instanceof SetTaskOrganization) {
-          dispatches.push(new SetTaskOrgProjects(projects));
-        } else {
-          // For now we are just nullifying the project if there's more than one
+        } else if (action instanceof SetOrganization) {
+          // nullifying the project
+          // when visiting the organization page
           dispatches.push(new NullifyOrgProject());
           dispatches.push(new SetOrganizationProjects(projects));
         }

@@ -11,6 +11,9 @@ export const projectResolver: ResolveFn<ProjectsStateModel> = (route: ActivatedR
   const store = inject(Store);
   const stateUtils = inject(StateUtils);
   const projectId = route.paramMap.get('projectId')!;
+  if (!projectId) {
+    throw new Error('No project ID found in route parameters.');
+  }
   return store.dispatch(new SetProject(projectId)).pipe(
     map(() => stateUtils.getStateSnapshot(ProjectsState.getState)),
     filter(({ project }) => !!project)

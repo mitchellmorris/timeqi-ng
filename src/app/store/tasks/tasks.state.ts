@@ -3,10 +3,9 @@ import { State, Action, Selector, StateContext, Store } from '@ngxs/store';
 import { CleanOrgTasks, NullifyProjectTask, SetProjectTasks, SetTask } from './tasks.actions';
 import { PartialEntry, Task, TasksStateModel } from '@betavc/timeqi-sh';
 import { Tasks as TasksService } from './tasks';
-import { map, mergeMap, tap } from 'rxjs';
+import { map, mergeMap, of, tap } from 'rxjs';
 import { dissoc } from 'ramda';
 import { CleanTaskEntries, SetTaskEntries } from '../entries/entries.actions';
-import { SetTaskOrganization } from '../organizations/organizations.actions';
 import { SetTaskProject } from '../projects/projects.actions';
 
 @State<TasksStateModel>({
@@ -38,6 +37,11 @@ export class TasksState {
 
   @Action(SetTask)
   setTask(ctx: StateContext<TasksStateModel>, action: SetTask) {
+    const state = this.store.selectSnapshot(state => state);
+    const task = state.tasks.task;
+    const entries = state.entries.entries;
+    const taskId = task ? task._id : null;
+    const getTask$ = taskId === action.id ? of(task) : this.tasksService.getTask(action.id!);
     if (!action.id) {
       ctx.setState({
         ...ctx.getState(),
@@ -46,9 +50,9 @@ export class TasksState {
       ctx.dispatch(new CleanTaskEntries());
       return;
     }
-    return this.tasksService.getTask(action.id).pipe(
+    return getTask$.pipe(
       map(task => task
-        ? { task: dissoc<Task, 'entries'>('entries', task), entries: task.entries || [] }
+        ? { task: dissoc<Task, 'entries'>('entries', task), entries: task.entries || entries }
         : { task: null, entries: [] }
       ),
       tap(({ task }) => {
@@ -67,18 +71,14 @@ export class TasksState {
         }
       }),
       mergeMap(({ entries, task }) => {
-        const dispatches = [ctx.dispatch(new SetTaskEntries(entries as PartialEntry[]))];
-        // Get organization from global OrganizationsState
-        const organization = this.store.selectSnapshot<any>(state => state.organizations.organization);
-        if (task && task.organization && !organization) {
-          dispatches.push(ctx.dispatch(new SetTaskOrganization(task.organization as string)));
+        const dispatches = [];
+        dispatches.push(new SetTaskEntries(entries as PartialEntry[]));
+        // Get project from global ProjectsState
+        // Note: We are assuming that setting the new project also sets the organization.
+        if (task && task.project) {
+          dispatches.push(new SetTaskProject(task.project as string));
         }
-        // Get organization from global OrganizationsState
-        const project = this.store.selectSnapshot<any>(state => state.projects.project);
-        if (task && task.project && !project) {
-          dispatches.push(ctx.dispatch(new SetTaskProject(task.project as string)));
-        }
-        return Promise.all(dispatches);
+        return ctx.dispatch(dispatches);
       })
     );
   }

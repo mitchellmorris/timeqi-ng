@@ -12,7 +12,6 @@ import { TimeOffStateModel } from '@betavc/timeqi-sh';
 })
 @Injectable()
 export class TimeOffState {
-
   @Selector()
   static getState(state: TimeOffStateModel) {
     return state;

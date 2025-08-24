@@ -29,7 +29,6 @@ export class ProjectsState {
   static getState(state: ProjectsStateModel) { return state; }
 
   @Action(SetProjectOrgProjects)
-  @Action(SetProjectOrgProjects)
   @Action(SetOrganizationProjects)
   setOrganizationProjects(ctx: StateContext<ProjectsStateModel>, action: SetOrganizationProjects | SetProjectOrgProjects) {
     const state = ctx.getState();
@@ -42,7 +41,10 @@ export class ProjectsState {
   @Action(SetTaskProject)
   @Action(SetProject)
   setProject(ctx: StateContext<ProjectsStateModel>, action: SetProject) {
-    return this.projectsService.getProject(action.id).pipe(
+    const project = this.store.selectSnapshot(state => state.projects.project);
+    const projectId = project ? project._id : null;
+    const getProject$ = projectId === action.id ? of(project) : this.projectsService.getProject(action.id);
+    return getProject$.pipe(
       map(project => project
         ? { project: dissoc<Project, 'tasks'>('tasks', project), tasks: project.tasks || [] }
         : { project: null, tasks: [] }
@@ -66,8 +68,7 @@ export class ProjectsState {
         const dispatches = [];
         dispatches.push(new SetProjectTasks(tasks as PartialTask[]));
         // Get organization from global OrganizationsState
-        const organization = this.store.selectSnapshot<any>(state => state.organizations.organization);
-        if (project && project.organization && !organization) {
+        if (project && project.organization) {
           dispatches.push(new SetProjectOrganization(project.organization as string));
         }
         // If the project has timeOff, dispatch UpsertProjectTimeOff
