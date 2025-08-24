@@ -4,7 +4,7 @@ import { MenuItem } from 'primeng/api';
 import { MenuModule } from 'primeng/menu';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { combineLatest } from 'rxjs';
-import { ProjectsStateModel, OrganizationsStateModel } from '@betavc/timeqi-sh';
+import { ProjectsStateModel, OrganizationsStateModel, TasksStateModel } from '@betavc/timeqi-sh';
 import { StateUtils } from '../../providers/utils/state';
 
 @Component({
@@ -23,23 +23,28 @@ export class Sidebar {
   readonly stateUtils = inject(StateUtils);
   organizations$ = this.stateUtils.getState$(state => state.organizations);
   projects$ = this.stateUtils.getState$(state => state.projects);
+  tasks$ = this.stateUtils.getState$(state => state.tasks);
   states$ = combineLatest([
     this.organizations$, 
-    this.projects$
+    this.projects$,
+    this.tasks$
   ]);
   states = toSignal(this.states$, { initialValue: null });
   menuItems = computed(() => {
     const [
       { organization, organizations }, 
-      { project, projects }
-    ] = this.states() as [OrganizationsStateModel, ProjectsStateModel];
+      { project, projects },
+      { task, tasks }
+    ] = this.states() as [OrganizationsStateModel, ProjectsStateModel, TasksStateModel];
     if (!this.states()) {
       return [];
     }
-    const menuItems: MenuItem[] = [{
-      separator: true
-    }];
+    const menuItems: MenuItem[] = [];
     if (!!organization) {
+      menuItems.splice(0, 0, {
+        separator: true
+      });
+      // Submenu for organization
       const orgItems: MenuItem[] = [];
       if (projects.length > 1) {
         orgItems.push({
@@ -53,26 +58,44 @@ export class Sidebar {
         icon: 'pi pi-cog',
         routerLink: ['organization', organization._id, 'settings']
       });
+      // Add Organization with submenu
       menuItems.splice(1, 0, {
         label: organization.name,
         items: orgItems
-      }, {
-        separator: true
       });
-      if (!!project || projects.length === 1) {
-        const _project = project || projects[0];
+      if (!!project) {
+        menuItems.splice(2, 0, {
+          separator: true
+        });
         menuItems.splice(3, 0, {
-          label: `Project: ${_project.name}`,
+          label: `Project: ${project.name}`,
           items: [{
             label: "Tasks",
-            icon: 'pi pi-list',
-            routerLink: ['project', _project._id]
+            icon: 'pi pi-list-check',
+            routerLink: ['project', project._id]
           }, {
             label: "Settings",
             icon: 'pi pi-cog',
-            routerLink: ['project', _project._id, 'settings']
+            routerLink: ['project', project._id, 'settings']
           }],
         });
+        if (!!task) {
+          menuItems.splice(4, 0, {
+            separator: true
+          });
+          menuItems.splice(5, 0, {
+            label: `Task: ${task.name}`,
+            items: [{
+                label: "Entries",
+                icon: 'pi pi-list',
+                routerLink: ['task', task._id]
+              }, {
+                label: "Settings",
+                icon: 'pi pi-cog',
+                routerLink: ['task', task._id, 'settings']
+              }],
+          });
+        }
       } 
     }
     return menuItems;

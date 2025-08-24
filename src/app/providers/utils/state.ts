@@ -9,7 +9,7 @@ export class StateUtils {
   constructor(private store: Store, private destroyRef: DestroyRef) {}
 
   getStateSnapshot(
-    action: TypedSelector<any>,
+    action: TypedSelector<any> = (state) => state,
     stateKey: string = '',
   ) {
     const state = this.store.selectSnapshot(action);
@@ -17,7 +17,7 @@ export class StateUtils {
   }
   // Factory function
   getState$(
-    action: TypedSelector<any>,
+    action: TypedSelector<any> = (state) => state,
     stateKey: string = '',
   ) {
     let state$ = this.store.select(action);

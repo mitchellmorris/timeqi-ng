@@ -5,7 +5,7 @@ import { Organization } from './pages/organization/organization';
 import { Project } from './pages/project/project';
 import { authGuard } from './providers/auth/auth-guard';
 import { Task } from './pages/task/task';
-import { EditTask } from './pages/task/edit-task/edit-task';
+import { EditTask } from './pages/task/task-settings/edit-task/edit-task';
 import { ProjectScheduling } from './pages/project/project-settings/project-scheduling/project-scheduling';
 import { projectResolver } from './pages/project/projectResolvers';
 import { taskResolver } from './pages/task/taskResolver'
@@ -15,7 +15,8 @@ import { OrganizationSettings } from './pages/organization/organization-settings
 import { organizationResolver } from './pages/organization/organizationResolvers';
 import { EditOrganization } from './pages/organization/organization-settings/edit-organization/edit-organization';
 import { OrganizationScheduling } from './pages/organization/organization-settings/organization-scheduling/organization-scheduling';
-import { ReviewTask } from './pages/task/review-task/review-task';
+import { TaskScheduling } from './pages/task/task-settings/task-scheduling/task-scheduling';
+import { TaskSettings } from './pages/task/task-settings/task-settings';
 
 export const routes: Routes = [
   {
@@ -80,13 +81,21 @@ export const routes: Routes = [
     canActivate: [authGuard],
     resolve: {
       taskState: taskResolver
+    }
+  },
+  {
+    path: 'task/:taskId/settings',
+    component: TaskSettings,
+    canActivate: [authGuard],
+    resolve: {
+      taskState: taskResolver
     },
     children: [{
         path: '',
-        component: ReviewTask,
-      }, {
-        path: 'edit',
         component: EditTask
+      }, {
+        path: 'scheduling',
+        component: TaskScheduling
       }]
   }
 ];

@@ -1,9 +1,9 @@
 import { Component, inject, OnDestroy } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Store } from '@ngxs/store';
-import { SetTask } from '../../../store/tasks/tasks.actions';
+import { SetTask } from '../../../../store/tasks/tasks.actions';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { TasksState } from '../../../store/tasks/tasks.state';
+import { TasksState } from '../../../../store/tasks/tasks.state';
 import { Task } from '@betavc/timeqi-sh';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { InputTextModule } from 'primeng/inputtext';
@@ -21,7 +21,7 @@ import { ButtonModule } from 'primeng/button';
   templateUrl: './edit-task.html',
   styleUrl: './edit-task.css'
 })
-export class EditTask implements OnDestroy {
+export class EditTask {
   readonly store = inject(Store);
   readonly route = inject(ActivatedRoute);
   readonly fb = inject(FormBuilder);
@@ -62,8 +62,5 @@ export class EditTask implements OnDestroy {
       //   this.router.navigate(['../'], { relativeTo: this.route });
       // });
     }
-  }
-  ngOnDestroy() {
-    this.store.dispatch(new SetTask(null)); // Clear task state on component destruction
   }
 }

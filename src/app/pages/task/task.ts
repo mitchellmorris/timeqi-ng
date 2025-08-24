@@ -1,5 +1,5 @@
-import { Component, effect, inject, OnDestroy } from '@angular/core';
-import { ActivatedRoute, Router, RouterModule } from '@angular/router';
+import { Component, inject, OnDestroy } from '@angular/core';
+import { ActivatedRoute, RouterModule } from '@angular/router';
 import { Store } from '@ngxs/store';
 import { ButtonModule } from 'primeng/button';
 import { SetTask } from '../../store/tasks/tasks.actions';
@@ -25,24 +25,11 @@ import { RouterUtils } from '../../providers/utils/routerUtils';
   templateUrl: './task.html',
   styleUrl: './task.css'
 })
-export class Task implements OnDestroy {
+export class Task {
   readonly store = inject(Store);
   readonly route = inject(ActivatedRoute);
   readonly stateUtils = inject(StateUtils);
-  readonly routerUtils = inject(RouterUtils);
-  taskId = this.route.snapshot.paramMap.get('taskId');
-  // entries: PartialEntry[] = [];
   entries$ = this.stateUtils.getState$(EntriesState.getState, 'entries');
   entries = toSignal(this.entries$, { initialValue: [] as PartialEntry[] });
-  tabs = [
-      { route: "../task", label: 'Review', icon: 'pi pi-eye' },
-      { route: "edit", label: 'Edit', icon: 'pi pi-pen-to-square' },
-      { route: "scheduling", label: 'Scheduling', icon: 'pi pi-calendar' },
-  ];
-  tab$ = this.routerUtils.getTabIndexByUrlByLastSegment$(this.tabs);
-  tab = toSignal(this.tab$, {initialValue: 0});
-  ngOnDestroy() {
-    this.store.dispatch(new SetTask(null)); // Clear task state on component destruction
-  }
 }
 
