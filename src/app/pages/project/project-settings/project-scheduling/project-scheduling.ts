@@ -22,7 +22,7 @@ import { toSignal } from '@angular/core/rxjs-interop';
   templateUrl: './project-scheduling.html',
   styleUrl: './project-scheduling.css'
 })
-export class Scheduling {
+export class ProjectScheduling {
   readonly store = inject(Store);
   readonly route = inject(ActivatedRoute);
   readonly stateUtils = inject(StateUtils);

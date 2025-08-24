@@ -16,7 +16,7 @@ import { toSignal } from '@angular/core/rxjs-interop';
   templateUrl: './project-settings.html',
   styleUrl: './project-settings.css'
 })
-export class Settings {
+export class ProjectSettings {
   readonly routerUtils = inject(RouterUtils);
   tabs = [
       { route: "../settings", label: 'General', icon: 'pi pi-cog' },

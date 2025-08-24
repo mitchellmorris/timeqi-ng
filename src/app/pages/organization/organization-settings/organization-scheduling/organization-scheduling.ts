@@ -22,7 +22,7 @@ import { SaveOrganizationSchedule } from '../../../../store/organizations/organi
   templateUrl: './organization-scheduling.html',
   styleUrl: './organization-scheduling.css'
 })
-export class Scheduling {
+export class OrganizationScheduling {
   readonly store = inject(Store);
   readonly route = inject(ActivatedRoute);
   readonly stateUtils = inject(StateUtils);

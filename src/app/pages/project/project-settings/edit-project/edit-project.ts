@@ -6,6 +6,6 @@ import { Component } from '@angular/core';
   templateUrl: './edit-project.html',
   styleUrl: './edit-project.css'
 })
-export class General {
+export class EditProject {
 
 }

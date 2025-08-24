@@ -1,8 +1,7 @@
-import { Component, inject, DestroyRef } from '@angular/core';
-import { ActivatedRoute, Router, RouterModule } from '@angular/router';
+import { Component, inject } from '@angular/core';
+import { RouterModule } from '@angular/router';
 import { TabsModule } from 'primeng/tabs';
 import { RouterUtils } from '../../../providers/utils/routerUtils';
-import { Observable } from 'rxjs';
 import { toSignal } from '@angular/core/rxjs-interop';
 
 @Component({
@@ -17,7 +16,7 @@ import { toSignal } from '@angular/core/rxjs-interop';
   templateUrl: './organization-settings.html',
   styleUrl: './organization-settings.css'
 })
-export class Settings {
+export class OrganizationSettings {
   readonly routerUtils = inject(RouterUtils);
   tabs = [
       { route: "../settings", label: 'General', icon: 'pi pi-cog' },

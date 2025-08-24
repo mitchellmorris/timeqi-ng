@@ -1,18 +1,18 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { General } from './general';
+import { EditProject } from './general';
 
-describe('General', () => {
-  let component: General;
-  let fixture: ComponentFixture<General>;
+describe('EditProject', () => {
+  let component: EditProject;
+  let fixture: ComponentFixture<EditProject>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [General]
+      imports: [EditProject]
     })
     .compileComponents();
 
-    fixture = TestBed.createComponent(General);
+    fixture = TestBed.createComponent(EditProject);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });
