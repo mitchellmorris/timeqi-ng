@@ -19,8 +19,8 @@ import { toSignal } from '@angular/core/rxjs-interop';
   providers: [
     StateUtils
   ],
-  templateUrl: './scheduling.html',
-  styleUrl: './scheduling.css'
+  templateUrl: './project-scheduling.html',
+  styleUrl: './project-scheduling.css'
 })
 export class Scheduling {
   readonly store = inject(Store);

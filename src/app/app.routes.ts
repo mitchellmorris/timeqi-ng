@@ -6,15 +6,15 @@ import { Project } from './pages/project/project';
 import { authGuard } from './providers/auth/auth-guard';
 import { Task } from './pages/task/task';
 import { EditTask } from './pages/task/edit-task/edit-task';
-import { Scheduling } from './pages/project/settings/scheduling/scheduling';
+import { Scheduling } from './pages/project/project-settings/project-scheduling/project-scheduling';
 import { projectResolver } from './pages/project/projectResolvers';
 import { taskResolver } from './pages/task/taskResolver'
-import { Settings as ProjectSettings } from './pages/project/settings/settings';
-import { General as ProjectGeneralSettings } from './pages/project/settings/general/general';
-import { Settings as OrganizationSettings } from './pages/organization/settings/settings';
+import { Settings as ProjectSettings } from './pages/project/project-settings/project-settings';
+import { General as ProjectGeneralSettings } from './pages/project/project-settings/edit-project/edit-project';
+import { Settings as OrganizationSettings } from './pages/organization/organization-settings/organization-settings';
 import { organizationResolver } from './pages/organization/organizationResolvers';
-import { General as OrgGeneralSettings } from './pages/organization/settings/general/general';
-import { Scheduling as OrgScheduling } from './pages/organization/settings/scheduling/scheduling';
+import { General as OrgGeneralSettings } from './pages/organization/organization-settings/edit-organization/edit-organization';
+import { Scheduling as OrgScheduling } from './pages/organization/organization-settings/organization-scheduling/organization-scheduling';
 import { ReviewTask } from './pages/task/review-task/review-task';
 
 export const routes: Routes = [

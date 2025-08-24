@@ -19,8 +19,8 @@ import { SaveOrganizationSchedule } from '../../../../store/organizations/organi
   providers: [
     StateUtils
   ],
-  templateUrl: './scheduling.html',
-  styleUrl: './scheduling.css'
+  templateUrl: './organization-scheduling.html',
+  styleUrl: './organization-scheduling.css'
 })
 export class Scheduling {
   readonly store = inject(Store);

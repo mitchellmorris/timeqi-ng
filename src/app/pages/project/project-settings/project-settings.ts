@@ -13,8 +13,8 @@ import { toSignal } from '@angular/core/rxjs-interop';
   providers: [
     RouterUtils
   ],
-  templateUrl: './settings.html',
-  styleUrl: './settings.css'
+  templateUrl: './project-settings.html',
+  styleUrl: './project-settings.css'
 })
 export class Settings {
   readonly routerUtils = inject(RouterUtils);
