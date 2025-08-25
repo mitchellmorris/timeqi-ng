@@ -1,1 +1,15 @@
 <p>task-scheduling works!</p>
+
+@if (task()) {
+<app-workshift-schedular
+  [data]="task()!"
+  (formSubmit)="onSubmit($event)"
+>
+  <div workshift>
+    <p class="mb-4">TBC...</p>
+  </div>
+  <div workweek>
+    <p class="mb-4">TBC...</p>
+  </div>
+</app-workshift-schedular>
+}
