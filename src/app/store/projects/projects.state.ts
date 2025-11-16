@@ -43,8 +43,8 @@ export class ProjectsState {
   setProject(ctx: StateContext<ProjectsStateModel>, action: SetProject) {
     const project = this.store.selectSnapshot(state => state.projects.project);
     const projectId = project ? project._id : null;
-    const getProject$ = projectId === action.id ? of(project) : this.projectsService.getProject(action.id);
-    return getProject$.pipe(
+    if (projectId === action.id) return of(project);
+    return this.projectsService.getProject(action.id).pipe(
       map(project => project
         ? { project: dissoc<Project, 'tasks'>('tasks', project), tasks: project.tasks || [] }
         : { project: null, tasks: [] }
