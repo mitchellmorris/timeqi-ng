@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { State, Action, Selector, StateContext } from '@ngxs/store';
-import { SetUser } from './user.actions';
+import { SetOrganizationUsers, SetUser } from './user.actions';
 import { User as UserService } from './user';
 import { map, mergeMap, tap } from 'rxjs';
 import { PartialOrganization, PartialTimeOff, User, UserStateModel } from '@betavc/timeqi-sh';
@@ -21,8 +21,15 @@ export class UserState {
   constructor(private userService: UserService) {}
 
   @Selector()
-  static getState(state: UserStateModel) {
-    return state;
+  static getState(state: UserStateModel) { return state; }
+  
+  @Action(SetOrganizationUsers) 
+  setUserOrganizations(ctx: StateContext<UserStateModel>, action: SetOrganizationUsers) {
+    const state = ctx.getState();
+    ctx.setState({
+      ...state,
+      users: action.users
+    });
   }
 
   @Action(SetUser)

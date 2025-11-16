@@ -4,13 +4,18 @@ import { Store } from '@ngxs/store';
 import { SetTask } from '../../../../store/tasks/tasks.actions';
 import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 import { TasksState } from '../../../../store/tasks/tasks.state';
-import { Task } from '@betavc/timeqi-sh';
+import { PartialUser, Task } from '@betavc/timeqi-sh';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { InputTextModule } from 'primeng/inputtext';
 import { FluidModule } from 'primeng/fluid';
 import { ButtonModule } from 'primeng/button';
 import { StateUtils } from '../../../../providers/utils/state';
-import { filter } from 'rxjs';
+import { filter, map } from 'rxjs';
+import { SelectButtonModule } from 'primeng/selectbutton';
+import { DatePipe } from '@angular/common';
+import { InputNumberModule } from 'primeng/inputnumber';
+import { UserState } from '../../../../store/user/user.state';
+import { SelectModule } from 'primeng/select';
 
 @Component({
   selector: 'app-edit-task',
@@ -18,7 +23,11 @@ import { filter } from 'rxjs';
     ReactiveFormsModule,
     InputTextModule,
     FluidModule,
-    ButtonModule
+    ButtonModule,
+    SelectButtonModule,
+    DatePipe,
+    InputNumberModule,
+    SelectModule
   ],
   templateUrl: './edit-task.html',
   styleUrl: './edit-task.css'
@@ -31,9 +40,21 @@ export class EditTask {
   taskId = this.route.snapshot.paramMap.get('taskId');
   task$ = this.stateUtils.getState$(TasksState.getState, 'task');
   task = toSignal(this.task$, { initialValue: null });
+  users$ = this.stateUtils.getState$(UserState.getState, 'users').pipe(
+    map(users => users.map((user: PartialUser) => ({ label: user.name, value: user._id }))),
+  );
+  users = toSignal(this.users$, { initialValue: [] });
+  modeOptions = [
+    { label: 'Snap', value: false },
+    { label: 'Lock', value: true }
+  ];
   form: FormGroup = this.fb.group({
       name: ['', Validators.required],
-      // Add more fields as needed based on your Task schema
+      startDate: [null],
+      endDate: [null],
+      locked: [false],
+      estimate: [0],
+      assignee: ['']
   });
   constructor(public router: Router) {
     effect(() => {

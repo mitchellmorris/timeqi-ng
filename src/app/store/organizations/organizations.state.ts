@@ -1,13 +1,14 @@
 import { Injectable } from '@angular/core';
 import { State, Action, Selector, StateContext, Store, } from '@ngxs/store';
 import { SaveOrganizationSchedule, SetOrganization, SetProjectOrganization, SetUserOrganizations } from './organizations.actions';
-import { Organization, OrganizationsStateModel, PartialProject, PartialTimeOff } from '@betavc/timeqi-sh';
+import { Organization, OrganizationsStateModel, PartialProject, PartialTimeOff, PartialUser } from '@betavc/timeqi-sh';
 import { Organizations as OrganizationsService } from './organizations';
 import { map, mergeMap, tap, of } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 import { dissoc } from 'ramda';
 import { NullifyOrgProject, SetOrganizationProjects, SetProjectOrgProjects } from '../projects/projects.actions';
 import { UpsertOrgTimeOff } from '../time-off/time-off.actions';
+import { SetOrganizationUsers } from '../user/user.actions';
 
 
 @State<OrganizationsStateModel>({
@@ -49,8 +50,9 @@ export class OrganizationsState {
         ? { 
           organization: dissoc<Organization, 'projects'>('projects', organization), 
           projects: organization.projects as PartialProject[] || state.projects.projects,
-          timeOff: organization.timeOff as PartialTimeOff[] || state.timeoff.timeoffs
-        } : { organization: null, projects: [], timeOff: [] }
+          timeOff: organization.timeOff as PartialTimeOff[] || state.timeoff.timeoffs,
+          users: organization.users as PartialUser[] || state.users.users
+        } : { organization: null, projects: [], timeOff: [], users: [] }
       ),
       tap(({ organization }) => {
         const state = ctx.getState();
@@ -66,7 +68,7 @@ export class OrganizationsState {
           });
         }
       }),
-      mergeMap(({ projects, timeOff }) => {
+      mergeMap(({ projects, timeOff, users }) => {
         const dispatches = [];
         if (action instanceof SetProjectOrganization) {
           dispatches.push(new SetProjectOrgProjects(projects));
@@ -78,6 +80,9 @@ export class OrganizationsState {
         }
         if (timeOff.length) {
           dispatches.push(new UpsertOrgTimeOff(timeOff));
+        }
+        if (users.length) {
+          dispatches.push(new SetOrganizationUsers(users));
         }
         return ctx.dispatch(dispatches);
       })
