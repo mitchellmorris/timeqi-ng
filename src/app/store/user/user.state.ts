@@ -29,7 +29,7 @@ export class UserState {
   setUser(ctx: StateContext<UserStateModel>) {
     return this.userService.getUser().pipe(
       map(user => user
-        ? { user: dissoc<User, 'organizations'>('organizations', user), organizations: user.organizations || [], timeOff: user.timeOff || [] }
+        ? { user: dissoc<User, 'organizations'>('organizations', user), organizations: user.organizations || [] }
         : { user: null, organizations: [], timeOff: [] }
       ),
       tap(({ user }) => {
@@ -49,8 +49,7 @@ export class UserState {
         }
       }),
       mergeMap(({ organizations, timeOff }) => ctx.dispatch([
-        new SetUserOrganizations(organizations as PartialOrganization[]),
-        ...(timeOff.length ? [new UpsertUserTimeOff(timeOff as PartialTimeOff[])] : [])
+        new SetUserOrganizations(organizations as PartialOrganization[])
       ])),
       // map(({ user }) => user)
     );
