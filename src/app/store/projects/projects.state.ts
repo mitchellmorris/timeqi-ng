@@ -42,11 +42,13 @@ export class ProjectsState {
   @Action(SetProject)
   setProject(ctx: StateContext<ProjectsStateModel>, action: SetProject) {
     const project = this.store.selectSnapshot(state => state.projects.project);
+    const tasks = this.store.selectSnapshot(state => state.tasks.tasks);
     const projectId = project ? project._id : null;
-    if (projectId === action.id) return of(project);
-    return this.projectsService.getProject(action.id).pipe(
+    const alreadyLoaded = projectId === action.id;
+    const getProject$ = alreadyLoaded ? of(project) : this.projectsService.getProject(action.id);
+    return getProject$.pipe(
       map(project => project
-        ? { project: dissoc<Project, 'tasks'>('tasks', project), tasks: project.tasks || [] }
+        ? { project: dissoc<Project, 'tasks'>('tasks', project), tasks: (alreadyLoaded ? tasks : project.tasks) || [] }
         : { project: null, tasks: [] }
       ),
       tap(({ project }) => {
