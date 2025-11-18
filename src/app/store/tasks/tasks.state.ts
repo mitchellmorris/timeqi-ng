@@ -5,7 +5,7 @@ import { PartialEntry, Task, TasksStateModel } from '@betavc/timeqi-sh';
 import { Tasks as TasksService } from './tasks';
 import { map, mergeMap, of, tap } from 'rxjs';
 import { dissoc } from 'ramda';
-import { CleanTaskEntries, SetTaskEntries } from '../entries/entries.actions';
+import { CleanTaskEntries, NullifyTaskEntry, SetTaskEntries } from '../entries/entries.actions';
 import { SetTaskProject } from '../projects/projects.actions';
 
 @State<TasksStateModel>({
@@ -25,6 +25,12 @@ export class TasksState {
 
   @Selector()
   static getState(state: TasksStateModel) { return state; }
+
+  @Selector()
+  static getTask(state: TasksStateModel) { return state.task; }
+
+  @Selector()
+  static getTasks(state: TasksStateModel) { return state.tasks; }
 
   @Action(SetProjectTasks)
   setProjectTasks(ctx: StateContext<TasksStateModel>, action: SetProjectTasks) {

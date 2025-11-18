@@ -17,6 +17,16 @@ export class TimeOffState {
     return state;
   }
 
+  @Selector()
+  static getTimeOff(state: TimeOffStateModel) {
+    return state.timeoff;
+  }
+
+  @Selector()
+  static getTimeOffs(state: TimeOffStateModel) {
+    return state.timeoffs;
+  }
+
   @Action(UpsertUserTimeOff)
   @Action(UpsertOrgTimeOff)
   @Action(UpsertProjectTimeOff)
