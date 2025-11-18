@@ -28,7 +28,7 @@ export class TaskSettings {
   taskId = this.route.snapshot.paramMap.get('taskId');
   tabs = [
       { route: "../settings", label: 'General', icon: 'pi pi-pen-to-square' },
-      { route: "scheduling", label: 'Scheduling', icon: 'pi pi-calendar' },
+      // { route: "scheduling", label: 'Scheduling', icon: 'pi pi-calendar' },
   ];
   tab$ = this.routerUtils.getTabIndexByUrlByLastSegment$(this.tabs);
   tab = toSignal(this.tab$, {initialValue: 0});

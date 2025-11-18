@@ -2,14 +2,18 @@
   <h1 class="text-4xl mb-4">Task Settings</h1>
 
   <p>This page allows you to manage the settings for your task.</p>
-
+  <div class="flex gap-6">
+    <div class="w-2/3 flex justify-end">
+      <p-button label="Back to Task" variant="outlined" class="tq-back-button" />
+    </div>
+  </div>
   <p-tabs [value]="tab()">
     <p-tablist>
       @for(tab of tabs; track $index ){
-        <p-tab [value]="tab.route" [routerLink]="tab.route" class="flex items-center !gap-2 text-inherit" [value]="$index">
-          <i [class]="tab.icon"></i>
-          <span>{{ tab.label }}</span>
-        </p-tab>
+      <p-tab [value]="tab.route" [routerLink]="tab.route" class="flex items-center !gap-2 text-inherit" [value]="$index">
+        <i [class]="tab.icon"></i>
+        <span>{{ tab.label }}</span>
+      </p-tab>
       }
     </p-tablist>
   </p-tabs>
