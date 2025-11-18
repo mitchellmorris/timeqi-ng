@@ -48,15 +48,25 @@
       />
     </div>
     <div class="flex gap-6 mb-4">
+      @if (locked) {
+      <div class="w-1/4">
+        <div class="mb-4">
+          <label class="text-2xl" for="startDate">
+              Start Date
+          </label>
+        </div>
+        <p-datepicker formControlName="startDate" [showIcon]="true"></p-datepicker>
+      </div>
+      }
       <div class="w-1/4">
         <div class="mb-4">
           <label class="text-2xl" for="estimate">
               Estimated Hours
           </label>
         </div>
-        <p-inputnumber formControlName="estimate" mode="decimal" [showButtons]="true" [min]="0" />
+        <p-inputnumber formControlName="estimate" mode="decimal" [showButtons]="true" [min]="0" class="w-full" />
       </div>
-      <div class="w-3/4">
+      <div [class]="locked ? 'w-1/2' : 'w-3/4'">
         <div class="mb-4">
           <label class="text-2xl mb-4" for="assignee">
               Task Assignee
@@ -73,13 +83,6 @@
         </p-select>
       </div>
     </div>
-    @if (locked) {
-    <div class="mb-4">
-        <label class="text-2xl" for="startDate">
-            Start Date
-        </label>
-    </div>
-    } 
     <div class="flex justify-end mb-4 gap-2">
       @if (form.dirty) {
       <p-button
