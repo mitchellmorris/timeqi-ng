@@ -12,3 +12,8 @@ export class CleanTaskEntries {
   static readonly type = '[Task] Clean Task Entries';
   constructor() { }
 }
+
+export class NullifyTaskEntry {
+  static readonly type = '[Task] Nullify Task Entry';
+  constructor() { }
+}

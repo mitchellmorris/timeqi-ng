@@ -88,7 +88,7 @@ export class TasksState {
       ...ctx.getState(),
       task: null
     });
-    ctx.dispatch(new CleanTaskEntries());
+    ctx.dispatch(new NullifyTaskEntry());
   }
   @Action(CleanOrgTasks)
   cleanOrgTasks(ctx: StateContext<TasksStateModel>) {

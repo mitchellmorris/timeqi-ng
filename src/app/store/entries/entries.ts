@@ -20,6 +20,10 @@ export class Entries {
       map(({ entryData }) => entryData),
       catchError(error => {
         console.error('Error fetching entries:', error);
+        // Return empty array instead of null for 404 errors
+        if (error.status === 404) {
+          return of([]);
+        }
         return of(null);
       })
     );
