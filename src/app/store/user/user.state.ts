@@ -3,6 +3,7 @@ import { State, Action, Selector, StateContext } from '@ngxs/store';
 import { SetOrganizationUsers, SetUser } from './user.actions';
 import { User as UserService } from './user';
 import { map, mergeMap, tap } from 'rxjs';
+import { map as _map } from 'ramda';
 import { PartialOrganization, PartialTimeOff, User, UserStateModel } from '@betavc/timeqi-sh';
 import { SetUserOrganizations } from '../organizations/organizations.actions';
 import { dissoc } from 'ramda';
@@ -22,6 +23,14 @@ export class UserState {
 
   @Selector()
   static getState(state: UserStateModel) { return state; }
+
+  @Selector()
+  static getUsers(state: UserStateModel) { return state.users; }
+
+  @Selector()
+  static getUserSelectOptions(state: UserStateModel) { 
+    return _map(user => ({ label: user.name, value: user._id }), state.users); 
+  }
   
   @Action(SetOrganizationUsers) 
   setUserOrganizations(ctx: StateContext<UserStateModel>, action: SetOrganizationUsers) {
