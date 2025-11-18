@@ -1,13 +1,16 @@
 import { Injectable } from '@angular/core';
-import { State, Action, Selector, StateContext, Store, } from '@ngxs/store';
+import { State, Action, Selector, StateContext, Store, createSelector, } from '@ngxs/store';
 import { NullifyOrgProject, SaveProjectSchedule, SetOrganizationProjects, SetProject, SetProjectOrgProjects, SetTaskProject } from '../projects/projects.actions';
-import { PartialTask, PartialTimeOff, Project, ProjectsStateModel } from '@betavc/timeqi-sh';
+import { PartialTask, PartialTimeOff, processProjectTasks, Project, ProjectsStateModel, TasksStateModel } from '@betavc/timeqi-sh';
 import { Projects as ProjectsService } from './projects';
 import { catchError, map, mergeMap, of, tap } from 'rxjs';
 import { dissoc } from 'ramda';
 import { CleanOrgTasks, NullifyProjectTask, SetProjectTasks } from '../tasks/tasks.actions';
 import { SetProjectOrganization } from '../organizations/organizations.actions';
 import { UpsertProjectTimeOff } from '../time-off/time-off.actions';
+import { TasksState } from '../tasks/tasks.state';
+import { EntriesState } from '../entries/entries.state';
+import { TimeOffState } from '../time-off/time-off.state';
 
 
 @State<ProjectsStateModel>({
@@ -27,6 +30,32 @@ export class ProjectsState {
 
   @Selector()
   static getState(state: ProjectsStateModel) { return state; }
+
+  static getProjectProjection = createSelector(
+    [
+      TasksState.getTasks, 
+      EntriesState.getProjectEntries, 
+      TimeOffState.getTimeOffs,
+      (state: ProjectsStateModel) => state.project
+    ],
+    async (tasks, projectEntries, timeOffs, project) => {
+      // Map tasks to include their applicable entries
+      const tasksWithEntries = tasks.map(task => ({
+        ...task,
+        entries: projectEntries[task._id] || []
+      }));
+      return await processProjectTasks(
+        {
+          ...project,
+          tasks: tasksWithEntries
+        },
+        0,
+        {
+          relativeTimeOff: timeOffs
+        }
+      );
+    }
+  );
 
   @Action(SetProjectOrgProjects)
   @Action(SetOrganizationProjects)

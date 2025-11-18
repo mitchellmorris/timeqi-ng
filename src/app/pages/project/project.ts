@@ -30,6 +30,8 @@ export class Project {
   readonly stateUtils = inject(StateUtils);
   projectId = this.route.snapshot.paramMap.get('projectId');
   activeTaskId: string | null = null;
+  // projection$ = this.stateUtils.getState$(ProjectsState.getProjectProjection, 'project');
+  // projection = toSignal(this.projection$, { initialValue: [] });
   tasks$ = this.stateUtils.getState$(TasksState.getState, 'tasks').pipe(
     filter(tasks => tasks.length > 0),
   );
