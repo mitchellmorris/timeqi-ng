@@ -4,6 +4,10 @@ export class SetTaskEntries {
   static readonly type = '[Task] Set Task Entries';
   constructor(public entries: PartialEntry[]) { }
 }
+export class SetProjectEntries {
+  static readonly type = '[Project] Set Project Entries';
+  constructor(public projectId: string) { }
+}
 export class CleanTaskEntries {
   static readonly type = '[Task] Clean Task Entries';
   constructor() { }

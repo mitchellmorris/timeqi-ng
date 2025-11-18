@@ -6,6 +6,7 @@ import { ProjectsState } from '../../store/projects/projects.state';
 import { filter, map } from 'rxjs';
 import { ProjectsStateModel } from '@betavc/timeqi-sh';
 import { StateUtils } from '../../providers/utils/state';
+import { SetProjectEntries } from '../../store/entries/entries.actions';
 
 export const projectResolver: ResolveFn<ProjectsStateModel> = (route: ActivatedRouteSnapshot, state: RouterStateSnapshot) => {
   const store = inject(Store);
@@ -14,7 +15,10 @@ export const projectResolver: ResolveFn<ProjectsStateModel> = (route: ActivatedR
   if (!projectId) {
     throw new Error('No project ID found in route parameters.');
   }
-  return store.dispatch(new SetProject(projectId)).pipe(
+  return store.dispatch([
+    new SetProject(projectId),
+    new SetProjectEntries(projectId)
+  ]).pipe(
     map(() => stateUtils.getStateSnapshot(ProjectsState.getState)),
     filter(({ project }) => !!project)
   );
