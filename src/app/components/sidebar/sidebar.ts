@@ -72,8 +72,12 @@ export class Sidebar {
             icon: 'pi pi-list-check',
             routerLink: ['project', project._id]
           }, {
-            label: "Settings",
-            icon: 'pi pi-cog',
+            label: "Add Task",
+            icon: 'pi pi-plus-circle',
+            routerLink: ['project', 'add-task']
+          }, {
+            label: "Edit Project",
+            icon: 'pi pi-pen-to-square',
             routerLink: ['project', project._id, 'settings']
           }],
         });
@@ -88,8 +92,8 @@ export class Sidebar {
                 icon: 'pi pi-list',
                 routerLink: ['task', task._id]
               }, {
-                label: "Settings",
-                icon: 'pi pi-cog',
+                label: "Edit Task",
+                icon: 'pi pi-pencil',
                 routerLink: ['task', task._id, 'settings']
               }],
           });
