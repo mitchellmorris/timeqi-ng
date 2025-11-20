@@ -15,10 +15,7 @@ export const projectResolver: ResolveFn<ProjectsStateModel> = (route: ActivatedR
   if (!projectId) {
     throw new Error('No project ID found in route parameters.');
   }
-  return store.dispatch([
-    new SetProject(projectId),
-    new SetProjectEntries(projectId)
-  ]).pipe(
+  return store.dispatch(new SetProject(projectId)).pipe(
     map(() => stateUtils.getStateSnapshot(ProjectsState.getState)),
     filter(({ project }) => !!project)
   );

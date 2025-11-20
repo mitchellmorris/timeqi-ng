@@ -18,6 +18,7 @@ import { UpsertProjectTimeOff } from '../time-off/time-off.actions';
 import { TasksState } from '../tasks/tasks.state';
 import { EntriesState } from '../entries/entries.state';
 import { TimeOffState } from '../time-off/time-off.state';
+import { SetProjectEntries } from '../entries/entries.actions';
 
 
 @State<ProjectsStateModel>({
@@ -106,6 +107,9 @@ export class ProjectsState {
         const dispatches = [];
         dispatches.push(new SetProjectTasks(tasks as PartialTask[]));
         // Get organization from global OrganizationsState
+        if (project) {
+          dispatches.push(new SetProjectEntries(project._id));
+        }
         if (project && project.organization) {
           dispatches.push(new SetProjectOrganization(project.organization as string));
         }
