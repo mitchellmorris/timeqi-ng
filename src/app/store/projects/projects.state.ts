@@ -1,7 +1,14 @@
 import { Injectable } from '@angular/core';
 import { State, Action, Selector, StateContext, Store, createSelector, } from '@ngxs/store';
-import { NullifyOrgProject, SaveProjectSchedule, SetOrganizationProjects, SetProject, SetProjectOrgProjects, SetTaskProject } from '../projects/projects.actions';
-import { PartialTask, PartialTimeOff, processProjectTasks, Project, ProjectsStateModel, TasksStateModel } from '@betavc/timeqi-sh';
+import { NullifyOrgProject, SaveProjectSchedule, SetOrganizationProjects, SetProject, SetProjectOrgProjects, SetProjectProjection, SetTaskProject } from '../projects/projects.actions';
+import { 
+  assignEntriesToTasks, 
+  PartialTask, 
+  PartialTimeOff, 
+  processProjectTasks, 
+  Project, 
+  ProjectsStateModel
+} from '@betavc/timeqi-sh';
 import { Projects as ProjectsService } from './projects';
 import { catchError, map, mergeMap, of, tap } from 'rxjs';
 import { dissoc } from 'ramda';
@@ -18,6 +25,7 @@ import { TimeOffState } from '../time-off/time-off.state';
   defaults: {
     projects: [],
     project: null,
+    projection: null
   }
 })
 @Injectable()
@@ -31,6 +39,12 @@ export class ProjectsState {
   @Selector()
   static getState(state: ProjectsStateModel) { return state; }
 
+  @Selector()
+  static getProject(state: ProjectsStateModel) { return state.project; }
+
+  @Selector()
+  static getProjects(state: ProjectsStateModel) { return state.projects; }
+
   static getProjectProjection = createSelector(
     [
       TasksState.getTasks, 
@@ -39,18 +53,11 @@ export class ProjectsState {
       (state: ProjectsStateModel) => state.project
     ],
     async (tasks, projectEntries, timeOffs, project) => {
-      // Map tasks to include their applicable entries
-      const tasksWithEntries = tasks.map(task => ({
-        ...task,
-        entries: projectEntries[task._id] || []
-      }));
       return await processProjectTasks(
         {
           ...project,
-          tasks: tasksWithEntries
-        },
-        0,
-        {
+          tasks: assignEntriesToTasks(tasks, projectEntries)
+        }, 0, {
           relativeTimeOff: timeOffs
         }
       );
@@ -112,6 +119,14 @@ export class ProjectsState {
         return ctx.dispatch(dispatches);
       })
     );
+  }
+  @Action(SetProjectProjection)
+  setProjectProjection(ctx: StateContext<ProjectsStateModel>, action: SetProjectProjection) {
+    const state = ctx.getState();
+    ctx.setState({
+      ...state,
+      projection: action.projectProjection
+    });
   }
   @Action(SaveProjectSchedule)
   saveProjectSchedule(ctx: StateContext<ProjectsStateModel>, action: SaveProjectSchedule) {
