@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { State, Action, Selector, StateContext, Store } from '@ngxs/store';
-import { CleanOrgTasks, NullifyProjectTask, SetProjectTasks, SetTask } from './tasks.actions';
+import { CleanOrgTasks, NullifyProjectTask, SetProjectTasks, SetTask, SetTaskProjection } from './tasks.actions';
 import { PartialEntry, Task, TasksStateModel } from '@betavc/timeqi-sh';
 import { Tasks as TasksService } from './tasks';
 import { map, mergeMap, of, tap } from 'rxjs';
@@ -13,6 +13,7 @@ import { SetTaskProject } from '../projects/projects.actions';
   defaults: {
     tasks: [],
     task: null,
+    projection: null
   }
 })
 @Injectable()
@@ -88,6 +89,14 @@ export class TasksState {
       })
     );
   }
+  @Action(SetTaskProjection)
+  setTaskProjection(ctx: StateContext<TasksStateModel>, action: SetTaskProjection) {
+    const state = ctx.getState();
+    ctx.setState({
+      ...state,
+      projection: action.taskProjection
+    });
+  }
   @Action(NullifyProjectTask)
   nullifyProjectTask(ctx: StateContext<TasksStateModel>) {
     ctx.setState({
@@ -100,7 +109,8 @@ export class TasksState {
   cleanOrgTasks(ctx: StateContext<TasksStateModel>) {
     ctx.setState({
       tasks: [],
-      task: null
+      task: null,
+      projection: null
     });
   }
 }

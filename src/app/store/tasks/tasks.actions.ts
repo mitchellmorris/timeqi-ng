@@ -17,6 +17,11 @@ export class SetTask {
   static readonly type = '[Project] Set Task';
   constructor(public id: string | null) { }
 }
+
+export class SetTaskProjection {
+  static readonly type = '[Project] Set Task Projection';
+  constructor(readonly taskProjection: Task) { }
+}
 /**
  * @Action(SetProject)
  * Dispatches the action to set the project

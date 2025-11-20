@@ -14,6 +14,7 @@ import { Store } from '@ngxs/store';
 import { TasksState } from '../../store/tasks/tasks.state';
 import { EntriesState } from '../../store/entries/entries.state';
 import { SetProjectProjection } from '../../store/projects/projects.actions';
+import { SetTaskProjection } from '../../store/tasks/tasks.actions';
 
 @Injectable({
   providedIn: 'root'
@@ -62,6 +63,9 @@ export class Projection {
       project.tasks = assignEntriesToTasks(tasks, projectEntries);
       processProjectTasks(project,0).then((processedProject) => {
         this.store.dispatch(new SetProjectProjection(processedProject));
+        if (!!task) {
+          this.store.dispatch(new SetTaskProjection(processedProject.tasks[task.index]));
+        }
       });
     });
   }
