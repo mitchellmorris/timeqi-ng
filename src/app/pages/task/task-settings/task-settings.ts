@@ -27,7 +27,7 @@ export class TaskSettings {
   readonly routerUtils = inject(RouterUtils);
   taskId = this.route.snapshot.paramMap.get('taskId');
   tabs = [
-      { route: "../settings", label: 'General', icon: 'pi pi-pen-to-square' },
+      { route: "../settings", label: 'Edit Task', icon: 'pi pi-pencil' },
       // { route: "scheduling", label: 'Scheduling', icon: 'pi pi-calendar' },
   ];
   tab$ = this.routerUtils.getTabIndexByUrlByLastSegment$(this.tabs);
