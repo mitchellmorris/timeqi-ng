@@ -1,9 +1,9 @@
 import { Injectable } from '@angular/core';
 import { State, Action, Selector, StateContext, Store } from '@ngxs/store';
-import { CleanOrgTasks, NullifyProjectTask, SetProjectTasks, SetTask, SetTaskProjection } from './tasks.actions';
+import { CleanOrgTasks, NullifyProjectTask, SetProjectTasks, SetTask, SetTaskProjection, UpdateTask } from './tasks.actions';
 import { PartialEntry, Task, TasksStateModel } from '@betavc/timeqi-sh';
 import { Tasks as TasksService } from './tasks';
-import { map, mergeMap, of, tap } from 'rxjs';
+import { catchError, map, mergeMap, of, tap } from 'rxjs';
 import { dissoc } from 'ramda';
 import { CleanTaskEntries, NullifyTaskEntry, SetTaskEntries } from '../entries/entries.actions';
 import { SetTaskProject } from '../projects/projects.actions';
@@ -86,6 +86,24 @@ export class TasksState {
           dispatches.push(new SetTaskProject(task.project as string));
         }
         return ctx.dispatch(dispatches);
+      })
+    );
+  }
+  @Action(UpdateTask)
+  updateTask(ctx: StateContext<TasksStateModel>, action: UpdateTask) {
+    return this.tasksService.updateTask(action.id, action.task).pipe(
+      tap((updatedTask) => {
+        if (updatedTask) {
+          const state = ctx.getState();
+          ctx.setState({
+            ...state,
+            task: updatedTask
+          });
+        }
+      }),
+      catchError(error => {
+        console.error('Error saving organization schedule:', error);
+        return of(null);
       })
     );
   }

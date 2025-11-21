@@ -23,6 +23,13 @@ export class SetTaskProjection {
   constructor(readonly taskProjection: Task) { }
 }
 /**
+ * 
+ */
+export class UpdateTask {
+  static readonly type = '[Task] Update Task';
+  constructor(public id: string, public task: Partial<Task>) { }
+}
+/**
  * @Action(SetProject)
  * Dispatches the action to set the project
  * and nullify the current task.

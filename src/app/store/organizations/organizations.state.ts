@@ -95,12 +95,14 @@ export class OrganizationsState {
       console.warn('No organization found to save schedule.');
       return;
     }
-    return this.orgsService.saveOrganization(state.organization._id, action.organization).pipe(
-      map(updatedOrganization => {
-        ctx.setState({
-          ...state,
-          organization: updatedOrganization
-        });
+    return this.orgsService.updateOrganization(state.organization._id, action.organization).pipe(
+      tap(updatedOrganization => {
+        if (updatedOrganization) {
+          ctx.setState({
+            ...state,
+            organization: updatedOrganization
+          });
+        }
       }),
       catchError(error => {
         console.error('Error saving organization schedule:', error);

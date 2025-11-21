@@ -28,7 +28,7 @@ export class Organizations {
     );
   }
 
-  saveOrganization(id: string, organization: Partial<OrganizationModel>): Observable<OrganizationModel | null> {
+  updateOrganization(id: string, organization: Partial<OrganizationModel>): Observable<OrganizationModel | null> {
     return this.http.put<OrganizationModel>(`${this.apiUrl}/organization/${id}`, organization).pipe(
       map((response: any) => response.updatedOrganization),
       catchError(error => {

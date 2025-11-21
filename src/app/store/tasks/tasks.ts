@@ -15,12 +15,22 @@ export class Tasks {
   ) {}
 
   getTask(id: string): Observable<Task | null> {
-      return this.http.get<{ task: Task, [key: string]: any }>(`${this.apiUrl}/task/${id}`).pipe(
-        map(({ existingTask }) => existingTask),
-        catchError(error => {
-          console.error('Error fetching task:', error);
-          return of(null);
-        })
-      );
+    return this.http.get<{ task: Task, [key: string]: any }>(`${this.apiUrl}/task/${id}`).pipe(
+      map(({ existingTask }) => existingTask),
+      catchError(error => {
+        console.error('Error fetching task:', error);
+        return of(null);
+      })
+    );
+  }
+  
+  updateTask(id: string, task: Partial<Task>): Observable<Task | null> {
+    return this.http.put<Task>(`${this.apiUrl}/task/${id}`, task).pipe(
+      map((response: any) => response.updatedTask),
+      catchError(error => {
+        console.error('Error saving task:', error);
+        return of(null);
+      })
+    );
   }
 }
