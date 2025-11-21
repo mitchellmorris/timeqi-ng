@@ -14,6 +14,7 @@ import { DatePickerModule } from 'primeng/datepicker';
 import { InputTextModule } from 'primeng/inputtext';
 import { UserState } from '../../store/user/user.state';
 import { ButtonModule } from 'primeng/button';
+import { EditorModule } from 'primeng/editor';
 
 @Component({
   selector: 'app-task-form',
@@ -26,6 +27,7 @@ import { ButtonModule } from 'primeng/button';
     DatePickerModule,
     InputTextModule,
     ButtonModule,
+    EditorModule
   ],
   templateUrl: './task-form.html',
   styleUrl: './task-form.css'
@@ -37,6 +39,7 @@ export class TaskForm implements OnInit {
   users: Signal<PrimeNG.SelectOption[]> = this.store.selectSignal(UserState.getUserSelectOptions);
   data = input<Partial<Task> | null>({
     name: '',
+    description: '',
     startDate: undefined,
     endDate: undefined,
     locked: false,
@@ -48,6 +51,7 @@ export class TaskForm implements OnInit {
   valueChanges = output<Partial<Task>>();
   form = this.fb.group({
     name: ['', Validators.required],
+    description: [''],
     startDate: [undefined as Date | undefined],
     endDate: [undefined as Date | undefined],
     locked: [false],
