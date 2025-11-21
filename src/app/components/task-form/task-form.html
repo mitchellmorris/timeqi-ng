@@ -1,0 +1,85 @@
+@let locked = form.get('locked')?.value;
+<form [formGroup]="form" 
+  (ngSubmit)="onSubmit()">
+  <div class="mb-4 flex justify-between items-center">
+    <label class="text-2xl" for="name">
+        Task
+    </label>
+    <div class="flex gap-6 items-center">
+      @if (!locked) {
+      <div class="text-lg text-gray-400">
+        {{ taskProjection()?.startDate | date:'mediumDate' }} - {{ taskProjection()?.endDate | date:'mediumDate' }}
+      </div>
+      }
+      <div class="flex gap-2 items-center">
+        <label class="text-lg font-semibold">
+          Mode:
+        </label>
+        <p-selectbutton 
+          [options]="modeOptions" 
+          formControlName="locked" />
+      </div>
+    </div>
+  </div>
+  <div class="mb-4">
+    <input 
+      pInputText 
+      id="name" 
+      class="w-full"
+      formControlName="name" 
+      [invalid]="form.get('name')?.invalid && (form.get('name')?.touched || form.get('name')?.dirty)" 
+    />
+  </div>
+  <div class="flex gap-6 mb-4">
+    @if (locked) {
+    <div class="w-1/4">
+      <div class="mb-4">
+        <label class="text-2xl" for="startDate">
+            Start Date
+        </label>
+      </div>
+      <p-datepicker formControlName="startDate" [showIcon]="true"></p-datepicker>
+    </div>
+    }
+    <div class="w-1/4">
+      <div class="mb-4">
+        <label class="text-2xl" for="estimate">
+            Estimate
+        </label>
+      </div>
+      <p-inputnumber formControlName="estimate" mode="decimal" [showButtons]="true" [min]="0" class="w-full" />
+    </div>
+    <div [class]="locked ? 'w-1/2' : 'w-3/4'">
+      <div class="mb-4">
+        <label class="text-2xl mb-4" for="assignee">
+            Assignee
+        </label>
+      </div>
+      <p-select 
+        formControlName="assignee" 
+        class="w-full"
+        [options]="users()" 
+        placeholder="Select Assignee"
+        [filter]="true" 
+        filterBy="name"
+        [showClear]="true">
+      </p-select>
+    </div>
+  </div>
+  <div class="flex justify-end mb-4 gap-2">
+    @if (form.dirty) {
+    <p-button
+      size="large"
+      variant="outlined"
+      label="Cancel" />
+    }
+    <button 
+      pButton 
+      type="submit" 
+      size="large" 
+      label="Save" 
+      class="p-button-primary"
+      [disabled]="form.invalid || form.pristine"
+    ></button>
+  </div>
+</form>

@@ -1,110 +1,22 @@
-<!-- <p-fluid class="card flex flex-wrap gap-4">
-  <form [formGroup]="form" (ngSubmit)="onSubmit()">
-      <div class="flex-auto mb-4">
-          <label for="name">Task Name</label>
-          <input pInputText id="name" formControlName="name" />
-      </div>
-      <div class="flex-auto mb-4">
-        <p-button type="submit" label="Submit" />
-      </div>
-      <div class="flex-auto mb-4">
-        <p-button label="Close" (onClick)="router.navigate(['../../'], { relativeTo: this.route })"></p-button>
-      </div>
-  </form>
-</p-fluid> -->
-@let locked = form.get('locked')?.value;
-@let startDate = form.get('startDate')?.value;
+@if (task()) {
 <div class="flex gap-6">
-  <form [formGroup]="form" 
-    (ngSubmit)="onSubmit()"
-    class="w-2/3">
-    <div class="mb-4 flex justify-between items-center">
-      <label class="text-2xl" for="name">
-          Task Name
-      </label>
-      <div class="flex gap-6 items-center">
-        @if (!locked) {
-        <div class="text-lg text-gray-400">
-          {{ startDate | date:'mediumDate' }} - {{ startDate | date:'mediumDate' }}
-        </div>
-        }
-        <div class="flex gap-2 items-center">
-          <label class="text-lg font-semibold">
-            Mode:
-          </label>
-          <p-selectbutton 
-            [options]="modeOptions" 
-            formControlName="locked" />
-        </div>
-      </div>
-    </div>
-    <div class="mb-4">
-      <input 
-        pInputText 
-        id="name" 
-        class="w-full"
-        formControlName="name" 
-        [invalid]="form.get('name')?.invalid && (form.get('name')?.touched || form.get('name')?.dirty)" 
-      />
-    </div>
-    <div class="flex gap-6 mb-4">
-      @if (locked) {
-      <div class="w-1/4">
-        <div class="mb-4">
-          <label class="text-2xl" for="startDate">
-              Start Date
-          </label>
-        </div>
-        <p-datepicker formControlName="startDate" [showIcon]="true"></p-datepicker>
-      </div>
-      }
-      <div class="w-1/4">
-        <div class="mb-4">
-          <label class="text-2xl" for="estimate">
-              Estimated Hours
-          </label>
-        </div>
-        <p-inputnumber formControlName="estimate" mode="decimal" [showButtons]="true" [min]="0" class="w-full" />
-      </div>
-      <div [class]="locked ? 'w-1/2' : 'w-3/4'">
-        <div class="mb-4">
-          <label class="text-2xl mb-4" for="assignee">
-              Task Assignee
-          </label>
-        </div>
-        <p-select 
-          formControlName="assignee" 
-          class="w-full"
-          [options]="users()" 
-          placeholder="Select Assignee"
-          [filter]="true" 
-          filterBy="name"
-          [showClear]="true">
-        </p-select>
-      </div>
-    </div>
-    <div class="flex justify-end mb-4 gap-2">
-      @if (form.dirty) {
-      <p-button
-        size="large"
-        variant="outlined"
-        label="Cancel" />
-      }
-      <button 
-        pButton 
-        type="submit" 
-        size="large" 
-        label="Save" 
-        class="p-button-primary"
-        [disabled]="form.invalid || form.pristine"
-      ></button>
-    </div>
-  </form>
-
+  <div class="w-2/3">
+    <app-task-form
+      [data]="task()"
+      (valueChanges)="onChanges($event)"
+      (formSubmit)="onSubmit($event)"
+    >
+    </app-task-form>
+  </div>
   <div class="w-1/3">
     <div class="p-4 rounded">
-      <h3 class="text-lg font-semibold mb-2">Project Scope</h3>
-      <p class="text-gray-400">This section takes up 1/3 of the width.</p>
+      <h3 class="text-lg font-semibold mb-2">Project Lens</h3>
+      <div class="text-gray-400">
+        {{ projectProjection()?.name }}
+        Project Estimate: {{ projectProjection()?.estimate }}
+        Project End: {{ projectProjection()?.endDate | date:'mediumDate' }}
+      </div>
     </div>
   </div>
 </div>
+}

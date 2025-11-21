@@ -1,35 +1,34 @@
-import { Component, effect, inject, OnDestroy, Signal } from '@angular/core';
+import { Component, effect, inject, Signal } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Store } from '@ngxs/store';
-import { SetTask } from '../../../../store/tasks/tasks.actions';
+import { SetTask, UpdateTask } from '../../../../store/tasks/tasks.actions';
 import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 import { TasksState } from '../../../../store/tasks/tasks.state';
-import { PartialUser, Task, PrimeNG } from '@betavc/timeqi-sh';
+import { Task, PrimeNG, Project } from '@betavc/timeqi-sh';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { InputTextModule } from 'primeng/inputtext';
 import { FluidModule } from 'primeng/fluid';
+import { TaskForm } from '../../../../components/task-form/task-form';
 import { ButtonModule } from 'primeng/button';
-import { StateUtils } from '../../../../providers/utils/state';
-import { filter, map } from 'rxjs';
+import { catchError, startWith, debounceTime, distinctUntilChanged } from 'rxjs';
 import { SelectButtonModule } from 'primeng/selectbutton';
 import { DatePipe } from '@angular/common';
 import { InputNumberModule } from 'primeng/inputnumber';
 import { UserState } from '../../../../store/user/user.state';
 import { SelectModule } from 'primeng/select';
 import { DatePickerModule } from 'primeng/datepicker';
+import { HttpClient } from '@angular/common/http';
+import { environment } from '../../../../../environments/environment';
+import { of } from 'rxjs';
+import { Projection } from '../../../../providers/projection/projection';
+import { ProjectsState } from '../../../../store/projects/projects.state';
 
 @Component({
   selector: 'app-edit-task',
   imports: [
-    ReactiveFormsModule,
-    InputTextModule,
-    FluidModule,
     ButtonModule,
-    SelectButtonModule,
+    TaskForm,
     DatePipe,
-    InputNumberModule,
-    SelectModule,
-    DatePickerModule
   ],
   templateUrl: './edit-task.html',
   styleUrl: './edit-task.css'
@@ -37,40 +36,28 @@ import { DatePickerModule } from 'primeng/datepicker';
 export class EditTask {
   readonly store = inject(Store);
   readonly route = inject(ActivatedRoute);
-  readonly fb = inject(FormBuilder);
-  readonly stateUtils = inject(StateUtils);
+  id = this.route.snapshot.params['taskId'];
   task: Signal<Task | null> = this.store.selectSignal(TasksState.getTask);
-  users: Signal<PrimeNG.SelectOption[]> = this.store.selectSignal(UserState.getUserSelectOptions);
-  modeOptions: PrimeNG.SelectOption[] = [
-    { label: 'Snap', value: false },
-    { label: 'Lock', value: true }
-  ];
-  form: FormGroup = this.fb.group({
-      name: ['', Validators.required],
-      startDate: [null],
-      endDate: [null],
-      locked: [false],
-      estimate: [0],
-      assignee: ['']
-  });
-  constructor(public router: Router) {
-    effect(() => {
-      if (this.task()) {
-        this.form.patchValue(this.task() as Task);
-      }
-    });
+  projectProjection: Signal<Project | null> = this.store.selectSignal(ProjectsState.getProjection);
+  taskProjection: Signal<Task | null> = this.store.selectSignal(TasksState.getProjection);
+
+  constructor(
+    readonly http: HttpClient,
+    readonly projection: Projection,
+    router: Router
+  ) {}
+
+  onChanges(formData: Partial<Task>) {
+    this.projection.taskModel.set(formData);
   }
-  onSubmit() {
-    if (this.form.valid) {
-      const updatedTask: Task = {
-        ...this.task(),
-        ...this.form.value
-      };
-      console.log('Updated Task:', updatedTask);
-      // Dispatch an action to update the task in the store
-      // this.store.dispatch(new SetTask(updatedTask.id)).subscribe(() => {
-      //   this.router.navigate(['../'], { relativeTo: this.route });
-      // });
-    }
+
+  onSubmit(formData: Partial<Task>) {
+    this.store.dispatch(new UpdateTask(
+      this.id,
+      {
+        ...(this.taskProjection() || {}),
+        ...formData
+      },
+    ));
   }
 }

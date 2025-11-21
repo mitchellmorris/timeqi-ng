@@ -46,6 +46,9 @@ export class ProjectsState {
   @Selector()
   static getProjects(state: ProjectsStateModel) { return state.projects; }
 
+  @Selector()
+  static getProjection(state: ProjectsStateModel) { return state.projection; }
+
   static getProjectProjection = createSelector(
     [
       TasksState.getTasks, 

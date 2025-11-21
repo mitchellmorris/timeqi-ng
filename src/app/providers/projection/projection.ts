@@ -35,15 +35,15 @@ export class Projection {
     return {...projectState, ...projectModel};
   });
   // All Tasks for the current Project
-  private tasks: Signal<PartialTask[]> = this.store.selectSignal(TasksState.getTasks);
+  private tasks: Signal<(PartialTask | Partial<Task>)[]> = this.store.selectSignal(TasksState.getTasks);
   // All Entries for the current Project
   private projectEntries: Signal<ProjectEntries> = this.store.selectSignal(EntriesState.getProjectEntries);
   // Current Task (when available in the context)
   private taskState: Signal<Task | null> = this.store.selectSignal(TasksState.getTask);
   // Used to merge in any local changes to the task
-  taskModel: WritableSignal<Task | null> = signal(null);
+  taskModel: WritableSignal<Partial<Task> | null> = signal(null);
   // Merged Task
-  private taskContext: Signal<Task | null> = computed(() => {
+  private taskContext: Signal<Partial<Task> | null> = computed(() => {
     const taskState = this.taskState();
     const taskModel = this.taskModel();
     if (!taskState && !taskModel) return null;
@@ -58,7 +58,7 @@ export class Projection {
       if (!project) return;
       const task = this.taskContext();
       const tasks = this.tasks();
-      if (!!task) tasks.splice(task.index, 1, task);
+      if (task && task.index !== undefined) tasks.splice(task.index, 1, task);
       const projectEntries = this.projectEntries();
       project.tasks = assignEntriesToTasks(tasks, projectEntries);
       processProjectTasks(project,0).then((processedProject) => {

@@ -33,6 +33,9 @@ export class TasksState {
   @Selector()
   static getTasks(state: TasksStateModel) { return state.tasks; }
 
+  @Selector()
+  static getProjection(state: TasksStateModel) { return state.projection; }
+
   @Action(SetProjectTasks)
   setProjectTasks(ctx: StateContext<TasksStateModel>, action: SetProjectTasks) {
     const state = ctx.getState();

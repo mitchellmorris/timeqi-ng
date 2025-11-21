@@ -33,10 +33,7 @@ export class WorkshiftSchedular implements OnInit {
   weekdays: Weekday[] = WEEKDAYS;
   
   ngOnInit() {
-    this.form.patchValue({
-      weekdays: this.data.weekdays,
-      workshift: this.data.workshift
-    });
+    this.form.patchValue(this.data);
     this.form.markAsPristine();
   }
   onSubmit() {
