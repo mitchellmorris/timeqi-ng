@@ -7,6 +7,7 @@ import { catchError, map, mergeMap, of, tap } from 'rxjs';
 import { dissoc } from 'ramda';
 import { CleanTaskEntries, NullifyTaskEntry, SetTaskEntries } from '../entries/entries.actions';
 import { SetTaskProject } from '../projects/projects.actions';
+import { CleanTaskActivity } from '../activity/activity.actions';
 
 @State<TasksStateModel>({
   name: 'tasks',
@@ -133,5 +134,6 @@ export class TasksState {
       task: null,
       projection: null
     });
+    ctx.dispatch(new CleanTaskActivity());
   }
 }

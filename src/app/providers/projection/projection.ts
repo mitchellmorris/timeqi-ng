@@ -63,9 +63,6 @@ export class Projection {
       project.tasks = assignEntriesToTasks(tasks, projectEntries);
       processProjectTasks(project,0).then((processedProject) => {
         this.store.dispatch(new SetProjectProjection(processedProject));
-        if (!!task) {
-          this.store.dispatch(new SetTaskProjection(processedProject.tasks[task.index]));
-        }
       });
     });
   }

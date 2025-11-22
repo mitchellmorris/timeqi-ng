@@ -15,6 +15,7 @@ import { ProjectsState } from './store/projects/projects.state';
 import { TasksState } from './store/tasks/tasks.state';
 import { EntriesState } from './store/entries/entries.state';
 import { TimeOffState } from './store/time-off/time-off.state';
+import { ActivityState } from './store/activity/activity.state';
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -37,7 +38,8 @@ export const appConfig: ApplicationConfig = {
         ProjectsState,
         TasksState,
         EntriesState,
-        TimeOffState
+        TimeOffState,
+        ActivityState
       ],
       withNgxsReduxDevtoolsPlugin()
     )

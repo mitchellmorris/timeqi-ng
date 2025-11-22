@@ -7,18 +7,20 @@ import {
   PartialTimeOff, 
   processProjectTasks, 
   Project, 
-  ProjectsStateModel
+  ProjectsStateModel,
+  Task
 } from '@betavc/timeqi-sh';
 import { Projects as ProjectsService } from './projects';
 import { catchError, map, mergeMap, of, tap } from 'rxjs';
 import { dissoc } from 'ramda';
-import { CleanOrgTasks, NullifyProjectTask, SetProjectTasks } from '../tasks/tasks.actions';
+import { CleanOrgTasks, NullifyProjectTask, SetProjectTasks, SetTaskProjection } from '../tasks/tasks.actions';
 import { SetProjectOrganization } from '../organizations/organizations.actions';
 import { UpsertProjectTimeOff } from '../time-off/time-off.actions';
 import { TasksState } from '../tasks/tasks.state';
 import { EntriesState } from '../entries/entries.state';
 import { TimeOffState } from '../time-off/time-off.state';
 import { SetProjectEntries } from '../entries/entries.actions';
+import { SetTaskActivity } from '../activity/activity.actions';
 
 
 @State<ProjectsStateModel>({
@@ -129,11 +131,21 @@ export class ProjectsState {
   }
   @Action(SetProjectProjection)
   setProjectProjection(ctx: StateContext<ProjectsStateModel>, action: SetProjectProjection) {
+    const dispatches = [];
     const state = ctx.getState();
+    const task = this.store.selectSnapshot(state => state.tasks.task);
     ctx.setState({
       ...state,
       projection: action.projectProjection
     });
+    if (task && action.projectProjection.tasks) {
+      const taskProjection = action.projectProjection.tasks[task.index] as Task;
+      dispatches.push(
+        new SetTaskProjection(taskProjection),
+        new SetTaskActivity(taskProjection.activity || [])
+      );
+    }
+    return ctx.dispatch(dispatches);
   }
   @Action(SaveProjectSchedule)
   saveProjectSchedule(ctx: StateContext<ProjectsStateModel>, action: SaveProjectSchedule) {
