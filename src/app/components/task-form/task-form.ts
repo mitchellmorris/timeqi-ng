@@ -1,7 +1,7 @@
 import { Component, effect, EventEmitter, inject, input, Input, OnInit, output, Output, Signal } from '@angular/core';
 import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { PartialUser, PrimeNG, Task } from '@betavc/timeqi-sh';
+import { PartialUser, PrimeNG, ScenarioDate, Task } from '@betavc/timeqi-sh';
 import { debounceTime, distinctUntilChanged, startWith } from 'rxjs';
 import { Projection } from '../../providers/projection/projection';
 import { Store } from '@ngxs/store';
@@ -40,8 +40,8 @@ export class TaskForm implements OnInit {
   data = input<Partial<Task> | null>({
     name: '',
     description: '',
-    startDate: undefined,
-    endDate: undefined,
+    startDate: null,
+    endDate: null,
     locked: false,
     estimate: 0,
     assignee: '' as string
@@ -52,8 +52,8 @@ export class TaskForm implements OnInit {
   form = this.fb.group({
     name: ['', Validators.required],
     description: [''],
-    startDate: [undefined as Date | undefined],
-    endDate: [undefined as Date | undefined],
+    startDate: [null as ScenarioDate],
+    endDate: [null as ScenarioDate],
     locked: [false],
     estimate: [0],
     assignee: ['' as string]
@@ -81,7 +81,6 @@ export class TaskForm implements OnInit {
       const formData = this.formChanges();
       if (this.form.dirty) {
         this.valueChanges.emit(formData as Partial<Task>);
-        // this.projection.taskModel.set(formData as Partial<Task>);
       }
     });
   }
@@ -91,8 +90,8 @@ export class TaskForm implements OnInit {
     if (!data) return;
     this.form.patchValue({
       ...data,
-      startDate: data.startDate ? new Date(data.startDate) : undefined,
-      endDate: data.endDate ? new Date(data.endDate) : undefined,
+      startDate: data.startDate,
+      endDate: data.endDate,
       assignee: data.assignee as string
     });
     this.form.markAsPristine();
