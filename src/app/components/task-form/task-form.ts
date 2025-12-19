@@ -1,7 +1,7 @@
 import { Component, effect, EventEmitter, inject, input, Input, OnInit, output, Output, Signal } from '@angular/core';
 import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { PartialUser, PrimeNG, ScenarioDate, Task } from '@betavc/timeqi-sh';
+import { InstanceUser, PrimeNG, ScenarioDate, Task } from '@betavc/timeqi-sh';
 import { debounceTime, distinctUntilChanged, startWith } from 'rxjs';
 import { Projection } from '../../providers/projection/projection';
 import { Store } from '@ngxs/store';

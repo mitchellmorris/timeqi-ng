@@ -1,4 +1,4 @@
-import { Project, PartialProject } from "@betavc/timeqi-sh";
+import { Project, InstanceProject } from "@betavc/timeqi-sh";
 
 /**
  * @Action(SetOrganization)
@@ -7,7 +7,7 @@ import { Project, PartialProject } from "@betavc/timeqi-sh";
  */
 export class SetOrganizationProjects {
   static readonly type = '[Org] Set Organization Projects';
-  constructor(public projects: PartialProject[]) { }
+  constructor(public projects: InstanceProject[]) { }
 }
 /**
  * @Action(SetProjectOrganization)
@@ -16,7 +16,7 @@ export class SetOrganizationProjects {
  */
 export class SetProjectOrgProjects {
   static readonly type = '[Project] Set Organization Projects';
-  constructor(public projects: PartialProject[]) { }
+  constructor(public projects: InstanceProject[]) { }
 }
 /**
  * projectResolvers.ts

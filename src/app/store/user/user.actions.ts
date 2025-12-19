@@ -1,4 +1,4 @@
-import { PartialUser } from "@betavc/timeqi-sh";
+import { InstanceUser } from "@betavc/timeqi-sh";
 
 export class SetUser {
   static readonly type = '[App] Set User';
@@ -6,5 +6,5 @@ export class SetUser {
 }
 export class SetOrganizationUsers {
   static readonly type = '[Org] Set Organization Users';
-  constructor(public users: PartialUser[]) { }
+  constructor(public users: InstanceUser[]) { }
 }

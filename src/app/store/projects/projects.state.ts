@@ -3,9 +3,9 @@ import { State, Action, Selector, StateContext, Store, createSelector, } from '@
 import { NullifyOrgProject, SaveProjectSchedule, SetOrganizationProjects, SetProject, SetProjectOrgProjects, SetProjectProjection, SetTaskProject } from '../projects/projects.actions';
 import { 
   assignEntriesToTasks, 
-  PartialTask, 
+  InstanceTask, 
   PartialTimeOff, 
-  processProjectTasks, 
+  processProjectProjection, 
   Project, 
   ProjectsStateModel,
   Task
@@ -59,10 +59,10 @@ export class ProjectsState {
       (state: ProjectsStateModel) => state.project
     ],
     async (tasks, projectEntries, timeOffs, project) => {
-      return await processProjectTasks(
+      return await processProjectProjection(
         {
-          ...project,
-          tasks: assignEntriesToTasks(tasks, projectEntries)
+          ...project as Project,
+          tasks: assignEntriesToTasks(tasks as InstanceTask[], projectEntries)
         }, 0, {
           relativeTimeOff: timeOffs
         }
@@ -110,7 +110,7 @@ export class ProjectsState {
       }),
       mergeMap(({ tasks, project }) => {
         const dispatches = [];
-        dispatches.push(new SetProjectTasks(tasks as PartialTask[]));
+        dispatches.push(new SetProjectTasks(tasks as InstanceTask[]));
         // Get organization from global OrganizationsState
         if (project) {
           dispatches.push(new SetProjectEntries(project._id));

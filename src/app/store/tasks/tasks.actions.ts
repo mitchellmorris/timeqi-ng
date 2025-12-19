@@ -1,4 +1,4 @@
-import { PartialTask, Task } from '@betavc/timeqi-sh';
+import { InstanceTask, Task } from '@betavc/timeqi-sh';
 
 /**
  * @Action(SetTaskProject)
@@ -7,7 +7,7 @@ import { PartialTask, Task } from '@betavc/timeqi-sh';
  */
 export class SetProjectTasks {
   static readonly type = '[Project] Set Project Tasks';
-  constructor(public tasks: PartialTask[]) { }
+  constructor(public tasks: InstanceTask[]) { }
 }
 /**
  * taskResolver.ts

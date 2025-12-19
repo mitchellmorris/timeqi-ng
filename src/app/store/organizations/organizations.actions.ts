@@ -1,4 +1,4 @@
-import { PartialOrganization, SchedulingSettings } from '@betavc/timeqi-sh';
+import { InstanceOrganization, SchedulingSettings } from '@betavc/timeqi-sh';
 
 /**
  * @Action(SetUser)
@@ -7,7 +7,7 @@ import { PartialOrganization, SchedulingSettings } from '@betavc/timeqi-sh';
  */
 export class SetUserOrganizations {
   static readonly type = '[App] Set User Organizations';
-  constructor(public organizations: PartialOrganization[]) { }
+  constructor(public organizations: InstanceOrganization[]) { }
 }
 /**
  * organizationResolvers.ts

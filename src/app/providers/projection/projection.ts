@@ -3,9 +3,9 @@ import { StateUtils } from '../utils/state';
 import { ProjectsState } from '../../store/projects/projects.state';
 import { 
   assignEntriesToTasks,
-  PartialEntry, 
-  PartialTask, 
-  processProjectTasks, 
+  InstanceEntry, 
+  InstanceTask, 
+  processProjectProjection, 
   Project,
   ProjectEntries,
   Task
@@ -35,7 +35,7 @@ export class Projection {
     return {...projectState, ...projectModel};
   });
   // All Tasks for the current Project
-  private tasks: Signal<(PartialTask | Partial<Task>)[]> = this.store.selectSignal(TasksState.getTasks);
+  private tasks: Signal<InstanceTask[]> = this.store.selectSignal(TasksState.getTasks);
   // All Entries for the current Project
   private projectEntries: Signal<ProjectEntries> = this.store.selectSignal(EntriesState.getProjectEntries);
   // Current Task (when available in the context)
@@ -58,10 +58,10 @@ export class Projection {
       if (!project) return;
       const task = this.taskContext();
       const tasks = this.tasks();
-      if (task && task.index !== undefined) tasks.splice(task.index, 1, task);
+      if (task && task.index !== undefined) tasks.splice(task.index, 1, task as InstanceTask);
       const projectEntries = this.projectEntries();
       project.tasks = assignEntriesToTasks(tasks, projectEntries);
-      processProjectTasks(project,0).then((processedProject) => {
+      processProjectProjection(project,0).then((processedProject) => {
         this.store.dispatch(new SetProjectProjection(processedProject));
       });
     });

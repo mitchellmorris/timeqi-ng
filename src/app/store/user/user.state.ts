@@ -4,7 +4,7 @@ import { SetOrganizationUsers, SetUser } from './user.actions';
 import { User as UserService } from './user';
 import { map, mergeMap, tap } from 'rxjs';
 import { map as _map } from 'ramda';
-import { PartialOrganization, PartialTimeOff, User, UserStateModel } from '@betavc/timeqi-sh';
+import { InstanceOrganization, PartialTimeOff, User, UserStateModel } from '@betavc/timeqi-sh';
 import { SetUserOrganizations } from '../organizations/organizations.actions';
 import { dissoc } from 'ramda';
 import { UpsertUserTimeOff } from '../time-off/time-off.actions';
@@ -65,7 +65,7 @@ export class UserState {
         }
       }),
       mergeMap(({ organizations, timeOff }) => ctx.dispatch([
-        new SetUserOrganizations(organizations as PartialOrganization[])
+        new SetUserOrganizations(organizations as InstanceOrganization[])
       ])),
       // map(({ user }) => user)
     );

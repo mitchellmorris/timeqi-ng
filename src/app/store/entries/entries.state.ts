@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { State, Action, Selector, StateContext } from '@ngxs/store';
-import { EntriesStateModel, Entry, PartialEntry } from '@betavc/timeqi-sh';
+import { EntriesStateModel, Entry, InstanceEntry } from '@betavc/timeqi-sh';
 import { CleanTaskEntries, NullifyTaskEntry, SetProjectEntries, SetTaskEntries } from './entries.actions';
 import { Entries } from './entries';
 import { tap } from 'rxjs/operators';
@@ -35,7 +35,7 @@ export class EntriesState {
   setProjectEntries(ctx: StateContext<EntriesStateModel>, action: SetProjectEntries) {
     return this.entriesService.getProjectEntries(action.projectId).pipe(
       tap((entries: Entry[] | null) => {
-        const projectEntries = reduce((acc:{ [taskId: string]: PartialEntry[] }, entry) => {
+        const projectEntries = reduce((acc:{ [taskId: string]: InstanceEntry[] }, entry) => {
           const taskId = entry.task as string;
           if (!acc[taskId]) {
             acc[taskId] = [];

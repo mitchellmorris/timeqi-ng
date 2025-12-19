@@ -3,7 +3,7 @@ import { ActivatedRoute, RouterModule } from '@angular/router';
 import { Store } from '@ngxs/store';
 import { ButtonModule } from 'primeng/button';
 import { SetTask } from '../../store/tasks/tasks.actions';
-import { PartialEntry } from '@betavc/timeqi-sh';
+import { InstanceEntry } from '@betavc/timeqi-sh';
 import { TabsModule } from 'primeng/tabs';
 import { EntriesState } from '../../store/entries/entries.state';
 import { toSignal } from '@angular/core/rxjs-interop';
@@ -30,6 +30,6 @@ export class Task {
   readonly route = inject(ActivatedRoute);
   readonly stateUtils = inject(StateUtils);
   entries$ = this.stateUtils.getState$(EntriesState.getState, 'entries');
-  entries = toSignal(this.entries$, { initialValue: [] as PartialEntry[] });
+  entries = toSignal(this.entries$, { initialValue: [] as InstanceEntry[] });
 }
 

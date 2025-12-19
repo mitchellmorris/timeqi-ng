@@ -3,7 +3,7 @@ import { Store } from '@ngxs/store';
 import { Router } from '@angular/router';
 import { ProjectsState } from '../../store/projects/projects.state';
 import { filter, Observable } from 'rxjs';
-import { PartialProject } from '@betavc/timeqi-sh';
+import { InstanceProject } from '@betavc/timeqi-sh';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { StateUtils } from '../../providers/utils/state';
 
@@ -19,13 +19,13 @@ import { StateUtils } from '../../providers/utils/state';
 export class Organization {
   readonly store = inject(Store);
   readonly stateUtils = inject(StateUtils);
-  projects$: Observable<PartialProject[]> = this.stateUtils.getState$(
+  projects$: Observable<InstanceProject[]> = this.stateUtils.getState$(
     ProjectsState.getState,
     'projects'
   ).pipe(
     filter(projects => projects.length > 0),
   );
-  projects = toSignal(this.projects$, { initialValue: [] as PartialProject[] });
+  projects = toSignal(this.projects$, { initialValue: [] as InstanceProject[] });
 
   constructor(
     private router: Router

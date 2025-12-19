@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { State, Action, Selector, StateContext, Store } from '@ngxs/store';
 import { CleanOrgTasks, NullifyProjectTask, SetProjectTasks, SetTask, SetTaskProjection, UpdateTask } from './tasks.actions';
-import { PartialEntry, Task, TasksStateModel } from '@betavc/timeqi-sh';
+import { InstanceEntry, Task, TasksStateModel } from '@betavc/timeqi-sh';
 import { Tasks as TasksService } from './tasks';
 import { catchError, map, mergeMap, of, tap } from 'rxjs';
 import { dissoc } from 'ramda';
@@ -83,7 +83,7 @@ export class TasksState {
       }),
       mergeMap(({ entries, task }) => {
         const dispatches = [];
-        dispatches.push(new SetTaskEntries(entries as PartialEntry[]));
+        dispatches.push(new SetTaskEntries(entries as InstanceEntry[]));
         // Get project from global ProjectsState
         // Note: We are assuming that setting the new project also sets the organization.
         if (task && task.project) {

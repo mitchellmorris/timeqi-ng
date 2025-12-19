@@ -1,6 +1,6 @@
 import { Component, effect, inject } from '@angular/core';
 import { TableModule } from 'primeng/table';
-import { PartialOrganization } from '@betavc/timeqi-sh';
+import { InstanceOrganization } from '@betavc/timeqi-sh';
 import { filter, first, Observable } from 'rxjs';
 import { Store } from '@ngxs/store'; // Add this import
 import { OrganizationsState } from '../../store/organizations/organizations.state';
@@ -20,11 +20,11 @@ import { StateUtils } from '../../providers/utils/state';
 export class Organizations {
   readonly store = inject(Store);
   readonly storeUtils = inject(StateUtils);
-  organizations$: Observable<PartialOrganization[]> = this.storeUtils.getState$(OrganizationsState.getState, 'organizations').pipe(
-    filter(organizations => (organizations as PartialOrganization[]).length > 0),
-    first(organizations => (organizations as PartialOrganization[]).length === 1),
+  organizations$: Observable<InstanceOrganization[]> = this.storeUtils.getState$(OrganizationsState.getState, 'organizations').pipe(
+    filter(organizations => (organizations as InstanceOrganization[]).length > 0),
+    first(organizations => (organizations as InstanceOrganization[]).length === 1),
   );
-  organizations = toSignal(this.organizations$, { initialValue: [] as PartialOrganization[] });
+  organizations = toSignal(this.organizations$, { initialValue: [] as InstanceOrganization[] });
   loading: boolean = true;
 
   constructor(private router: Router) { 
