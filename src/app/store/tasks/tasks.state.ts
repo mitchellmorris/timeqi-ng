@@ -1,10 +1,10 @@
 import { Injectable } from '@angular/core';
 import { State, Action, Selector, StateContext, Store } from '@ngxs/store';
-import { CleanOrgTasks, NullifyProjectTask, SetProjectTasks, SetTask, SetTaskProjection, UpdateTask } from './tasks.actions';
-import { InstanceEntry, Task, TasksStateModel } from '@betavc/timeqi-sh';
+import { CleanOrgTasks, NullifyProjectTask, SetProjectTasks, SetTask, SetTaskProjection, SetTasksProjections, UpdateTask } from './tasks.actions';
+import { InstanceEntry, InstanceTask, Task, TasksStateModel } from '@betavc/timeqi-sh';
 import { Tasks as TasksService } from './tasks';
 import { catchError, map, mergeMap, of, tap } from 'rxjs';
-import { dissoc } from 'ramda';
+import { addIndex, dissoc, equals, pickBy } from 'ramda';
 import { CleanTaskEntries, NullifyTaskEntry, SetTaskEntries } from '../entries/entries.actions';
 import { SetTaskProject } from '../projects/projects.actions';
 import { CleanTaskActivity } from '../activity/activity.actions';
@@ -14,7 +14,8 @@ import { CleanTaskActivity } from '../activity/activity.actions';
   defaults: {
     tasks: [],
     task: null,
-    projection: null
+    projection: null,
+    projections: []
   }
 })
 @Injectable()
@@ -63,8 +64,14 @@ export class TasksState {
     }
     return getTask$.pipe(
       map(task => task
-        ? { task: dissoc<Task, 'entries'>('entries', task), entries: task.entries || entries }
-        : { task: null, entries: [] }
+        ? { 
+          task: dissoc<Task, 'entries'>('entries', task), 
+          entries: task.entries || entries 
+        }
+        : { 
+          task: null, 
+          entries: [] 
+        }
       ),
       tap(({ task }) => {
         const state = ctx.getState();
@@ -83,7 +90,6 @@ export class TasksState {
       }),
       mergeMap(({ entries, task }) => {
         const dispatches = [];
-        dispatches.push(new SetTaskEntries(entries as InstanceEntry[]));
         // Get project from global ProjectsState
         // Note: We are assuming that setting the new project also sets the organization.
         if (task && task.project) {
@@ -111,14 +117,59 @@ export class TasksState {
       })
     );
   }
+
   @Action(SetTaskProjection)
   setTaskProjection(ctx: StateContext<TasksStateModel>, action: SetTaskProjection) {
     const state = ctx.getState();
     ctx.setState({
       ...state,
-      projection: action.taskProjection
+      projection: pickBy(
+          (value, key) => {
+            return !equals(value, state.task![key]) &&
+            // exclude these
+            [
+              'tasks',
+              'activity',
+              'timeOff',
+              'users',
+              'entries'
+            ].indexOf(key) === -1;
+          }, 
+          action.taskProjection
+        )
     });
   }
+
+  @Action(SetTasksProjections)
+  setTasksProjections(ctx: StateContext<TasksStateModel>, action: SetTasksProjections) {
+    const state = ctx.getState();
+    ctx.setState({
+      ...state,
+      projections: action.taskProjections.map((task) => {
+        return pickBy(
+          (value, key) => {
+            // only include these keys
+            return [
+              '_id',
+              'index',
+              'startDate',
+              'status',
+              'remainingEstimate',
+              'targetDate',
+              'projectedDate',
+              'endDate',
+              'leadTime',
+              'trailingTime',
+              'elapsedHours',
+              'workedHours',
+            ].indexOf(key) >= 0;
+          }, 
+          task
+        )
+      })
+    });
+  }
+
   @Action(NullifyProjectTask)
   nullifyProjectTask(ctx: StateContext<TasksStateModel>) {
     ctx.setState({
@@ -127,12 +178,14 @@ export class TasksState {
     });
     ctx.dispatch(new NullifyTaskEntry());
   }
+
   @Action(CleanOrgTasks)
   cleanOrgTasks(ctx: StateContext<TasksStateModel>) {
     ctx.setState({
       tasks: [],
       task: null,
-      projection: null
+      projection: null,
+      projections: []
     });
     ctx.dispatch(new CleanTaskActivity());
   }

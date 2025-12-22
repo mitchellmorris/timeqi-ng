@@ -2,13 +2,17 @@ import { computed, effect, inject, Injectable, signal, Signal, WritableSignal } 
 import { StateUtils } from '../utils/state';
 import { ProjectsState } from '../../store/projects/projects.state';
 import { 
+  Activity,
   assignEntriesToTasks,
+  Entry,
   InstanceEntry, 
   InstanceTask, 
+  PartialTimeOff, 
   processProjectProjection, 
   Project,
   ProjectEntries,
-  Task
+  Task,
+  TimeOff
 } from '@betavc/timeqi-sh';
 import { Store } from '@ngxs/store';
 import { TasksState } from '../../store/tasks/tasks.state';
@@ -58,12 +62,22 @@ export class Projection {
       if (!project) return;
       const task = this.taskContext();
       const tasks = this.tasks();
-      if (task && task.index !== undefined) tasks.splice(task.index, 1, task as InstanceTask);
-      const projectEntries = this.projectEntries();
-      project.tasks = assignEntriesToTasks(tasks, projectEntries);
-      processProjectProjection(project,0).then((processedProject) => {
-        this.store.dispatch(new SetProjectProjection(processedProject));
-      });
+      // This inserts the updated task into the tasks array at the correct index
+      if (task && task.index !== undefined) {
+        tasks.splice(
+          // we only update the task at the current index
+          task.index, 
+          1, 
+          // TODO: Why do we need to cast here?
+          task as InstanceTask
+        );
+      }
+      this.store.dispatch(new SetProjectProjection({
+        ...project,
+        // assign the correct entries to all tasks
+        // to conform to the expected structure
+        tasks: assignEntriesToTasks(tasks, this.projectEntries())
+      }));
     });
   }
 }

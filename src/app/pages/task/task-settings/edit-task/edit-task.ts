@@ -25,6 +25,7 @@ export class EditTask {
   readonly store = inject(Store);
   readonly route = inject(ActivatedRoute);
   id = this.route.snapshot.params['taskId'];
+  // Remember that that the taskResolver should have already fetched the task
   task: Signal<Task | null> = this.store.selectSignal(TasksState.getTask);
   taskProjection: Signal<Task | null> = this.store.selectSignal(TasksState.getProjection);
 

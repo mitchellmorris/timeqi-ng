@@ -29,7 +29,7 @@ export class SetProject {
 
 export class SetProjectProjection {
   static readonly type = '[Project] Set Project Projection';
-  constructor(readonly projectProjection: Project) { }
+  constructor(readonly project: Project) { }
 }
 
 /**

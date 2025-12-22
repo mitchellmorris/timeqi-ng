@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, Signal } from '@angular/core';
 import { TasksState } from '../../store/tasks/tasks.state';
 import { filter } from 'rxjs';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -9,6 +9,9 @@ import { RouterModule } from '@angular/router';
 import { Dialog } from 'primeng/dialog';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { StateUtils } from '../../providers/utils/state';
+import { Store } from '@ngxs/store';
+import { InstanceTask, Task } from '@betavc/timeqi-sh';
+import { Projection } from '../../providers/projection/projection';
 
 @Component({
   selector: 'app-project',
@@ -25,6 +28,7 @@ import { StateUtils } from '../../providers/utils/state';
   styleUrl: './project.css'
 })
 export class Project {
+  readonly store = inject(Store);
   readonly route = inject(ActivatedRoute);
   readonly router = inject(Router);
   readonly stateUtils = inject(StateUtils);
@@ -32,10 +36,7 @@ export class Project {
   activeTaskId: string | null = null;
   // projection$ = this.stateUtils.getState$(ProjectsState.getProjectProjection, 'project');
   // projection = toSignal(this.projection$, { initialValue: [] });
-  tasks$ = this.stateUtils.getState$(TasksState.getState, 'tasks').pipe(
-    filter(tasks => tasks.length > 0),
-  );
-  tasks = toSignal(this.tasks$, { initialValue: [] });
+  tasks: Signal<InstanceTask[]> = this.store.selectSignal(TasksState.getTasks);
   taskActions: MenuItem[] = [
     {
       label: 'Edit',
@@ -54,5 +55,9 @@ export class Project {
       }
     }
   ];
+  
+  constructor(
+    readonly projection: Projection
+  ) {}
 }
 

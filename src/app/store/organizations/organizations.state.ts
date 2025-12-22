@@ -5,7 +5,7 @@ import { Organization, OrganizationsStateModel, InstanceProject, PartialTimeOff,
 import { Organizations as OrganizationsService } from './organizations';
 import { map, mergeMap, tap, of } from 'rxjs';
 import { catchError } from 'rxjs/operators';
-import { dissoc } from 'ramda';
+import { dissoc, omit } from 'ramda';
 import { NullifyOrgProject, SetOrganizationProjects, SetProjectOrgProjects } from '../projects/projects.actions';
 import { UpsertOrgTimeOff } from '../time-off/time-off.actions';
 import { SetOrganizationUsers } from '../user/user.actions';
@@ -44,11 +44,13 @@ export class OrganizationsState {
   SetOrganization(ctx: StateContext<OrganizationsStateModel>, action: SetOrganization | SetProjectOrganization) {
     const state = this.store.selectSnapshot(state => state);
     const organizationId = state.organizations.organization ? state.organizations.organization._id : null;
-    const getOrg$ = organizationId === action.id ? of(state.organizations.organization) : this.orgsService.getOrganization(action.id);
+    const getOrg$ = organizationId === action.id ? 
+      of(state.organizations.organization) : 
+      this.orgsService.getOrganization(action.id);
     return getOrg$.pipe(
       map(organization => organization
         ? { 
-          organization: dissoc<Organization, 'projects'>('projects', organization), 
+          organization: omit(['projects', 'timeOff', 'users'], organization) as Organization, 
           projects: organization.projects as InstanceProject[] || state.projects.projects,
           timeOff: organization.timeOff as PartialTimeOff[] || state.timeoff.timeoffs,
           users: organization.users as InstanceUser[] || state.users.users

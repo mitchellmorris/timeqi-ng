@@ -17,7 +17,7 @@ import { FormsModule } from '@angular/forms';
 })
 export class ProjectLens {
   readonly store = inject(Store);
-  projectProjection: Signal<Project | null> = this.store.selectSignal(ProjectsState.getProjection);
+  projectProjection: Signal<Partial<Project> | null> = this.store.selectSignal(ProjectsState.getProjection);
   taskProjection: Signal<Task | null> = this.store.selectSignal(TasksState.getProjection);
   activity!: number;
 }

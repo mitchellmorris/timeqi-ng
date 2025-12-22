@@ -1,10 +1,10 @@
 import { Injectable } from '@angular/core';
-import { State, Action, Selector, StateContext } from '@ngxs/store';
+import { State, Action, Selector, StateContext, Store } from '@ngxs/store';
 import { EntriesStateModel, Entry, InstanceEntry } from '@betavc/timeqi-sh';
 import { CleanTaskEntries, NullifyTaskEntry, SetProjectEntries, SetTaskEntries } from './entries.actions';
 import { Entries } from './entries';
-import { tap } from 'rxjs/operators';
-import { reduce } from 'ramda';
+import { mergeMap, tap } from 'rxjs/operators';
+import { of, reduce } from 'ramda';
 
 @State<EntriesStateModel>({
   name: 'entries',
@@ -18,6 +18,7 @@ import { reduce } from 'ramda';
 export class EntriesState {
 
   constructor(
+    private store: Store,
     private entriesService: Entries
   ) {}
 
@@ -33,13 +34,14 @@ export class EntriesState {
 
   @Action(SetProjectEntries)
   setProjectEntries(ctx: StateContext<EntriesStateModel>, action: SetProjectEntries) {
+    const state = this.store.selectSnapshot(state => state);
+    const task = state.tasks.task;
     return this.entriesService.getProjectEntries(action.projectId).pipe(
       tap((entries: Entry[] | null) => {
         const projectEntries = reduce((acc:{ [taskId: string]: InstanceEntry[] }, entry) => {
           const taskId = entry.task as string;
-          if (!acc[taskId]) {
+          if (!acc[taskId])
             acc[taskId] = [];
-          }
           acc[taskId].push(entry);
           return acc;
         }, {}, entries || []);
@@ -49,6 +51,8 @@ export class EntriesState {
           ...state,
           projectEntries
         });
+        if (task) 
+          ctx.dispatch(new SetTaskEntries(task!._id));
       })
     );
   }
@@ -58,7 +62,8 @@ export class EntriesState {
     const state = ctx.getState();
     ctx.setState({
       ...state,
-      entries: action.entries
+      //TODO: I don't believe we even need entries if there is a project task lookup.
+      entries: state.projectEntries[action.taskId] || []
     });
   }
 
