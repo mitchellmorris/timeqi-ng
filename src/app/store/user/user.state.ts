@@ -4,7 +4,7 @@ import { SetOrganizationUsers, SetUser } from './user.actions';
 import { User as UserService } from './user';
 import { map, mergeMap, tap } from 'rxjs';
 import { map as _map } from 'ramda';
-import { InstanceOrganization, PartialTimeOff, User, UserStateModel } from '@betavc/timeqi-sh';
+import { InstanceOrganization, InstanceTimeOff, User, UserStateModel } from '@betavc/timeqi-sh';
 import { SetUserOrganizations } from '../organizations/organizations.actions';
 import { dissoc } from 'ramda';
 import { UpsertUserTimeOff } from '../time-off/time-off.actions';

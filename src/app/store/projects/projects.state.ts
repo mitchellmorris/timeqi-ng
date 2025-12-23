@@ -6,7 +6,7 @@ import {
   assignEntriesToTasks, 
   InstanceEntry, 
   InstanceTask, 
-  PartialTimeOff, 
+  InstanceTimeOff, 
   processProjectProjection, 
   Project, 
   ProjectsStateModel,
@@ -135,7 +135,7 @@ export class ProjectsState {
           dispatches.push(new SetProjectOrganization(project.organization as string));
         // If the project has timeOff, dispatch UpsertProjectTimeOff
         if (project && project.timeOff && project.timeOff.length) 
-          dispatches.push(new UpsertProjectTimeOff(project.timeOff as PartialTimeOff[]));
+          dispatches.push(new UpsertProjectTimeOff(project.timeOff as InstanceTimeOff[]));
         if (action instanceof SetProject)
           dispatches.push(new NullifyProjectTask());
         return ctx.dispatch(dispatches);
@@ -151,7 +151,7 @@ export class ProjectsState {
         // convert to IDs only so we store references instead of full objects
         activityIterationCb: (activity: Activity) => {
           activity.entries = activity.entries.map(e => (e as InstanceEntry)._id);
-          activity.timeOff = activity.timeOff.map(t => (t as PartialTimeOff)._id);
+          activity.timeOff = activity.timeOff.map(t => (t as InstanceTimeOff)._id);
           return Promise.resolve(activity);
         }
       }

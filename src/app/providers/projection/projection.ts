@@ -7,7 +7,7 @@ import {
   Entry,
   InstanceEntry, 
   InstanceTask, 
-  PartialTimeOff, 
+  InstanceTimeOff, 
   processProjectProjection, 
   Project,
   ProjectEntries,

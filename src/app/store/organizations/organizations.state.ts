@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { State, Action, Selector, StateContext, Store, } from '@ngxs/store';
 import { SaveOrganizationSchedule, SetOrganization, SetProjectOrganization, SetUserOrganizations } from './organizations.actions';
-import { Organization, OrganizationsStateModel, InstanceProject, PartialTimeOff, InstanceUser } from '@betavc/timeqi-sh';
+import { Organization, OrganizationsStateModel, InstanceProject, InstanceTimeOff, InstanceUser } from '@betavc/timeqi-sh';
 import { Organizations as OrganizationsService } from './organizations';
 import { map, mergeMap, tap, of } from 'rxjs';
 import { catchError } from 'rxjs/operators';
@@ -52,7 +52,7 @@ export class OrganizationsState {
         ? { 
           organization: omit(['projects', 'timeOff', 'users'], organization) as Organization, 
           projects: organization.projects as InstanceProject[] || state.projects.projects,
-          timeOff: organization.timeOff as PartialTimeOff[] || state.timeoff.timeoffs,
+          timeOff: organization.timeOff as InstanceTimeOff[] || state.timeoff.timeoffs,
           users: organization.users as InstanceUser[] || state.users.users
         } : { organization: null, projects: [], timeOff: [], users: [] }
       ),
