@@ -41,7 +41,7 @@ export class OrganizationsState {
   
   @Action(SetProjectOrganization)
   @Action(SetOrganization)
-  SetOrganization(ctx: StateContext<OrganizationsStateModel>, action: SetOrganization | SetProjectOrganization) {
+  setOrganization(ctx: StateContext<OrganizationsStateModel>, action: SetOrganization | SetProjectOrganization) {
     const state = this.store.selectSnapshot(state => state);
     const organizationId = state.organizations.organization ? state.organizations.organization._id : null;
     const getOrg$ = organizationId === action.id ? 

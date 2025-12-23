@@ -41,7 +41,7 @@ export class Projection {
   // All Tasks for the current Project
   private tasks: Signal<InstanceTask[]> = this.store.selectSignal(TasksState.getTasks);
   // All Entries for the current Project
-  private projectEntries: Signal<ProjectEntries> = this.store.selectSignal(EntriesState.getProjectEntries);
+  private projectEntries: Signal<ProjectEntries> = this.store.selectSignal(EntriesState.getEntries);
   // Current Task (when available in the context)
   private taskState: Signal<Task | null> = this.store.selectSignal(TasksState.getTask);
   // Used to merge in any local changes to the task

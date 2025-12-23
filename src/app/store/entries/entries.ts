@@ -14,7 +14,7 @@ export class Entries {
     private http: HttpClient
   ) {}
 
-  getProjectEntries(projectId: string): Observable<Entry[] | null> {
+  getEntries(projectId: string): Observable<Entry[] | null> {
     const getEntries$ = this.http.get<{ entryData: Entry[], [key: string]: any }>(`${this.apiUrl}/entry/project/${projectId}`);
     return getEntries$.pipe(
       map(({ entryData }) => entryData),

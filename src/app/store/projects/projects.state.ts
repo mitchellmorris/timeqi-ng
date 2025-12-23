@@ -21,7 +21,7 @@ import { UpsertProjectTimeOff } from '../time-off/time-off.actions';
 import { TasksState } from '../tasks/tasks.state';
 import { EntriesState } from '../entries/entries.state';
 import { TimeOffState } from '../time-off/time-off.state';
-import { SetProjectEntries } from '../entries/entries.actions';
+import { SetEntries } from '../entries/entries.actions';
 import { SetProjectActivity, SetTaskActivity } from '../activity/activity.actions';
 
 
@@ -57,7 +57,7 @@ export class ProjectsState {
   // static getProjectProjection = createSelector(
   //   [
   //     TasksState.getTasks, 
-  //     EntriesState.getProjectEntries, 
+  //     EntriesState.getEntries, 
   //     TimeOffState.getTimeOffs,
   //     (state: ProjectsStateModel) => state.project
   //   ],
@@ -129,7 +129,7 @@ export class ProjectsState {
         const dispatches = [];
         // Get organization from global OrganizationsState
         if (project) 
-          dispatches.push(new SetProjectEntries(project._id));
+          dispatches.push(new SetEntries(project._id));
         dispatches.push(new SetProjectTasks(tasks as InstanceTask[]));
         if (project && project.organization) 
           dispatches.push(new SetProjectOrganization(project.organization as string));
