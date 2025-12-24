@@ -1,28 +1,52 @@
 import { Injectable } from '@angular/core';
 import { State, Action, Selector, StateContext, Store, createSelector, } from '@ngxs/store';
-import { NullifyOrgProject, SaveProjectSchedule, SetOrganizationProjects, SetProject, SetProjectOrgProjects, SetProjectProjection, SetTaskProject } from '../projects/projects.actions';
+import { 
+  CleanOrgProjects,
+  NullifyOrgProject, 
+  NullifyProject, 
+  SaveProjectSchedule, 
+  SetOrganizationProjects, 
+  SetProject,
+  SetProjectProjection, 
+  SetTaskProject,
+} from '../projects/projects.actions';
 import { 
   Activity,
-  assignEntriesToTasks, 
+  getId,
   InstanceEntry, 
   InstanceTask, 
   InstanceTimeOff, 
   processProjectProjection, 
-  Project, 
   ProjectsStateModel,
   Task
 } from '@betavc/timeqi-sh';
-import { Projects, Projects as ProjectsService } from './projects';
-import { catchError, map, mergeMap, of, tap } from 'rxjs';
-import { difference, dissoc, equals, is, isNotEmpty, pickBy, pipe, prop, reduce, sortBy } from 'ramda';
-import { CleanOrgTasks, NullifyProjectTask, SetProjectTasks, SetTaskProjection, SetTasksProjections } from '../tasks/tasks.actions';
+import { Projects as ProjectsService } from './projects';
+import { 
+  catchError, 
+  map, 
+  mergeMap, 
+  of, 
+} from 'rxjs';
+import { 
+  equals, 
+  isNotEmpty, 
+  pickBy, 
+  pipe, 
+  prop, 
+  reduce, 
+  sortBy 
+} from 'ramda';
+import { 
+  CleanProjectTasks, 
+  NullifyProjectTask, 
+  SetProjectTasks, 
+  SetProjectTaskProjection, 
+  SetProjectTasksProjections 
+} from '../tasks/tasks.actions';
 import { SetProjectOrganization } from '../organizations/organizations.actions';
-import { UpsertProjectTimeOff } from '../time-off/time-off.actions';
-import { TasksState } from '../tasks/tasks.state';
-import { EntriesState } from '../entries/entries.state';
-import { TimeOffState } from '../time-off/time-off.state';
-import { SetEntries } from '../entries/entries.actions';
-import { SetProjectActivity, SetTaskActivity } from '../activity/activity.actions';
+import { CleanProjectTimeOff, SetProjectTimeOff } from '../time-off/time-off.actions';
+import { CleanProjectTaskEntries, SetProjectTaskEntries } from '../entries/entries.actions';
+import { SetProjectActivity, SetProjectTaskActivity } from '../activity/activity.actions';
 
 
 @State<ProjectsStateModel>({
@@ -82,9 +106,8 @@ export class ProjectsState {
     (project, projection) => ({ ...project, ...projection })
   );
 
-  @Action(SetProjectOrgProjects)
   @Action(SetOrganizationProjects)
-  setOrganizationProjects(ctx: StateContext<ProjectsStateModel>, action: SetOrganizationProjects | SetProjectOrgProjects) {
+  setOrganizationProjects(ctx: StateContext<ProjectsStateModel>, action: SetOrganizationProjects) {
     const state = ctx.getState();
     ctx.setState({
       ...state,
@@ -95,49 +118,53 @@ export class ProjectsState {
   @Action(SetTaskProject)
   @Action(SetProject)
   setProject(ctx: StateContext<ProjectsStateModel>, action: SetProject) {
-    const project = this.store.selectSnapshot(state => state.projects.project);
-    const tasks = this.store.selectSnapshot(state => state.tasks.tasks);
-    const projectId = project ? project._id : null;
+    const state = ctx.getState();
+    const states = this.store.selectSnapshot(state => state);
+    const project = states.projects.project;
+    const projectId = project?._id;
+    if (!action.id && !project) {
+      console.warn('warning: No project id provided, nullifying project.');
+      return ctx.dispatch(new NullifyProject());
+    }
     const alreadyLoaded = projectId === action.id;
-    const getProject$ = alreadyLoaded ? of(project) : this.projectsService.getProject(action.id);
+    const getProject$ = alreadyLoaded && project ? 
+      of(project) : 
+      this.projectsService.getProject(action.id || projectId);
+
     return getProject$.pipe(
-      map(project => project
-        ? { 
-          project: dissoc<Project, 'tasks'>('tasks', project), 
-          tasks: (alreadyLoaded ? tasks : project.tasks) || [] }
-        : { 
-          project: null, 
-          tasks: [] 
-        }
-      ),
-      tap(({ project }) => {
-        const state = ctx.getState();
+      mergeMap(( project ) => {
         if (!project) {
-          console.warn('No organization found, setting project to null.');
-          ctx.setState({
-            ...state,
-            project: null
-          });
-        } else {
-          ctx.setState({
-            ...state,
-            project
-          });
+          console.warn('warning: No project found, nullifying project.');
+          return ctx.dispatch(new NullifyProject());
         }
-      }),
-      mergeMap(({ tasks, project }) => {
+
         const dispatches = [];
+        const tasks = states.tasks.tasks;
         // Get organization from global OrganizationsState
-        if (project) 
-          dispatches.push(new SetEntries(project._id));
-        dispatches.push(new SetProjectTasks(tasks as InstanceTask[]));
+        ctx.setState({
+          ...state,
+          project
+        });
+
+        dispatches.push(
+          new SetProjectTaskEntries(project._id),
+          new SetProjectTasks(alreadyLoaded ? tasks : project.tasks)
+        );
+        // If the project has timeOff, dispatch SetProjectTimeOff
+        if (project.timeOff && project.timeOff.length) 
+          dispatches.push(new SetProjectTimeOff(project.timeOff as InstanceTimeOff[]));
+
         if (project && project.organization) 
-          dispatches.push(new SetProjectOrganization(project.organization as string));
-        // If the project has timeOff, dispatch UpsertProjectTimeOff
-        if (project && project.timeOff && project.timeOff.length) 
-          dispatches.push(new UpsertProjectTimeOff(project.timeOff as InstanceTimeOff[]));
+          // No need to make assumptions here
+          // SetProjectOrganization will check if the org is loaded
+          dispatches.push(new SetProjectOrganization(
+            getId(project.organization)
+          ));
+        // If the action is SetProject, nullify the current project task
+        // we assume that the user is viewing all tasks
         if (action instanceof SetProject)
           dispatches.push(new NullifyProjectTask());
+
         return ctx.dispatch(dispatches);
       })
     );
@@ -177,12 +204,12 @@ export class ProjectsState {
           processedProject
         )
       });
-      dispatches.push(new SetTasksProjections(processedProject.tasks as InstanceTask[]))
+      dispatches.push(new SetProjectTasksProjections(processedProject.tasks as InstanceTask[]));
       if (task && isNotEmpty(processedProject.tasks)) {
         const taskProjection = processedProject.tasks![task.index] as Task;
         dispatches.push(
-          new SetTaskProjection(taskProjection),
-          new SetTaskActivity(taskProjection.activity || [])
+          new SetProjectTaskProjection(taskProjection),
+          new SetProjectTaskActivity(taskProjection.activity || [])
         );
       } else if (processedProject.tasks) {
         const projectActivity = pipe(
@@ -218,16 +245,36 @@ export class ProjectsState {
         })
       );
   }
+
+  @Action(NullifyProject)
   @Action(NullifyOrgProject)
-  removeOrgProject(ctx: StateContext<ProjectsStateModel>, action: NullifyOrgProject) {
+  nullifyProject(ctx: StateContext<ProjectsStateModel>) {
     const state = ctx.getState();
+    const dispatches = [];
     if (state.project) {
       ctx.setState({
         ...state,
         project: null,
         projection: null
       });
-      this.store.dispatch(new CleanOrgTasks());
+      dispatches.push(
+        new CleanProjectTasks(), 
+        new CleanProjectTimeOff(),
+        new CleanProjectTaskEntries()
+      );
     }
+    return ctx.dispatch(dispatches);
+  }
+
+  @Action(CleanOrgProjects)
+  cleanProjects(ctx: StateContext<ProjectsStateModel>) {
+    const state = ctx.getState();
+    ctx.setState({
+      ...state,
+      projects: []
+    });
+    return ctx.dispatch([
+      new NullifyProject(),
+    ]);
   }
 }

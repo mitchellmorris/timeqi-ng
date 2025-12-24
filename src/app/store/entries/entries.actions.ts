@@ -1,15 +1,11 @@
-import { InstanceEntry, InstanceTask } from '@betavc/timeqi-sh';
 
-export class SetTaskEntries {
-  static readonly type = '[Task] Set Task Entries';
-  constructor(public taskId: string) { }
-}
-export class SetEntries {
-  static readonly type = '[Project] Set Project Entries';
+
+export class SetProjectTaskEntries {
+  static readonly type = '[Project] Set Project Task Entries';
   constructor(public projectId: string) { }
 }
-export class CleanTaskEntries {
-  static readonly type = '[Task] Clean Task Entries';
+export class CleanProjectTaskEntries {
+  static readonly type = '[Project] Clean Project Task Entries';
   constructor() { }
 }
 

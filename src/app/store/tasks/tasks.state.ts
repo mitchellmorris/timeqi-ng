@@ -1,13 +1,22 @@
 import { Injectable } from '@angular/core';
 import { State, Action, Selector, StateContext, Store } from '@ngxs/store';
-import { CleanOrgTasks, NullifyProjectTask, SetProjectTasks, SetTask, SetTaskProjection, SetTasksProjections, UpdateTask } from './tasks.actions';
-import { InstanceEntry, InstanceTask, Task, TasksStateModel } from '@betavc/timeqi-sh';
+import { 
+  CleanProjectTasks, 
+  NullifyProjectTask, 
+  NullifyTask, 
+  SetProjectTasks, 
+  SetTask, 
+  SetProjectTaskProjection, 
+  SetProjectTasksProjections, 
+  UpdateTask 
+} from './tasks.actions';
+import { getId, InstanceTimeOff, TasksStateModel } from '@betavc/timeqi-sh';
 import { Tasks as TasksService } from './tasks';
 import { catchError, map, mergeMap, of, tap } from 'rxjs';
-import { addIndex, dissoc, equals, pickBy } from 'ramda';
-import { CleanTaskEntries, NullifyTaskEntry, SetTaskEntries } from '../entries/entries.actions';
+import { equals, pickBy } from 'ramda';
 import { SetTaskProject } from '../projects/projects.actions';
 import { CleanTaskActivity } from '../activity/activity.actions';
+import { CleanTaskTimeOff, SetTaskTimeOff } from '../time-off/time-off.actions';
 
 @State<TasksStateModel>({
   name: 'tasks',
@@ -49,56 +58,45 @@ export class TasksState {
 
   @Action(SetTask)
   setTask(ctx: StateContext<TasksStateModel>, action: SetTask) {
-    const state = this.store.selectSnapshot(state => state);
-    const task = state.tasks.task;
-    const entries = state.entries.entries;
-    const taskId = task ? task._id : null;
-    const getTask$ = taskId === action.id ? of(task) : this.tasksService.getTask(action.id!);
-    if (!action.id) {
-      ctx.setState({
-        ...ctx.getState(),
-        task: null
-      });
-      ctx.dispatch(new CleanTaskEntries());
+    const state = ctx.getState();
+    const states = this.store.selectSnapshot(state => state);
+    const task = states.tasks.task;
+    const taskId =  task?._id;
+    if (!action.id && !task) {
+      console.warn('warning: No task id provided, nullifying task.');
+      ctx.dispatch(new NullifyTask());
       return;
     }
+    const getTask$ = taskId === action.id && task ? 
+      of(task) :
+      this.tasksService.getTask(action.id || taskId);
+      
     return getTask$.pipe(
-      map(task => task
-        ? { 
-          task: dissoc<Task, 'entries'>('entries', task), 
-          entries: task.entries || entries 
-        }
-        : { 
-          task: null, 
-          entries: [] 
-        }
-      ),
-      tap(({ task }) => {
-        const state = ctx.getState();
+      mergeMap(( task ) => {
         if (!task) {
-          console.warn('No task found, setting task to null.');
-          ctx.setState({
-            ...state,
-            task: null
-          });
-        } else {
-          ctx.setState({
-            ...state,
-            task
-          });
+          console.warn('warning: No task found, nullifying task.');
+          return ctx.dispatch(new NullifyTask());
         }
-      }),
-      mergeMap(({ entries, task }) => {
+        
         const dispatches = [];
+
+        ctx.setState({
+          ...state,
+          task
+        });
         // Get project from global ProjectsState
         // Note: We are assuming that setting the new project also sets the organization.
-        if (task && task.project) {
-          dispatches.push(new SetTaskProject(task.project as string));
-        }
+        if (task.project) 
+          dispatches.push(new SetTaskProject(getId(task.project)));
+
+        if (task.timeOff && task.timeOff.length) 
+          dispatches.push(new SetTaskTimeOff(task.timeOff));
+
         return ctx.dispatch(dispatches);
       })
     );
   }
+
   @Action(UpdateTask)
   updateTask(ctx: StateContext<TasksStateModel>, action: UpdateTask) {
     return this.tasksService.updateTask(action.id, action.task).pipe(
@@ -118,8 +116,8 @@ export class TasksState {
     );
   }
 
-  @Action(SetTaskProjection)
-  setTaskProjection(ctx: StateContext<TasksStateModel>, action: SetTaskProjection) {
+  @Action(SetProjectTaskProjection)
+  setTaskProjection(ctx: StateContext<TasksStateModel>, action: SetProjectTaskProjection) {
     const state = ctx.getState();
     ctx.setState({
       ...state,
@@ -140,8 +138,8 @@ export class TasksState {
     });
   }
 
-  @Action(SetTasksProjections)
-  setTasksProjections(ctx: StateContext<TasksStateModel>, action: SetTasksProjections) {
+  @Action(SetProjectTasksProjections)
+  setTasksProjections(ctx: StateContext<TasksStateModel>, action: SetProjectTasksProjections) {
     const state = ctx.getState();
     ctx.setState({
       ...state,
@@ -170,23 +168,30 @@ export class TasksState {
     });
   }
 
+  @Action(NullifyTask)
   @Action(NullifyProjectTask)
   nullifyProjectTask(ctx: StateContext<TasksStateModel>) {
     ctx.setState({
       ...ctx.getState(),
-      task: null
-    });
-    ctx.dispatch(new NullifyTaskEntry());
-  }
-
-  @Action(CleanOrgTasks)
-  cleanOrgTasks(ctx: StateContext<TasksStateModel>) {
-    ctx.setState({
-      tasks: [],
       task: null,
       projection: null,
+    });
+    return ctx.dispatch([
+      new CleanTaskTimeOff(),
+      new CleanTaskActivity()
+    ]);
+  }
+
+  @Action(CleanProjectTasks)
+  cleanTasks(ctx: StateContext<TasksStateModel>) {
+    const state = ctx.getState();
+    ctx.setState({
+      ...state,
+      tasks: [],
       projections: []
     });
-    ctx.dispatch(new CleanTaskActivity());
+    return ctx.dispatch([
+      new NullifyProjectTask(),
+    ]);
   }
 }

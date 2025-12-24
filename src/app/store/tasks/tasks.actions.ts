@@ -1,53 +1,41 @@
 import { InstanceTask, Task } from '@betavc/timeqi-sh';
 
-/**
- * @Action(SetTaskProject)
- * @Action(SetProject)
- * Dispatches the action to set the project tasks.
- */
 export class SetProjectTasks {
   static readonly type = '[Project] Set Project Tasks';
   constructor(public tasks: InstanceTask[]) { }
 }
-/**
- * taskResolver.ts
- * Resolves the task for the given ID.
- */
+
 export class SetTask {
-  static readonly type = '[Project] Set Task';
+  static readonly type = '[Task Resolver] Set Task';
   constructor(public id: string | null) { }
 }
 
-export class SetTaskProjection {
+export class SetProjectTaskProjection {
   static readonly type = '[Project] Set Task Projection';
   constructor(readonly taskProjection: Task) { }
 }
 
-export class SetTasksProjections {
+export class SetProjectTasksProjections {
   static readonly type = '[Project] Set Tasks Projections';
   constructor(readonly taskProjections: Partial<InstanceTask>[]) { }
 }
-/**
- * 
- */
+
 export class UpdateTask {
-  static readonly type = '[Task] Update Task';
+  static readonly type = '[Task Edit Form] Update Task';
   constructor(public id: string, public task: Partial<Task>) { }
 }
-/**
- * @Action(SetProject)
- * Dispatches the action to set the project
- * and nullify the current task.
- */
+
 export class NullifyProjectTask {
   static readonly type = '[Project] Nullify Project Task';
   constructor() { }
 }
-/**
- * @Action(NullifyOrgProject)
- * Dispatches the action to clean all tasks for the organization.
- */
-export class CleanOrgTasks {
-  static readonly type = '[Org] Clean Org Tasks';
+
+export class NullifyTask {
+  static readonly type = '[Task] Nullify Task';
+  constructor() { }
+}
+
+export class CleanProjectTasks {
+  static readonly type = '[Project] Clean Project Tasks';
   constructor() { }
 }

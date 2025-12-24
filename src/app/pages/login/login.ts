@@ -6,7 +6,7 @@ import { FieldsetModule } from 'primeng/fieldset';
 import { FormGroup, FormBuilder, Validators, ReactiveFormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { Auth } from '../../providers/auth/auth';
-import { SetUser } from '../../store/user/user.actions';
+import { SetLoginUser } from '../../store/user/user.actions';
 import { Store } from '@ngxs/store';
 // import { AuthService } from '../services/auth.service';
 
@@ -46,7 +46,7 @@ export class Login {
       this.authService.login(val.email, val.password)
         .subscribe(
           () => {
-            this.store.dispatch(new SetUser());
+            this.store.dispatch(new SetLoginUser());
             this.router.navigateByUrl('/');
           }
         );

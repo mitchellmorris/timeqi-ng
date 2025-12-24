@@ -1,14 +1,37 @@
 import { Injectable } from '@angular/core';
-import { State, Action, Selector, StateContext, Store, } from '@ngxs/store';
-import { SaveOrganizationSchedule, SetOrganization, SetProjectOrganization, SetUserOrganizations } from './organizations.actions';
-import { Organization, OrganizationsStateModel, InstanceProject, InstanceTimeOff, InstanceUser } from '@betavc/timeqi-sh';
+import { 
+  State, 
+  Action, 
+  Selector, 
+  StateContext, 
+  Store, 
+} from '@ngxs/store';
+import { 
+  NullifyOrganization,
+  SaveOrganizationSchedule, 
+  SetOrganization, 
+  SetProjectOrganization, 
+  SetUserOrganizations 
+} from './organizations.actions';
+import { 
+  OrganizationsStateModel, 
+} from '@betavc/timeqi-sh';
 import { Organizations as OrganizationsService } from './organizations';
-import { map, mergeMap, tap, of } from 'rxjs';
+import { mergeMap, tap, of } from 'rxjs';
 import { catchError } from 'rxjs/operators';
-import { dissoc, omit } from 'ramda';
-import { NullifyOrgProject, SetOrganizationProjects, SetProjectOrgProjects } from '../projects/projects.actions';
-import { UpsertOrgTimeOff } from '../time-off/time-off.actions';
-import { SetOrganizationUsers } from '../user/user.actions';
+import { 
+  CleanOrgProjects,
+  NullifyOrgProject, 
+  SetOrganizationProjects,
+} from '../projects/projects.actions';
+import { 
+  CleanOrgTimeOff, 
+  SetOrgTimeOff, 
+} from '../time-off/time-off.actions';
+import { 
+  CleanOrganizationUsers, 
+  SetOrganizationUsers, 
+} from '../user/user.actions';
 
 
 @State<OrganizationsStateModel>({
@@ -26,7 +49,6 @@ export class OrganizationsState {
     private orgsService: OrganizationsService
   ) {}
 
-
   @Selector()
   static getState(state: OrganizationsStateModel) { return state; }
 
@@ -42,54 +64,59 @@ export class OrganizationsState {
   @Action(SetProjectOrganization)
   @Action(SetOrganization)
   setOrganization(ctx: StateContext<OrganizationsStateModel>, action: SetOrganization | SetProjectOrganization) {
-    const state = this.store.selectSnapshot(state => state);
-    const organizationId = state.organizations.organization ? state.organizations.organization._id : null;
+    const state = ctx.getState();
+    const states = this.store.selectSnapshot(state => state);
+    const organization = states.organizations.organization;
+    // Check if the organization is already in the state
+    const organizationId = organization?._id;
+    if (!action.id && !organization) {
+      console.warn('warning: No organization id provided, nullifying organization.');
+      return ctx.dispatch(new NullifyOrganization());
+    }
+
+    // Only fetch the organization if it's not already in the state
     const getOrg$ = organizationId === action.id ? 
-      of(state.organizations.organization) : 
-      this.orgsService.getOrganization(action.id);
+      of(organization) : 
+      this.orgsService.getOrganization(action.id || organizationId);
+
     return getOrg$.pipe(
-      map(organization => organization
-        ? { 
-          organization: omit(['projects', 'timeOff', 'users'], organization) as Organization, 
-          projects: organization.projects as InstanceProject[] || state.projects.projects,
-          timeOff: organization.timeOff as InstanceTimeOff[] || state.timeoff.timeoffs,
-          users: organization.users as InstanceUser[] || state.users.users
-        } : { organization: null, projects: [], timeOff: [], users: [] }
-      ),
-      tap(({ organization }) => {
-        const state = ctx.getState();
+      mergeMap((organization) => {
         if (!organization) {
-          ctx.setState({
-            ...state,
-            organization: null
-          });
-        } else {
-          ctx.setState({
-            ...state,
-            organization
-          });
+          console.warn('warning: No organization found, nullifying organization.');
+          return ctx.dispatch(new NullifyOrganization());
         }
-      }),
-      mergeMap(({ projects, timeOff, users }) => {
+
         const dispatches = [];
-        if (action instanceof SetProjectOrganization) {
-          dispatches.push(new SetProjectOrgProjects(projects));
-        } else if (action instanceof SetOrganization) {
+        const projects = organization.projects || states.projects.projects;
+        const timeOff = organization.timeOff || states.timeoff.timeoffs;
+        const users = organization.users || states.users.users;
+
+        ctx.setState({
+          ...state,
+          organization
+        });
+
+        // If the action is setting a project organization, update the projects list
+        if (action instanceof SetOrganization)
           // nullifying the project
+          // and cleaning the time off
           // when visiting the organization page
           dispatches.push(new NullifyOrgProject());
-          dispatches.push(new SetOrganizationProjects(projects));
-        }
-        if (timeOff.length) {
-          dispatches.push(new UpsertOrgTimeOff(timeOff));
-        }
-        if (users.length) {
+        // Also calls setOrganizationProjects
+        dispatches.push(new SetOrganizationProjects(projects));
+
+        if (timeOff.length > 0) 
+          // set or override the organization's time off
+          dispatches.push(new SetOrgTimeOff(timeOff));
+
+        if (users.length > 0) 
           dispatches.push(new SetOrganizationUsers(users));
-        }
+
         return ctx.dispatch(dispatches);
       })
     );
   }
+
   @Action(SaveOrganizationSchedule)
   saveOrganizationSchedule(ctx: StateContext<OrganizationsStateModel>, action: SaveOrganizationSchedule) {
     const state = ctx.getState();
@@ -111,5 +138,23 @@ export class OrganizationsState {
         return of(null);
       })
     );
+  }
+
+  @Action(NullifyOrganization)
+  nullifyOrganization(ctx: StateContext<OrganizationsStateModel>) {
+    const state = ctx.getState();
+    const dispatches = [];
+    if (state.organization) {
+      ctx.setState({
+        ...state,
+        organization: null
+      });
+      dispatches.push(
+        new CleanOrgTimeOff(),
+        new CleanOrganizationUsers(),
+        new CleanOrgProjects()
+      );
+    }
+    return ctx.dispatch(dispatches);
   }
 }

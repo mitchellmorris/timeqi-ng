@@ -1,7 +1,7 @@
 import { Activity } from "@betavc/timeqi-sh";
 
-export class SetTaskActivity {
-  static readonly type = '[Task] Set Task Activity';
+export class SetProjectTaskActivity {
+  static readonly type = '[Project] Set Project Task Activity';
   constructor(public activity: Activity[]) { }
 }
 

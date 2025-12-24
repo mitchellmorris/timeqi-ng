@@ -1,7 +1,11 @@
 import { Injectable } from '@angular/core';
 import { State, Action, Selector, StateContext, Store } from '@ngxs/store';
 import { EntriesStateModel, Entry, InstanceEntry } from '@betavc/timeqi-sh';
-import { CleanTaskEntries, NullifyTaskEntry, SetEntries, SetTaskEntries } from './entries.actions';
+import { 
+  CleanProjectTaskEntries, 
+  NullifyTaskEntry, 
+  SetProjectTaskEntries,
+} from './entries.actions';
 import { Entries } from './entries';
 import { mergeMap, tap } from 'rxjs/operators';
 import { of, reduce } from 'ramda';
@@ -31,8 +35,8 @@ export class EntriesState {
     return state.entries;
   }
 
-  @Action(SetEntries)
-  setEntries(ctx: StateContext<EntriesStateModel>, action: SetEntries) {
+  @Action(SetProjectTaskEntries)
+  setEntries(ctx: StateContext<EntriesStateModel>, action: SetProjectTaskEntries) {
     const state = this.store.selectSnapshot(state => state);
     const task = state.tasks.task;
     return this.entriesService.getEntries(action.projectId).pipe(
@@ -62,13 +66,13 @@ export class EntriesState {
     });
   }
 
-  @Action(CleanTaskEntries)
-  cleanTaskEntries(ctx: StateContext<EntriesStateModel>) {
+  @Action(CleanProjectTaskEntries)
+  cleanProjectEntries(ctx: StateContext<EntriesStateModel>) {
     const state = ctx.getState();
     ctx.setState({
       ...state,
-      entries: {},
-      entry: null
+      entries: {}
     });
+    ctx.dispatch(new NullifyTaskEntry());
   }
 }

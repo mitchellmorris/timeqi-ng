@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { State, Action, Selector, StateContext, Store } from '@ngxs/store';
-import { CleanTaskActivity, SetProjectActivity, SetTaskActivity } from './activity.actions';
+import { CleanTaskActivity, SetProjectActivity, SetProjectTaskActivity } from './activity.actions';
 import { ActivityStateModel, InstanceProject, InstanceTask, Project, Activity } from '@betavc/timeqi-sh';
 import { reduce } from 'ramda';
 
@@ -25,8 +25,8 @@ export class ActivityState {
   }
 
   @Action(SetProjectActivity)
-  @Action(SetTaskActivity)
-  addTaskActivity(ctx: StateContext<ActivityStateModel>, { activity }: SetTaskActivity) {
+  @Action(SetProjectTaskActivity)
+  addTaskActivity(ctx: StateContext<ActivityStateModel>, { activity }: SetProjectTaskActivity) {
     const state = ctx.getState();
     ctx.setState({
       ...state,

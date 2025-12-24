@@ -1,24 +1,16 @@
 import { computed, effect, inject, Injectable, signal, Signal, WritableSignal } from '@angular/core';
-import { StateUtils } from '../utils/state';
 import { ProjectsState } from '../../store/projects/projects.state';
 import { 
-  Activity,
   assignEntriesToTasks,
-  Entry,
-  InstanceEntry, 
   InstanceTask, 
-  InstanceTimeOff, 
-  processProjectProjection, 
   Project,
   ProjectEntries,
   Task,
-  TimeOff
 } from '@betavc/timeqi-sh';
 import { Store } from '@ngxs/store';
 import { TasksState } from '../../store/tasks/tasks.state';
 import { EntriesState } from '../../store/entries/entries.state';
 import { SetProjectProjection } from '../../store/projects/projects.actions';
-import { SetTaskProjection } from '../../store/tasks/tasks.actions';
 
 @Injectable({
   providedIn: 'root'
