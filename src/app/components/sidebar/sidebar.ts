@@ -2,10 +2,10 @@ import { Component, inject, computed } from '@angular/core';
 import { Store } from '@ngxs/store';
 import { MenuItem } from 'primeng/api';
 import { MenuModule } from 'primeng/menu';
-import { toSignal } from '@angular/core/rxjs-interop';
-import { combineLatest } from 'rxjs';
-import { ProjectsStateModel, OrganizationsStateModel, TasksStateModel } from '@betavc/timeqi-sh';
 import { StateUtils } from '../../providers/utils/state';
+import { OrganizationsState } from '../../store/organizations/organizations.state';
+import { ProjectsState } from '../../store/projects/projects.state';
+import { TasksState } from '../../store/tasks/tasks.state';
 
 @Component({
   selector: 'app-sidebar',
@@ -20,25 +20,19 @@ import { StateUtils } from '../../providers/utils/state';
 })
 export class Sidebar {
   readonly store = inject(Store);
-  readonly stateUtils = inject(StateUtils);
-  organizations$ = this.stateUtils.getState$(state => state.organizations);
-  projects$ = this.stateUtils.getState$(state => state.projects);
-  tasks$ = this.stateUtils.getState$(state => state.tasks);
-  states$ = combineLatest([
-    this.organizations$, 
-    this.projects$,
-    this.tasks$
-  ]);
-  states = toSignal(this.states$, { initialValue: null });
+  organizations = this.store.selectSignal(OrganizationsState.getState);
+  projects = this.store.selectSignal(ProjectsState.getState);
+  task = this.store.selectSignal(TasksState.getState);
+
+  private _index = 0;
+  get index() {
+    return this._index++ - 1;
+  }
   menuItems = computed(() => {
-    const [
-      { organization, organizations }, 
-      { project, projects },
-      { task, tasks }
-    ] = this.states() as [OrganizationsStateModel, ProjectsStateModel, TasksStateModel];
-    if (!this.states()) {
-      return [];
-    }
+    const { organization, organizations } = this.organizations();
+    const { project, projects } = this.projects();
+    const { task, tasks } = this.task();
+    
     const menuItems: MenuItem[] = [];
     if (!!organization) {
       menuItems.splice(0, 0, {
@@ -47,9 +41,19 @@ export class Sidebar {
       // Submenu for organization
       const orgItems: MenuItem[] = [];
         orgItems.push({
-          label: "Projects",
+          label: `Projects (${projects.length})`,
           icon: 'pi pi-briefcase',
-          routerLink: ['organization', organization._id]
+          ...projects.length > 1 ? {
+            routerLink: ['organization', organization._id],
+          } : {
+            // TODO: Why is tooltip not showing when there is only one project?
+            tooltip: "This is available with more projects.",
+            disabled: true
+          } 
+        });
+        orgItems.push({
+          label: "Create New Project",
+          icon: 'pi pi-briefcase'
         });
         orgItems.push({
           label: "Settings",
@@ -68,7 +72,7 @@ export class Sidebar {
         menuItems.splice(3, 0, {
           label: `Project: ${project.name}`,
           items: [{
-            label: "Tasks",
+            label: `Tasks (${tasks.length})`,
             icon: 'pi pi-list-check',
             routerLink: ['project', project._id]
           }, {
@@ -100,6 +104,31 @@ export class Sidebar {
         }
       } 
     }
+    menuItems.splice(6, 0, {
+      separator: true
+    });
+    const orgsItems: MenuItem[] = [];
+      orgsItems.push({
+        label: `Organizations (${organizations.length})`,
+        icon: 'pi pi-building',
+        ...organizations.length > 1 ? {
+          routerLink: ['organizations'],
+        } : {
+          // TODO: Why is tooltip not showing when there is only one organization?
+          tooltip: "This is available with more organizations.",
+          disabled: true
+        },
+        
+      });
+      orgsItems.push({
+        label: "Create Organization",
+        icon: 'pi pi-building'
+      });
+    // Add Organization with submenu
+    menuItems.splice(7, 0, {
+      label: "Account",
+      items: orgsItems
+    });
     return menuItems;
   });
 }
