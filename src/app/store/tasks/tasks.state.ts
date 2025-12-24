@@ -61,17 +61,17 @@ export class TasksState {
     const state = ctx.getState();
     const states = this.store.selectSnapshot(state => state);
     const task = states.tasks.task;
-    const taskId =  task?._id;
+    const taskId = task?._id;
+
     if (!action.id && !task) {
       console.warn('warning: No task id provided, nullifying task.');
       ctx.dispatch(new NullifyTask());
       return;
     }
-    const getTask$ = taskId === action.id && task ? 
-      of(task) :
-      this.tasksService.getTask(action.id || taskId);
+
+    if (taskId === action.id && task) return;
       
-    return getTask$.pipe(
+    return this.tasksService.getTask(action.id || taskId).pipe(
       mergeMap(( task ) => {
         if (!task) {
           console.warn('warning: No task found, nullifying task.');
@@ -87,10 +87,12 @@ export class TasksState {
         // Get project from global ProjectsState
         // Note: We are assuming that setting the new project also sets the organization.
         if (task.project) 
-          dispatches.push(new SetTaskProject(getId(task.project)));
+          dispatches.push(new SetTaskProject(
+            getId(task.project)
+          ));
 
         if (task.timeOff && task.timeOff.length) 
-          dispatches.push(new SetTaskTimeOff(task.timeOff));
+          dispatches.push(new SetTaskTimeOff(task.timeOff as InstanceTimeOff[]));
 
         return ctx.dispatch(dispatches);
       })

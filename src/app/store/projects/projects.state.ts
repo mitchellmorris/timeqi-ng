@@ -122,16 +122,22 @@ export class ProjectsState {
     const states = this.store.selectSnapshot(state => state);
     const project = states.projects.project;
     const projectId = project?._id;
+    
     if (!action.id && !project) {
       console.warn('warning: No project id provided, nullifying project.');
       return ctx.dispatch(new NullifyProject());
     }
-    const alreadyLoaded = projectId === action.id;
-    const getProject$ = alreadyLoaded && project ? 
-      of(project) : 
-      this.projectsService.getProject(action.id || projectId);
 
-    return getProject$.pipe(
+    const alreadyLoaded = projectId === action.id;
+    if (alreadyLoaded) {
+      if (action instanceof SetProject) {
+        return ctx.dispatch(new NullifyProjectTask());
+      } else {
+        return;
+      }
+    }
+
+    return this.projectsService.getProject(action.id || projectId).pipe(
       mergeMap(( project ) => {
         if (!project) {
           console.warn('warning: No project found, nullifying project.');

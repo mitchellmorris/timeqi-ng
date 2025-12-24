@@ -1,4 +1,4 @@
-import { Component, inject, effect } from '@angular/core';
+import { Component, inject, effect, Signal } from '@angular/core';
 import { Store } from '@ngxs/store';
 import { Router } from '@angular/router';
 import { ProjectsState } from '../../store/projects/projects.state';
@@ -19,13 +19,8 @@ import { StateUtils } from '../../providers/utils/state';
 export class Organization {
   readonly store = inject(Store);
   readonly stateUtils = inject(StateUtils);
-  projects$: Observable<InstanceProject[]> = this.stateUtils.getState$(
-    ProjectsState.getState,
-    'projects'
-  ).pipe(
-    filter(projects => projects.length > 0),
-  );
-  projects = toSignal(this.projects$, { initialValue: [] as InstanceProject[] });
+
+  projects: Signal<InstanceProject[]> = this.store.selectSignal(ProjectsState.getProjects);
 
   constructor(
     private router: Router

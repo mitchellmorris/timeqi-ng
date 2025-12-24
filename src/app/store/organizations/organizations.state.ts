@@ -52,6 +52,12 @@ export class OrganizationsState {
   @Selector()
   static getState(state: OrganizationsStateModel) { return state; }
 
+  @Selector()
+  static getOrganization(state: OrganizationsStateModel) { return state.organization; }
+
+  @Selector()
+  static getOrganizations(state: OrganizationsStateModel) { return state.organizations; }
+
   @Action(SetUserOrganizations) 
   setUserOrganizations(ctx: StateContext<OrganizationsStateModel>, action: SetUserOrganizations) {
     const state = ctx.getState();
@@ -67,19 +73,25 @@ export class OrganizationsState {
     const state = ctx.getState();
     const states = this.store.selectSnapshot(state => state);
     const organization = states.organizations.organization;
-    // Check if the organization is already in the state
     const organizationId = organization?._id;
+
     if (!action.id && !organization) {
       console.warn('warning: No organization id provided, nullifying organization.');
       return ctx.dispatch(new NullifyOrganization());
     }
-
     // Only fetch the organization if it's not already in the state
-    const getOrg$ = organizationId === action.id ? 
-      of(organization) : 
-      this.orgsService.getOrganization(action.id || organizationId);
+    if (organizationId === action.id) {
+      if (action instanceof SetOrganization) {
+        // We still need to nullify the project since no project is selected
+        return ctx.dispatch(new NullifyOrgProject());
+      } else {
+        return;
+      }
+    };
 
-    return getOrg$.pipe(
+    return this.orgsService.getOrganization(
+      action.id || organizationId
+    ).pipe(
       mergeMap((organization) => {
         if (!organization) {
           console.warn('warning: No organization found, nullifying organization.');
