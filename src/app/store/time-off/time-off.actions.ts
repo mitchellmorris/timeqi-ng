@@ -29,3 +29,8 @@ export class CleanTaskTimeOff {
   static readonly type = '[Task] Clean Task Time Off';
   constructor() { }
 }
+
+export class SetProjectTasksTimeOff {
+  static readonly type = '[Project] Set Project Task Time Off';
+  constructor(readonly timeOff: InstanceTimeOff[]) { }
+}

@@ -10,10 +10,10 @@ import {
   SetProjectTasksProjections, 
   UpdateTask 
 } from './tasks.actions';
-import { getId, InstanceTimeOff, TasksStateModel } from '@betavc/timeqi-sh';
+import { getId, InstanceTimeOff, Task, TasksStateModel } from '@betavc/timeqi-sh';
 import { Tasks as TasksService } from './tasks';
 import { catchError, map, mergeMap, of, tap } from 'rxjs';
-import { equals, pickBy } from 'ramda';
+import { equals, omit, pickBy } from 'ramda';
 import { SetTaskProject } from '../projects/projects.actions';
 import { CleanTaskActivity } from '../activity/activity.actions';
 import { CleanTaskTimeOff, SetTaskTimeOff } from '../time-off/time-off.actions';
@@ -45,7 +45,10 @@ export class TasksState {
   static getTasks(state: TasksStateModel) { return state.tasks; }
 
   @Selector()
-  static getProjection(state: TasksStateModel) { return state.projection; }
+  static getProjection(state: TasksStateModel): Task | null { 
+    if (!state.task) return null;
+    return { ...state.task, ...state.projection } as Task;
+  }
 
   @Action(SetProjectTasks)
   setProjectTasks(ctx: StateContext<TasksStateModel>, action: SetProjectTasks) {
@@ -82,7 +85,12 @@ export class TasksState {
 
         ctx.setState({
           ...state,
-          task
+          task: omit([
+            'activity',
+            'timeOff',
+            'users',
+            'entries'
+          ], task)
         });
         // Get project from global ProjectsState
         // Note: We are assuming that setting the new project also sets the organization.
@@ -128,7 +136,6 @@ export class TasksState {
             return !equals(value, state.task![key]) &&
             // exclude these
             [
-              'tasks',
               'activity',
               'timeOff',
               'users',
@@ -145,7 +152,7 @@ export class TasksState {
     const state = ctx.getState();
     ctx.setState({
       ...state,
-      projections: action.taskProjections.map((task) => {
+      projections: action.projections.map((task) => {
         return pickBy(
           (value, key) => {
             // only include these keys

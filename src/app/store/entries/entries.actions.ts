@@ -1,6 +1,6 @@
 
 
-export class SetProjectTaskEntries {
+export class SetProjectTasksEntries {
   static readonly type = '[Project] Set Project Task Entries';
   constructor(public projectId: string) { }
 }

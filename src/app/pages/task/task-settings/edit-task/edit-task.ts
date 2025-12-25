@@ -23,8 +23,6 @@ import { ProjectLens } from '../../../../components/project-lens/project-lens';
 })
 export class EditTask {
   readonly store = inject(Store);
-  readonly route = inject(ActivatedRoute);
-  id = this.route.snapshot.params['taskId'];
   // Remember that that the taskResolver should have already fetched the task
   task: Signal<Task | null> = this.store.selectSignal(TasksState.getTask);
   taskProjection: Signal<Task | null> = this.store.selectSignal(TasksState.getProjection);
@@ -34,12 +32,14 @@ export class EditTask {
   ) {}
 
   onChanges(formData: Partial<Task>) {
-    this.projection.taskModel.set(formData);
+    this.projection.taskModel.set(
+      { ...this.task(), ...formData }
+    );
   }
 
   onSubmit(formData: Partial<Task>) {
     this.store.dispatch(new UpdateTask(
-      this.id,
+      this.task()!._id,
       {
         ...(this.taskProjection() || {}),
         ...formData

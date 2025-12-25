@@ -4,7 +4,7 @@ import { EntriesStateModel, Entry, InstanceEntry } from '@betavc/timeqi-sh';
 import { 
   CleanProjectTaskEntries, 
   NullifyTaskEntry, 
-  SetProjectTaskEntries,
+  SetProjectTasksEntries,
 } from './entries.actions';
 import { Entries } from './entries';
 import { mergeMap, tap } from 'rxjs/operators';
@@ -35,8 +35,8 @@ export class EntriesState {
     return state.entries;
   }
 
-  @Action(SetProjectTaskEntries)
-  setEntries(ctx: StateContext<EntriesStateModel>, action: SetProjectTaskEntries) {
+  @Action(SetProjectTasksEntries)
+  setEntries(ctx: StateContext<EntriesStateModel>, action: SetProjectTasksEntries) {
     const state = this.store.selectSnapshot(state => state);
     const task = state.tasks.task;
     return this.entriesService.getEntries(action.projectId).pipe(

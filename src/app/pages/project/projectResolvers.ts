@@ -6,7 +6,7 @@ import { ProjectsState } from '../../store/projects/projects.state';
 import { filter, first, map } from 'rxjs';
 import { ProjectsStateModel } from '@betavc/timeqi-sh';
 import { StateUtils } from '../../providers/utils/state';
-import { SetProjectTaskEntries } from '../../store/entries/entries.actions';
+import { SetProjectTasksEntries } from '../../store/entries/entries.actions';
 
 export const projectResolver: ResolveFn<ProjectsStateModel> = (route: ActivatedRouteSnapshot, state: RouterStateSnapshot) => {
   const store = inject(Store);

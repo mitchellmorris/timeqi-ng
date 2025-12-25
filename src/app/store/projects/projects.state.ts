@@ -17,6 +17,7 @@ import {
   InstanceTask, 
   InstanceTimeOff, 
   processProjectProjection, 
+  Project, 
   ProjectsStateModel,
   Task
 } from '@betavc/timeqi-sh';
@@ -30,6 +31,7 @@ import {
 import { 
   equals, 
   isNotEmpty, 
+  omit, 
   pickBy, 
   pipe, 
   prop, 
@@ -44,9 +46,12 @@ import {
   SetProjectTasksProjections 
 } from '../tasks/tasks.actions';
 import { SetProjectOrganization } from '../organizations/organizations.actions';
-import { CleanProjectTimeOff, SetProjectTimeOff } from '../time-off/time-off.actions';
-import { CleanProjectTaskEntries, SetProjectTaskEntries } from '../entries/entries.actions';
+import { CleanProjectTimeOff, SetProjectTasksTimeOff, SetProjectTimeOff } from '../time-off/time-off.actions';
+import { CleanProjectTaskEntries, SetProjectTasksEntries } from '../entries/entries.actions';
 import { SetProjectActivity, SetProjectTaskActivity } from '../activity/activity.actions';
+import { TasksState } from '../tasks/tasks.state';
+import { EntriesState } from '../entries/entries.state';
+import { TimeOffState } from '../time-off/time-off.state';
 
 
 @State<ProjectsStateModel>({
@@ -75,36 +80,65 @@ export class ProjectsState {
   static getProjects(state: ProjectsStateModel) { return state.projects; }
 
   @Selector()
-  static getProjection(state: ProjectsStateModel) { return state.projection; }
+  static getProjection(state: ProjectsStateModel): Project | null { 
+    if (!state.project) return null;
+    return { ...state.project, ...state.projection } as Project;
+   }
+  
+    // @Selector()
+    // static getProjection(state: TasksStateModel): Task | null { 
+    //   if (!state.task) return null;
+    //   return { ...state.task, ...state.projection } as Task;
+    // }
 
-  // Keeping here as reference for future use
-  // static getProjectProjection = createSelector(
+  static getPopulatedProject = createSelector(
+    [
+      TasksState.getTasks,
+      EntriesState.getEntries,
+      TimeOffState.getState,
+      ProjectsState.getProject
+    ],
+    (tasks, entries, timeOff, project) => {
+      if (!project) return null;
+      return { 
+        ...project, 
+        tasks: tasks.map(task => ({
+          ...task,
+          entries: entries[task._id] || [],
+          timeOff: timeOff.tasks[task._id] || []
+        })), 
+        timeOff: timeOff.lookup.project
+      };
+    }
+  );
+
+  // static getPopulatedProject = createSelector(
   //   [
-  //     TasksState.getTasks, 
-  //     EntriesState.getEntries, 
-  //     TimeOffState.getTimeOffs,
-  //     (state: ProjectsStateModel) => state.project
+  //     TasksState.getState,
+  //     EntriesState.getEntries,
+  //     TimeOffState.getState,
+  //     ProjectsState.getProject
   //   ],
-  //   async (tasks, projectEntries, timeOffs, project) => {
-  //     return await processProjectProjection(
-  //       {
-  //         ...project as Project,
-  //         tasks: assignEntriesToTasks(tasks as InstanceTask[], projectEntries)
-  //       }, 0, {
-  //         relativeTimeOff: timeOffs
-  //       }
-  //     );
+  //   ({ task, tasks }, entries, timeOff, project) => {
+  //     if (!project) return null;
+  //     if (task)
+  //       tasks.splice(
+  //         task.index, 
+  //         1, 
+  //         { 
+  //           ...tasks[task.index], 
+  //           ...task,
+  //           entries: entries[task._id] || [],
+  //           timeOff: timeOff.tasks[task._id] || []
+  //         }
+  //       );
+  //     return { 
+  //       ...project,
+  //       tasks,
+  //       timeOff: timeOff.lookup.project
+  //     };
   //   }
   // );
-
-  static getProjectProjection = createSelector(
-    [
-      ProjectsState.getProject,
-      ProjectsState.getProjection,
-      (state: ProjectsStateModel) => state.project
-    ],
-    (project, projection) => ({ ...project, ...projection })
-  );
 
   @Action(SetOrganizationProjects)
   setOrganizationProjects(ctx: StateContext<ProjectsStateModel>, action: SetOrganizationProjects) {
@@ -122,7 +156,7 @@ export class ProjectsState {
     const states = this.store.selectSnapshot(state => state);
     const project = states.projects.project;
     const projectId = project?._id;
-    
+
     if (!action.id && !project) {
       console.warn('warning: No project id provided, nullifying project.');
       return ctx.dispatch(new NullifyProject());
@@ -149,12 +183,25 @@ export class ProjectsState {
         // Get organization from global OrganizationsState
         ctx.setState({
           ...state,
-          project
+          project: omit([
+            'tasks',
+            'timeOff',
+            'users',
+          ], project)
         });
 
+        // Pulls timeOffs from the project's tasks
+        const taskTimeOff = (project.tasks as InstanceTask[]).reduce((acc: InstanceTimeOff[], task) => {
+          if (task.timeOff && task.timeOff.length) 
+            acc.push(...(task.timeOff as InstanceTimeOff[]));
+          return acc;
+        }, []);
+        if (taskTimeOff.length)
+          dispatches.push(new SetProjectTasksTimeOff(taskTimeOff));
+
         dispatches.push(
-          new SetProjectTaskEntries(project._id),
-          new SetProjectTasks(alreadyLoaded ? tasks : project.tasks)
+          new SetProjectTasks(alreadyLoaded ? tasks : project.tasks),
+          new SetProjectTasksEntries(project._id),
         );
         // If the project has timeOff, dispatch SetProjectTimeOff
         if (project.timeOff && project.timeOff.length) 
@@ -175,6 +222,7 @@ export class ProjectsState {
       })
     );
   }
+
   @Action(SetProjectProjection)
   setProjectProjection(ctx: StateContext<ProjectsStateModel>, action: SetProjectProjection) {
     return processProjectProjection(

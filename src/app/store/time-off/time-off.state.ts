@@ -10,6 +10,7 @@ import {
   CleanProjectTimeOff,
   CleanTaskTimeOff,
   SetOrgTimeOff, 
+  SetProjectTasksTimeOff, 
   SetProjectTimeOff, 
   SetTaskTimeOff, 
 } from './time-off.actions';
@@ -21,11 +22,12 @@ import { concat } from 'ramda';
   defaults: {
     timeoff: null,
     timeoffs: [],
-    grouped: {
+    lookup: {
       organization: [],
       project: [],
       task: []
-    }
+    },
+    tasks: {}
   }
 })
 @Injectable()
@@ -58,13 +60,13 @@ export class TimeOffState {
     const state = ctx.getState();
     switch(true) {
       case action instanceof SetOrgTimeOff:
-        state.grouped.organization = action.timeOff.map(item => item._id);
+        state.lookup.organization = action.timeOff.map(item => item._id);
         break;
       case action instanceof SetProjectTimeOff:
-        state.grouped.project = action.timeOff.map(item => item._id);
+        state.lookup.project = action.timeOff.map(item => item._id);
         break;
       case action instanceof SetTaskTimeOff:
-        state.grouped.task = action.timeOff.map(item => item._id);
+        state.lookup.task = action.timeOff.map(item => item._id);
         break;
     }
     ctx.setState({
@@ -81,38 +83,55 @@ export class TimeOffState {
   @Action(CleanTaskTimeOff)
   cleanTimeOff(ctx: StateContext<TimeOffStateModel>, action: CleanOrgTimeOff | CleanProjectTimeOff | CleanTaskTimeOff) {
     const state = ctx.getState();
-    const groupedIds: string[] = [];
+    const lookupIds: string[] = [];
     switch(true) {
       case action instanceof CleanOrgTimeOff:
-        groupedIds.push(
-          ...state.grouped.organization, 
-          ...state.grouped.project, 
-          ...state.grouped.task
+        lookupIds.push(
+          ...state.lookup.organization, 
+          ...state.lookup.project, 
+          ...state.lookup.task
         );
-        state.grouped.organization = [];
-        state.grouped.project = [];
-        state.grouped.task = [];
+        state.lookup.organization = [];
+        state.lookup.project = [];
+        state.lookup.task = [];
         break;
       case action instanceof CleanProjectTimeOff:
-        groupedIds.push(
-          ...state.grouped.project, 
-          ...state.grouped.task
+        lookupIds.push(
+          ...state.lookup.project, 
+          ...state.lookup.task
         );
-        state.grouped.project = [];
-        state.grouped.task = [];
+        state.lookup.project = [];
+        state.lookup.task = [];
         break;
       case action instanceof CleanTaskTimeOff:
-        groupedIds.push(
-          ...state.grouped.task
+        lookupIds.push(
+          ...state.lookup.task
         );
-        state.grouped.task = [];
+        state.lookup.task = [];
         break;
     }
     ctx.setState({
       ...state,
       timeoffs: state.timeoffs.filter(timeOff => 
-        !groupedIds.includes(timeOff._id)
+        !lookupIds.includes(timeOff._id)
       )
+    });
+  }
+
+  @Action(SetProjectTasksTimeOff)
+  setProjectTasksTimeOff(ctx: StateContext<TimeOffStateModel>, action: SetProjectTasksTimeOff) {
+    const state = ctx.getState();
+    const taskGroups = { ...state.tasks };
+    action.timeOff.forEach(timeOff => {
+      const taskId = timeOff.target as string;
+      if (!taskGroups[taskId]) {
+        taskGroups[taskId] = [];
+      }
+      taskGroups[taskId].push(timeOff);
+    });
+    ctx.setState({
+      ...state,
+      tasks: taskGroups
     });
   }
 }

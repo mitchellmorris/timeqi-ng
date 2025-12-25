@@ -80,6 +80,7 @@ export class TaskForm implements OnInit {
     effect(async () => {
       const formData = this.formChanges();
       if (this.form.dirty) {
+        
         this.valueChanges.emit(formData as Partial<Task>);
       }
     });
@@ -96,6 +97,7 @@ export class TaskForm implements OnInit {
     });
     this.form.markAsPristine();
   }
+  
   onSubmit() {
     if (this.form.invalid) {
       this.form.markAllAsTouched();

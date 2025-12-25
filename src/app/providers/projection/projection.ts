@@ -1,16 +1,15 @@
 import { computed, effect, inject, Injectable, signal, Signal, WritableSignal } from '@angular/core';
 import { ProjectsState } from '../../store/projects/projects.state';
 import { 
-  assignEntriesToTasks,
   InstanceTask, 
   Project,
-  ProjectEntries,
   Task,
 } from '@betavc/timeqi-sh';
 import { Store } from '@ngxs/store';
 import { TasksState } from '../../store/tasks/tasks.state';
-import { EntriesState } from '../../store/entries/entries.state';
 import { SetProjectProjection } from '../../store/projects/projects.actions';
+import { toObservable, toSignal } from '@angular/core/rxjs-interop';
+import { debounceTime } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
@@ -18,58 +17,67 @@ import { SetProjectProjection } from '../../store/projects/projects.actions';
 export class Projection {
   private store = inject(Store);
   // Current Project
-  private projectState: Signal<Project | null> = this.store.selectSignal(ProjectsState.getProject);
+  private projectPopulated: Signal<Project | null> = this.store.selectSignal(ProjectsState.getPopulatedProject);
   // Used to merge in any local changes to the project
   projectModel: WritableSignal<Project | null> = signal(null);
+  private debouncedProjectModel = toSignal(
+    toObservable(this.projectModel).pipe(
+      debounceTime(300)
+    ),
+    { initialValue: null }
+  );
   // Merged Project
   private projectContext: Signal<Project | null> = computed(() => {
-    const projectState = this.projectState();
-    const projectModel = this.projectModel();
-    if (!projectState && !projectModel) return null;
-    if (!projectModel) return projectState;
-    if (!projectState) return projectModel;
-    return {...projectState, ...projectModel};
+    const projectPopulated = this.projectPopulated();
+    const projectModel = this.debouncedProjectModel();
+
+    if (!projectPopulated && !projectModel) return null;
+    if (!projectModel) return projectPopulated;
+    if (!projectPopulated) return projectModel;
+
+    return { ...projectPopulated, ...projectModel };
   });
-  // All Tasks for the current Project
-  private tasks: Signal<InstanceTask[]> = this.store.selectSignal(TasksState.getTasks);
-  // All Entries for the current Project
-  private projectEntries: Signal<ProjectEntries> = this.store.selectSignal(EntriesState.getEntries);
   // Current Task (when available in the context)
-  private taskState: Signal<Task | null> = this.store.selectSignal(TasksState.getTask);
+  private task: Signal<Task | null> = this.store.selectSignal(TasksState.getTask);
   // Used to merge in any local changes to the task
   taskModel: WritableSignal<Partial<Task> | null> = signal(null);
+  private debouncedTaskModel = toSignal(
+    toObservable(this.taskModel).pipe(
+      debounceTime(300)
+    ),
+    { initialValue: null }
+  );
   // Merged Task
   private taskContext: Signal<Partial<Task> | null> = computed(() => {
-    const taskState = this.taskState();
-    const taskModel = this.taskModel();
-    if (!taskState && !taskModel) return null;
-    if (!taskModel) return taskState;
-    if (!taskState) return taskModel;
-    return {...taskState, ...taskModel};
+    const task = this.task();
+    const taskModel = this.debouncedTaskModel();
+
+    if (!task && !taskModel) return null;
+    if (!taskModel) return task;
+    if (!task) return taskModel;
+
+    return {...task, ...taskModel};
   });
-  readonly project: WritableSignal<Project | null> = signal(null);
+
   constructor() {
     effect(() => {
-      const project = this.projectContext();
-      if (!project) return;
-      const task = this.taskContext();
-      const tasks = this.tasks();
+      const projectPopulated = this.projectContext();
+      if (!projectPopulated) return;
+      const taskUpdated = this.taskContext();
       // This inserts the updated task into the tasks array at the correct index
-      if (task && task.index !== undefined) {
-        tasks.splice(
+      if (taskUpdated && taskUpdated.index !== undefined && projectPopulated.tasks) {
+        projectPopulated.tasks.splice(
           // we only update the task at the current index
-          task.index, 
+          taskUpdated.index, 
           1, 
           // TODO: Why do we need to cast here?
-          task as InstanceTask
+          { 
+            ...projectPopulated.tasks[taskUpdated.index] as InstanceTask, 
+            ...taskUpdated,
+          } 
         );
       }
-      this.store.dispatch(new SetProjectProjection({
-        ...project,
-        // assign the correct entries to all tasks
-        // to conform to the expected structure
-        tasks: assignEntriesToTasks(tasks, this.projectEntries())
-      }));
+      this.store.dispatch(new SetProjectProjection(projectPopulated));
     });
   }
 }
