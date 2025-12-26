@@ -52,6 +52,7 @@ import { SetProjectActivity, SetProjectTaskActivity } from '../activity/activity
 import { TasksState } from '../tasks/tasks.state';
 import { EntriesState } from '../entries/entries.state';
 import { TimeOffState } from '../time-off/time-off.state';
+import { CleanProjectUsers, SetProjectUsers } from '../user/user.actions';
 
 
 @State<ProjectsStateModel>({
@@ -173,6 +174,7 @@ export class ProjectsState {
           dispatches.push(new SetProjectTasksTimeOff(taskTimeOff));
         
         dispatches.push(
+          new SetProjectUsers(project.users as string[]),
           new SetProjectTasks(alreadyLoaded ? tasks : project.tasks),
           new SetProjectTasksEntries(project._id),
         );
@@ -285,6 +287,7 @@ export class ProjectsState {
         projection: null
       });
       dispatches.push(
+        new CleanProjectUsers(),
         new CleanProjectTasks(), 
         new CleanProjectTimeOff(),
         new CleanProjectTaskEntries()

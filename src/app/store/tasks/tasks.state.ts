@@ -17,6 +17,7 @@ import { equals, omit, pickBy } from 'ramda';
 import { SetTaskProject } from '../projects/projects.actions';
 import { CleanTaskActivity } from '../activity/activity.actions';
 import { CleanTaskTimeOff, SetTaskTimeOff } from '../time-off/time-off.actions';
+import { CleanTaskUsers, SetTaskUsers } from '../user/user.actions';
 
 @State<TasksStateModel>({
   name: 'tasks',
@@ -94,13 +95,16 @@ export class TasksState {
         });
         // Get project from global ProjectsState
         // Note: We are assuming that setting the new project also sets the organization.
-        if (task.project) 
+        if (task.project) {
           dispatches.push(new SetTaskProject(
             getId(task.project)
           ));
+        }
+        dispatches.push(new SetTaskUsers(task.users as string[]));
 
-        if (task.timeOff && task.timeOff.length) 
+        if (task.timeOff && task.timeOff.length) {
           dispatches.push(new SetTaskTimeOff(task.timeOff as InstanceTimeOff[]));
+        } 
 
         return ctx.dispatch(dispatches);
       })
@@ -189,6 +193,7 @@ export class TasksState {
       projection: null,
     });
     return ctx.dispatch([
+      new CleanTaskUsers(),
       new CleanTaskTimeOff(),
       new CleanTaskActivity()
     ]);
@@ -203,7 +208,7 @@ export class TasksState {
       projections: []
     });
     return ctx.dispatch([
-      new NullifyProjectTask(),
+      new NullifyTask(),
     ]);
   }
 }

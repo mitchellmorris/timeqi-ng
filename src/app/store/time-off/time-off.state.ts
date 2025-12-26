@@ -91,7 +91,10 @@ export class TimeOffState {
   @Action(CleanOrgTimeOff)
   @Action(CleanProjectTimeOff)
   @Action(CleanTaskTimeOff)
-  cleanTimeOff(ctx: StateContext<TimeOffStateModel>, action: CleanOrgTimeOff | CleanProjectTimeOff | CleanTaskTimeOff) {
+  cleanTimeOff(
+    ctx: StateContext<TimeOffStateModel>, 
+    action: CleanOrgTimeOff | CleanProjectTimeOff | CleanTaskTimeOff
+  ) {
     const state = ctx.getState();
     const lookupIds: string[] = [];
     switch(true) {

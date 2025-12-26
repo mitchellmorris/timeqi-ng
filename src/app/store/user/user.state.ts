@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { State, Action, Selector, StateContext } from '@ngxs/store';
-import { CleanOrganizationUsers, SetLoginUser, SetOrganizationUsers, SetProjectOrgUsers, SetUser } from './user.actions';
+import { CleanOrganizationUsers, CleanProjectUsers, CleanTaskUsers, SetLoginUser, SetOrganizationUsers, SetProjectUsers, SetTaskUsers, SetUser } from './user.actions';
 import { User as UserService } from './user';
 import { map, mergeMap, tap } from 'rxjs';
 import { map as _map } from 'ramda';
@@ -12,7 +12,11 @@ import { dissoc } from 'ramda';
   name: 'users',
   defaults: {
     users: [],
-    user: null
+    user: null,
+    lookup: {
+      project: [],
+      task: []
+    }
   }
 })
 @Injectable()
@@ -32,12 +36,35 @@ export class UserState {
   }
   
   @Action(SetOrganizationUsers)
-  @Action(SetProjectOrgUsers)
-  setOrganizationUsers(ctx: StateContext<UserStateModel>, action: SetOrganizationUsers | SetProjectOrgUsers) {
+  setOrganizationUsers(ctx: StateContext<UserStateModel>, action: SetOrganizationUsers ) {
     const state = ctx.getState();
     ctx.setState({
       ...state,
       users: action.users
+    });
+  }
+
+  @Action(SetProjectUsers)
+  setProjectUsers(ctx: StateContext<UserStateModel>, action: SetProjectUsers ) {
+    const state = ctx.getState();
+    ctx.setState({
+      ...state,
+      lookup: {
+        ...state.lookup,
+        project: action.users
+      }
+    });
+  }
+
+  @Action(SetTaskUsers)
+  setTaskUsers(ctx: StateContext<UserStateModel>, action: SetTaskUsers ) {
+    const state = ctx.getState();
+    ctx.setState({
+      ...state,
+      lookup: {
+        ...state.lookup,
+        task: action.users
+      }
     });
   }
 
@@ -73,11 +100,29 @@ export class UserState {
   }
 
   @Action(CleanOrganizationUsers)
-  cleanOrganizationUsers(ctx: StateContext<UserStateModel>) {
+  @Action(CleanProjectUsers)
+  @Action(CleanTaskUsers)
+  cleanOrganizationUsers(
+    ctx: StateContext<UserStateModel>, 
+    action: CleanOrganizationUsers | CleanProjectUsers | CleanTaskUsers
+  ) {
     const state = ctx.getState();
+    switch(true) {
+      case action instanceof CleanOrganizationUsers:
+        state.users = [];
+        state.lookup.project = [];
+        state.lookup.task = [];
+        break;
+      case action instanceof CleanProjectUsers:
+        state.lookup.project = [];
+        state.lookup.task = [];
+        break;
+      case action instanceof CleanTaskUsers:
+        state.lookup.task = [];
+        break;
+    }
     ctx.setState({
-      ...state,
-      users: []
+      ...state
     });
   }
 }
