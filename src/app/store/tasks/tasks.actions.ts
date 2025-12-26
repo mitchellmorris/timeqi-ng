@@ -17,7 +17,7 @@ export class SetProjectTaskProjection {
 
 export class SetProjectTasksProjections {
   static readonly type = '[Project] Set Tasks Projections';
-  constructor(readonly taskProjections: Partial<InstanceTask>[]) { }
+  constructor(readonly projections: Partial<InstanceTask>[]) { }
 }
 
 export class UpdateTask {

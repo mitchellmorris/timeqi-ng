@@ -47,6 +47,16 @@ export class TimeOffState {
     return state.timeoffs;
   }
 
+  @Selector()
+  static getTimeOffTasks(state: TimeOffStateModel) {
+    return state.tasks;
+  }
+
+  @Selector()
+  static getTimeOffLookup(state: TimeOffStateModel) {
+    return state.lookup;
+  }
+
   @Action(SetOrgTimeOff)
   @Action(SetProjectTimeOff)
   @Action(SetTaskTimeOff)

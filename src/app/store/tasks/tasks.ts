@@ -26,7 +26,7 @@ export class Tasks {
   
   updateTask(id: string, task: Partial<Task>): Observable<Task | null> {
     return this.http.put<Task>(`${this.apiUrl}/task/${id}`, task).pipe(
-      map((response: any) => response.updatedTask),
+      map((response: any) => response.existingTask),
       catchError(error => {
         console.error('Error saving task:', error);
         return of(null);

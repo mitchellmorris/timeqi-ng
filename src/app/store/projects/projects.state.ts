@@ -95,50 +95,23 @@ export class ProjectsState {
     [
       TasksState.getTasks,
       EntriesState.getEntries,
-      TimeOffState.getState,
+      TimeOffState.getTimeOffTasks,
+      TimeOffState.getTimeOffLookup,
       ProjectsState.getProject
     ],
-    (tasks, entries, timeOff, project) => {
+    (tasks, entries, timeOffTasks, timeOffLookup, project) => {
       if (!project) return null;
       return { 
         ...project, 
         tasks: tasks.map(task => ({
           ...task,
           entries: entries[task._id] || [],
-          timeOff: timeOff.tasks[task._id] || []
+          timeOff: timeOffTasks[task._id] || []
         })), 
-        timeOff: timeOff.lookup.project
+        timeOff: timeOffLookup.project
       };
     }
   );
-
-  // static getPopulatedProject = createSelector(
-  //   [
-  //     TasksState.getState,
-  //     EntriesState.getEntries,
-  //     TimeOffState.getState,
-  //     ProjectsState.getProject
-  //   ],
-  //   ({ task, tasks }, entries, timeOff, project) => {
-  //     if (!project) return null;
-  //     if (task)
-  //       tasks.splice(
-  //         task.index, 
-  //         1, 
-  //         { 
-  //           ...tasks[task.index], 
-  //           ...task,
-  //           entries: entries[task._id] || [],
-  //           timeOff: timeOff.tasks[task._id] || []
-  //         }
-  //       );
-  //     return { 
-  //       ...project,
-  //       tasks,
-  //       timeOff: timeOff.lookup.project
-  //     };
-  //   }
-  // );
 
   @Action(SetOrganizationProjects)
   setOrganizationProjects(ctx: StateContext<ProjectsStateModel>, action: SetOrganizationProjects) {
@@ -198,7 +171,7 @@ export class ProjectsState {
         }, []);
         if (taskTimeOff.length)
           dispatches.push(new SetProjectTasksTimeOff(taskTimeOff));
-
+        
         dispatches.push(
           new SetProjectTasks(alreadyLoaded ? tasks : project.tasks),
           new SetProjectTasksEntries(project._id),

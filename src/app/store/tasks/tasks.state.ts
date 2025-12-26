@@ -110,12 +110,15 @@ export class TasksState {
   @Action(UpdateTask)
   updateTask(ctx: StateContext<TasksStateModel>, action: UpdateTask) {
     return this.tasksService.updateTask(action.id, action.task).pipe(
-      tap((updatedTask) => {
-        if (updatedTask) {
+      tap((existingTask) => {
+        if (existingTask) {
           const state = ctx.getState();
+          if (state.task) {
+            state.tasks[state.task.index] = existingTask;
+          }
           ctx.setState({
             ...state,
-            task: updatedTask
+            task: existingTask
           });
         }
       }),

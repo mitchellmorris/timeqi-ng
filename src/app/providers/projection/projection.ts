@@ -1,4 +1,4 @@
-import { computed, effect, inject, Injectable, signal, Signal, WritableSignal } from '@angular/core';
+import { computed, effect, inject, Injectable, signal, Signal, untracked, WritableSignal } from '@angular/core';
 import { ProjectsState } from '../../store/projects/projects.state';
 import { 
   InstanceTask, 
@@ -10,6 +10,7 @@ import { TasksState } from '../../store/tasks/tasks.state';
 import { SetProjectProjection } from '../../store/projects/projects.actions';
 import { toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { debounceTime } from 'rxjs';
+import { pick } from 'ramda';
 
 @Injectable({
   providedIn: 'root'
@@ -63,17 +64,19 @@ export class Projection {
     effect(() => {
       const projectPopulated = this.projectContext();
       if (!projectPopulated) return;
+      // This also includes updates that are only accessible through the taskContext
       const taskUpdated = this.taskContext();
       // This inserts the updated task into the tasks array at the correct index
       if (taskUpdated && taskUpdated.index !== undefined && projectPopulated.tasks) {
+        const taskPopulated = projectPopulated.tasks[taskUpdated.index];
         projectPopulated.tasks.splice(
           // we only update the task at the current index
           taskUpdated.index, 
           1, 
           // TODO: Why do we need to cast here?
           { 
-            ...projectPopulated.tasks[taskUpdated.index] as InstanceTask, 
-            ...taskUpdated,
+            ...taskUpdated as InstanceTask,
+            ...pick(['entries', 'timeOff'],  taskPopulated as InstanceTask)
           } 
         );
       }
