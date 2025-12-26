@@ -95,8 +95,8 @@ export class ProjectsState {
   static getPopulatedProject = createSelector(
     [
       TasksState.getTasks,
-      EntriesState.getEntries,
-      TimeOffState.getTimeOffTasks,
+      EntriesState.getTasksEntries,
+      TimeOffState.getTasksTimeOff,
       TimeOffState.getTimeOffLookup,
       ProjectsState.getProject
     ],

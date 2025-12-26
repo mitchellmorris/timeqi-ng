@@ -48,7 +48,7 @@ export class TimeOffState {
   }
 
   @Selector()
-  static getTimeOffTasks(state: TimeOffStateModel) {
+  static getTasksTimeOff(state: TimeOffStateModel) {
     return state.tasks;
   }
 

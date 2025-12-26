@@ -13,8 +13,8 @@ import { of, reduce } from 'ramda';
 @State<EntriesStateModel>({
   name: 'entries',
   defaults: {
-    entries: {},
     entry: null,
+    tasks: {},
   }
 })
 @Injectable()
@@ -31,8 +31,8 @@ export class EntriesState {
   }
 
   @Selector()
-  static getEntries(state: EntriesStateModel) {
-    return state.entries;
+  static getTasksEntries(state: EntriesStateModel) {
+    return state.tasks;
   }
 
   @Action(SetProjectTasksEntries)
@@ -45,7 +45,7 @@ export class EntriesState {
         const state = ctx.getState();
         ctx.setState({
           ...state,
-          entries: reduce((acc:{ [taskId: string]: InstanceEntry[] }, entry) => {
+          tasks: reduce((acc:{ [taskId: string]: InstanceEntry[] }, entry) => {
             const taskId = entry.task as string;
             if (!acc[taskId])
               acc[taskId] = [];
@@ -71,7 +71,7 @@ export class EntriesState {
     const state = ctx.getState();
     ctx.setState({
       ...state,
-      entries: {}
+      tasks: {}
     });
     ctx.dispatch(new NullifyTaskEntry());
   }
