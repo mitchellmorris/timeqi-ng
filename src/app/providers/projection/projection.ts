@@ -4,6 +4,7 @@ import {
   InstanceTask, 
   Project,
   Task,
+  upsertTaskIntoProjectTasks,
 } from '@betavc/timeqi-sh';
 import { Store } from '@ngxs/store';
 import { TasksState } from '../../store/tasks/tasks.state';
@@ -57,7 +58,7 @@ export class Projection {
     if (!taskModel) return task;
     if (!task) return taskModel;
 
-    return {...task, ...taskModel};
+    return { ...task, ...taskModel };
   });
 
   constructor() {
@@ -67,20 +68,11 @@ export class Projection {
       // This also includes updates that are only accessible through the taskContext
       const taskUpdated = this.taskContext();
       // This inserts the updated task into the tasks array at the correct index
-      if (taskUpdated && taskUpdated.index !== undefined && projectPopulated.tasks) {
-        const taskPopulated = projectPopulated.tasks[taskUpdated.index];
-        projectPopulated.tasks.splice(
-          // we only update the task at the current index
-          taskUpdated.index, 
-          1, 
-          // TODO: Why do we need to cast here?
-          { 
-            ...taskUpdated as InstanceTask,
-            ...pick(['entries', 'timeOff'],  taskPopulated as InstanceTask)
-          } 
-        );
-      }
-      this.store.dispatch(new SetProjectProjection(projectPopulated));
+      const projectWithUpdatedTask = upsertTaskIntoProjectTasks(
+        taskUpdated as Task, 
+        projectPopulated
+      );
+      this.store.dispatch(new SetProjectProjection(projectWithUpdatedTask));
     });
   }
 }

@@ -13,20 +13,113 @@
     <div class="font-semibold mb-1">
       {{ taskProjection()?.name }}
     </div>
-    <div class="text-sm flex">
-      <div class="w-1/2">Total Hours Worked</div>
-      <div class="w-1/2">{{ taskProjection()?.workedHours }}</div>
+    <div class="text-sm flex mb-1">
+      <div class="w-5/12 font-semibold">Start Date</div>
+      <div class="w-7/12">{{ taskProjection()?.startDate | date:'EEEE, MMM d, y' }}</div>
     </div>
     <div class="text-sm flex">
-      <div class="w-1/2">Elapsed Hours</div>
-      <div class="w-1/2">{{ taskProjection()?.elapsedHours }}</div>
+      <div class="w-5/12">Target Date</div>
+      <div class="w-7/12">{{ taskProjection()?.targetDate | date:'EEEE, MMM d, y' }}</div>
+    </div>
+    <div class="text-sm flex">
+      <div class="w-5/12">Projected Date</div>
+      <div class="w-7/12">{{ taskProjection()?.projectedDate | date:'EEEE, MMM d, y' }}</div>
+    </div>
+    <div class="text-sm flex my-1">
+      <div class="w-5/12 font-semibold">Status</div>
+      <div class="w-7/12">{{ taskProjection()?.status }}</div>
+    </div>
+    <div class="text-sm flex">
+      <div class="w-5/12">Total Hours Worked</div>
+      <div class="w-7/12">{{ taskProjection()?.workedHours }}</div>
+    </div>
+    <div class="text-sm flex">
+      <div class="w-5/12">Remaining Hours</div>
+      <div class="w-7/12">{{ activity()[0]?.remainingHours }}</div>
+    </div>
+    <div class="text-sm flex">
+      <div class="w-5/12">Elapsed Hours</div>
+      <div class="w-7/12">{{ taskProjection()?.elapsedHours }}</div>
     </div>
   </div>
   <div class="mb-4">
-    <label class="font-semibold mb-1 block" for="activitySlider">Adjust Activity Level</label>
-    <p-slider [(ngModel)]="activity" class="w-56" />
-    <div class="text-sm text-gray-500 mt-1">
-      Current Activity Level: {{ activity }}%
+    <label class="font-semibold mb-1 block" for="activitySlider">Activities ({{ activityCount() }})</label>
+    <div class="flex">
+      <div class="w-1/12 pt-6">
+        <p-slider [(ngModel)]="activityIndex" max="{{ activityCount() - 1 }}" orientation="vertical" class="w-56" />
+      </div>
+      <div class="w-11/12">
+        <div class="text-sm">
+          <!-- Current Activity Level: {{ activity }}% -->
+          @for (activity of activity(); track $index) {
+          @if ($index === activityIndex()) {
+          <div class="mb-2">
+            <div class="flex">
+              <div class="w-4/11 font-semibold">Date</div>
+              <div class="w-7/11">{{ activity.date | date:'EEEE, MMM d, y' }}</div>
+            </div>
+            <div class="flex my-1">
+              <div class="w-4/11 font-semibold">{{ activity.workDay ? 'Workday' : 'Non-Workday' }}</div>
+            </div>
+            <div class="flex">
+              <div class="w-4/11">Hours Worked</div>
+              <div class="w-7/11">{{ activity.hours }}</div>
+            </div>
+            <div class="flex">
+              <div class="w-4/11">Total Hours</div>
+              <div class="w-7/11">{{ activity.workedHours }}</div>
+            </div>
+            @if (activity.elapsed) {
+            <div class="flex">
+              <div class="w-4/11">Elapsed Hours</div>
+              <div class="w-7/11">{{ activity.elapsedHours }}</div>
+            </div>
+            }
+            <div class="flex">
+              <div class="w-4/11">Remaining Hours</div>
+              <div class="w-7/11">{{ activity.remainingHours }}</div>
+            </div>
+            @if (activity.pending) {
+            <div class="flex">
+              <div class="w-4/11">Pending Hours</div>
+              <div class="w-7/11">{{ activity.pendingHours }}</div>
+            </div>
+            }
+            @if (activity.overrun > 0) {
+            <div class="flex">
+              <div class="w-4/11">Overrun Hours</div>
+              <div class="w-7/11">{{ activity.overrun }}</div>
+            </div>
+            }
+            <div class="flex">
+              <div class="w-4/11">Workshift</div>
+              <div class="w-7/11">{{ activity.workshift }}</div>
+            </div>
+            @if (activity.coverage < 0) {
+            <div class="flex">
+              <div class="w-4/11">Hours Behind</div>
+              <div class="w-7/11">{{ (activity.coverage * -1) }}</div>
+            </div>
+            }
+            <div class="flex">
+              <div class="w-4/11">Elapsed Hours</div>
+              <div class="w-7/11">{{ activity.elapsedHours }}</div>
+            </div>
+          </div>
+          @if (activity.entries.length > 0) {
+          <div class="flex my-1">
+            <div class="w-4/11 font-semibold">Entries ({{ activity.entries.length }})</div>
+          </div>
+          }
+          @if (activity.timeOff.length > 0) {
+          <div class="flex my-1">
+            <div class="w-4/11 font-semibold">Time Off ({{ activity.timeOff.length }})</div>
+          </div>
+          }
+          }
+          }
+        </div>
+      </div>
     </div>
   </div>
 </div>

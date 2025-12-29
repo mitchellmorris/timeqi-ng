@@ -10,7 +10,7 @@ import {
   SetProjectTasksProjections, 
   UpdateTask 
 } from './tasks.actions';
-import { getId, InstanceTimeOff, Task, TasksStateModel } from '@betavc/timeqi-sh';
+import { getId, InstanceTimeOff, Task, TASK_PROJECTION_SCALAR_FIELDS, TasksStateModel } from '@betavc/timeqi-sh';
 import { Tasks as TasksService } from './tasks';
 import { catchError, map, mergeMap, of, tap } from 'rxjs';
 import { equals, omit, pickBy } from 'ramda';
@@ -25,7 +25,7 @@ import { CleanTaskUsers, SetTaskUsers } from '../user/user.actions';
     tasks: [],
     task: null,
     projection: null,
-    projections: []
+    projections: [],
   }
 })
 @Injectable()
@@ -163,20 +163,7 @@ export class TasksState {
         return pickBy(
           (value, key) => {
             // only include these keys
-            return [
-              '_id',
-              'index',
-              'startDate',
-              'status',
-              'remainingEstimate',
-              'targetDate',
-              'projectedDate',
-              'endDate',
-              'leadTime',
-              'trailingTime',
-              'elapsedHours',
-              'workedHours',
-            ].indexOf(key) >= 0;
+            return TASK_PROJECTION_SCALAR_FIELDS.indexOf(key) >= 0;
           }, 
           task
         )

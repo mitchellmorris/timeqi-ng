@@ -24,6 +24,11 @@ export class ActivityState {
     return state;
   }
 
+  @Selector()
+  static getActivity(state: ActivityStateModel) {
+    return state.activity;
+  }
+
   @Action(SetProjectActivity)
   @Action(SetProjectTaskActivity)
   addTaskActivity(ctx: StateContext<ActivityStateModel>, { activity }: SetProjectTaskActivity) {

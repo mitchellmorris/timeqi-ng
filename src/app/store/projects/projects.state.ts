@@ -85,12 +85,6 @@ export class ProjectsState {
     if (!state.project) return null;
     return { ...state.project, ...state.projection } as Project;
    }
-  
-    // @Selector()
-    // static getProjection(state: TasksStateModel): Task | null { 
-    //   if (!state.task) return null;
-    //   return { ...state.task, ...state.projection } as Task;
-    // }
 
   static getPopulatedProject = createSelector(
     [
@@ -222,13 +216,21 @@ export class ProjectsState {
         // we only pick the fields that have changed and are not arrays
         projection: pickBy(
           (value, key) => {
-            return !equals(value, state.project![key]) &&
-            // exclude these keys
+            return (
+              !equals(value, state.project![key]) &&
+              // exclude these keys
+              [
+                'tasks',
+                'timeOff',
+                'users',
+              ].indexOf(key) === -1
+            ) ||
+            // always include these keys
             [
-              'tasks',
-              'timeOff',
-              'users',
-            ].indexOf(key) === -1;
+              'estimate',
+              'elapsedHours',
+              'projectedDate'
+            ].indexOf(key) !== -1;
           }, 
           processedProject
         )

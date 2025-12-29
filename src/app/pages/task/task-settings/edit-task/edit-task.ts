@@ -3,12 +3,13 @@ import { ActivatedRoute } from '@angular/router';
 import { Store } from '@ngxs/store';
 import { UpdateTask } from '../../../../store/tasks/tasks.actions';
 import { TasksState } from '../../../../store/tasks/tasks.state';
-import { Task } from '@betavc/timeqi-sh';
+import { hasDifferences, Task, TASK_PROJECTION_SCALAR_FIELDS } from '@betavc/timeqi-sh';
 import { TaskForm } from '../../../../components/task-form/task-form';
 import { ButtonModule } from 'primeng/button';
 import { DatePipe } from '@angular/common';
 import { Projection } from '../../../../providers/projection/projection';
 import { ProjectLens } from '../../../../components/project-lens/project-lens';
+import { pick } from 'ramda';
 
 @Component({
   selector: 'app-edit-task',
@@ -32,9 +33,21 @@ export class EditTask {
   ) {}
 
   onChanges(formData: Partial<Task>) {
-    this.projection.taskModel.set(
-      { ...this.task(), ...formData }
-    );
+    // Only move forward with certain properties
+    // when they have changed
+    if (!hasDifferences(
+      TASK_PROJECTION_SCALAR_FIELDS, 
+      this.taskProjection() || {}, 
+      formData
+    )) return;
+    // we are only updating the projection
+    // with certain properties
+    const projectionTask = pick(
+      TASK_PROJECTION_SCALAR_FIELDS as (keyof Task)[], { 
+        ...this.task(), 
+        ...formData
+    });
+    this.projection.taskModel.set(projectionTask);
   }
 
   onSubmit(formData: Partial<Task>) {
