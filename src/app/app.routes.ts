@@ -16,6 +16,7 @@ import { organizationResolver } from './pages/organization/organizationResolvers
 import { EditOrganization } from './pages/organization/organization-settings/edit-organization/edit-organization';
 import { OrganizationScheduling } from './pages/organization/organization-settings/organization-scheduling/organization-scheduling';
 import { TaskScheduling } from './pages/task/task-scheduling/task-scheduling';
+import { TaskDetail } from './pages/task/task-detail/task-detail';
 
 export const routes: Routes = [
   {
@@ -83,6 +84,9 @@ export const routes: Routes = [
     },
     children: [{
         path: '',
+        component: TaskDetail
+      }, {
+        path: 'edit',
         component: EditTask
       }, {
         path: 'scheduling',

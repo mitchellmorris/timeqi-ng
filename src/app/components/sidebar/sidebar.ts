@@ -35,41 +35,35 @@ export class Sidebar {
     
     const menuItems: MenuItem[] = [];
     if (!!organization) {
-      menuItems.splice(0, 0, {
-        separator: true
-      });
-      // Submenu for organization
-      const orgItems: MenuItem[] = [];
-        orgItems.push({
-          label: `Projects (${projects.length})`,
-          icon: 'pi pi-briefcase',
-          ...projects.length > 1 ? {
-            routerLink: ['organization', organization._id],
-          } : {
-            // TODO: Why is tooltip not showing when there is only one project?
-            tooltip: "This is available with more projects.",
-            disabled: true
-          } 
-        });
-        orgItems.push({
-          label: "Create New Project",
-          icon: 'pi pi-briefcase'
-        });
-        orgItems.push({
-          label: "Settings",
-          icon: 'pi pi-cog',
-          routerLink: ['organization', organization._id, 'settings']
-        });
       // Add Organization with submenu
-      menuItems.splice(1, 0, {
+      menuItems.push({
+        separator: true
+      }, {
         label: organization.name,
-        items: orgItems
+        items: [{
+            label: `Projects (${projects.length})`,
+            icon: 'pi pi-briefcase',
+            ...projects.length > 1 ? {
+              routerLink: ['organization', organization._id],
+            } : {
+              // TODO: Why is tooltip not showing when there is only one project?
+              tooltip: "This is available with more projects.",
+              disabled: true
+            }
+          }, {
+            label: "Create New Project",
+            icon: 'pi pi-briefcase'
+          }, {
+            label: "Settings",
+            icon: 'pi pi-cog',
+            routerLink: ['organization', organization._id, 'settings']
+          }
+        ]
       });
       if (!!project) {
-        menuItems.splice(2, 0, {
+        menuItems.push({
           separator: true
-        });
-        menuItems.splice(3, 0, {
+        }, {
           label: `Project: ${project.name}`,
           items: [{
             label: `Tasks (${tasks.length})`,
@@ -86,10 +80,9 @@ export class Sidebar {
           }],
         });
         if (!!task) {
-          menuItems.splice(4, 0, {
+          menuItems.push({
             separator: true
-          });
-          menuItems.splice(5, 0, {
+          }, {
             label: `Task: ${task.name}`,
             items: [{
                 label: "Entries",
@@ -98,17 +91,17 @@ export class Sidebar {
               }, {
                 label: "Edit Task",
                 icon: 'pi pi-pencil',
-                routerLink: ['task', task._id, 'settings']
+                routerLink: ['task', task._id, 'edit']
               }],
           });
         }
       } 
     }
-    menuItems.splice(6, 0, {
+    menuItems.push({
       separator: true
-    });
-    const orgsItems: MenuItem[] = [];
-      orgsItems.push({
+    }, {
+      label: "Account",
+      items: [{
         label: `Organizations (${organizations.length})`,
         icon: 'pi pi-building',
         ...organizations.length > 1 ? {
@@ -118,16 +111,10 @@ export class Sidebar {
           tooltip: "This is available with more organizations.",
           disabled: true
         },
-        
-      });
-      orgsItems.push({
+      }, {
         label: "Create Organization",
         icon: 'pi pi-building'
-      });
-    // Add Organization with submenu
-    menuItems.splice(7, 0, {
-      label: "Account",
-      items: orgsItems
+      }]
     });
     return menuItems;
   });
