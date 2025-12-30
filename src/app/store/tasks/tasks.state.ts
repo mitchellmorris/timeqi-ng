@@ -10,7 +10,14 @@ import {
   SetProjectTasksProjections, 
   UpdateTask 
 } from './tasks.actions';
-import { getId, InstanceTimeOff, Task, TASK_PROJECTION_SCALAR_FIELDS, TasksStateModel } from '@betavc/timeqi-sh';
+import { 
+  getId, 
+  InstanceTimeOff, 
+  Task, 
+  TASK_PROJECTION_SCALAR_FIELDS, 
+  TASK_PROJECTION_RELATIONAL_FIELDS,
+  TasksStateModel 
+} from '@betavc/timeqi-sh';
 import { Tasks as TasksService } from './tasks';
 import { catchError, map, mergeMap, of, tap } from 'rxjs';
 import { equals, omit, pickBy } from 'ramda';
@@ -86,12 +93,9 @@ export class TasksState {
 
         ctx.setState({
           ...state,
-          task: omit([
-            'activity',
-            'timeOff',
-            'users',
-            'entries'
-          ], task)
+          task: omit(
+            TASK_PROJECTION_RELATIONAL_FIELDS as (keyof Task)[], task
+          ) as Task
         });
         // Get project from global ProjectsState
         // Note: We are assuming that setting the new project also sets the organization.
@@ -142,12 +146,7 @@ export class TasksState {
           (value, key) => {
             return !equals(value, state.task![key]) &&
             // exclude these
-            [
-              'activity',
-              'timeOff',
-              'users',
-              'entries'
-            ].indexOf(key) === -1;
+            TASK_PROJECTION_RELATIONAL_FIELDS.indexOf(key) === -1;
           }, 
           action.taskProjection
         )
