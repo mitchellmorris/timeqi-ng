@@ -5,18 +5,17 @@ import { Organization } from './pages/organization/organization';
 import { Project } from './pages/project/project';
 import { authGuard } from './providers/auth/auth-guard';
 import { Task } from './pages/task/task';
-import { EditTask } from './pages/task/task-settings/edit-task/edit-task';
+import { EditTask } from './pages/task/edit-task/edit-task';
 import { ProjectScheduling } from './pages/project/project-settings/project-scheduling/project-scheduling';
 import { projectResolver } from './pages/project/projectResolvers';
-import { taskResolver } from './pages/task/taskResolver'
+import { taskResolver } from './pages/task/taskResolver';
 import { ProjectSettings } from './pages/project/project-settings/project-settings';
 import { EditProject } from './pages/project/project-settings/edit-project/edit-project';
 import { OrganizationSettings } from './pages/organization/organization-settings/organization-settings';
 import { organizationResolver } from './pages/organization/organizationResolvers';
 import { EditOrganization } from './pages/organization/organization-settings/edit-organization/edit-organization';
 import { OrganizationScheduling } from './pages/organization/organization-settings/organization-scheduling/organization-scheduling';
-import { TaskScheduling } from './pages/task/task-settings/task-scheduling/task-scheduling';
-import { TaskSettings } from './pages/task/task-settings/task-settings';
+import { TaskScheduling } from './pages/task/task-scheduling/task-scheduling';
 
 export const routes: Routes = [
   {
@@ -78,14 +77,6 @@ export const routes: Routes = [
   {
     path: 'task/:taskId',
     component: Task,
-    canActivate: [authGuard],
-    resolve: {
-      taskState: taskResolver
-    }
-  },
-  {
-    path: 'task/:taskId/settings',
-    component: TaskSettings,
     canActivate: [authGuard],
     resolve: {
       taskState: taskResolver

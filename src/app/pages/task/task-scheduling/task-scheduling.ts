@@ -2,13 +2,13 @@ import { Component, inject } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { Store } from '@ngxs/store';
-import { OrganizationsState } from '../../../../store/organizations/organizations.state';
+import { OrganizationsState } from '../../../store/organizations/organizations.state';
 import { SchedulingSettings, Task } from '@betavc/timeqi-sh';
-import { StateUtils } from '../../../../providers/utils/state';
+import { StateUtils } from '../../../providers/utils/state';
 import { first, Observable } from 'rxjs';
-import { WorkshiftSchedular } from '../../../../components/workshift-schedular/workshift-schedular';
-import { SaveOrganizationSchedule } from '../../../../store/organizations/organizations.actions';
-import { TasksState } from '../../../../store/tasks/tasks.state';
+import { WorkshiftSchedular } from '../../../components/workshift-schedular/workshift-schedular';
+import { SaveOrganizationSchedule } from '../../../store/organizations/organizations.actions';
+import { TasksState } from '../../../store/tasks/tasks.state';
 
 @Component({
   selector: 'app-task-scheduling',

@@ -1,14 +1,14 @@
 import { Component, inject, Signal } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { Store } from '@ngxs/store';
-import { UpdateTask } from '../../../../store/tasks/tasks.actions';
-import { TasksState } from '../../../../store/tasks/tasks.state';
+import { UpdateTask } from '../../../store/tasks/tasks.actions';
+import { TasksState } from '../../../store/tasks/tasks.state';
 import { hasDifferences, Task, TASK_PROJECTION_SCALAR_FIELDS } from '@betavc/timeqi-sh';
-import { TaskForm } from '../../../../components/task-form/task-form';
+import { TaskForm } from '../../../components/task-form/task-form';
 import { ButtonModule } from 'primeng/button';
 import { DatePipe } from '@angular/common';
-import { Projection } from '../../../../providers/projection/projection';
-import { ProjectLens } from '../../../../components/project-lens/project-lens';
+import { Projection } from '../../../providers/projection/projection';
+import { ProjectLens } from '../../../components/project-lens/project-lens';
 import { pick } from 'ramda';
 
 @Component({

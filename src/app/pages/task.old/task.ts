@@ -2,10 +2,14 @@ import { Component, inject, OnDestroy } from '@angular/core';
 import { ActivatedRoute, RouterModule } from '@angular/router';
 import { Store } from '@ngxs/store';
 import { ButtonModule } from 'primeng/button';
+import { SetTask } from '../../store/tasks/tasks.actions';
+import { InstanceEntry } from '@betavc/timeqi-sh';
 import { TabsModule } from 'primeng/tabs';
+import { EntriesState } from '../../store/entries/entries.state';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { StateUtils } from '../../providers/utils/state';
 import { RouterUtils } from '../../providers/utils/routerUtils';
+
 
 @Component({
   selector: 'app-task',
@@ -24,12 +28,8 @@ import { RouterUtils } from '../../providers/utils/routerUtils';
 export class Task {
   readonly store = inject(Store);
   readonly route = inject(ActivatedRoute);
-  readonly routerUtils = inject(RouterUtils);
-  taskId = this.route.snapshot.paramMap.get('taskId');
-  tabs = [
-      { route: "../settings", label: 'Edit Task', icon: 'pi pi-pencil' },
-      // { route: "scheduling", label: 'Scheduling', icon: 'pi pi-calendar' },
-  ];
-  tab$ = this.routerUtils.getTabIndexByUrlByLastSegment$(this.tabs);
-  tab = toSignal(this.tab$, {initialValue: 0});
+  readonly stateUtils = inject(StateUtils);
+  entries$ = this.stateUtils.getState$(EntriesState.getState, 'entries');
+  entries = toSignal(this.entries$, { initialValue: [] as InstanceEntry[] });
 }
+
