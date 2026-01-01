@@ -1,7 +1,15 @@
-import { Component, effect, EventEmitter, inject, input, Input, OnInit, output, Output, Signal } from '@angular/core';
+import { 
+  Component, 
+  effect,
+  inject,
+  input,
+  OnInit,
+  output,
+  Signal,
+} from '@angular/core';
 import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { InstanceUser, PrimeNG, ScenarioDate, Task } from '@betavc/timeqi-sh';
+import { PrimeNG, ScenarioDate, Task } from '@betavc/timeqi-sh';
 import { debounceTime, distinctUntilChanged, startWith } from 'rxjs';
 import { Projection } from '../../providers/projection/projection';
 import { Store } from '@ngxs/store';
@@ -15,6 +23,7 @@ import { InputTextModule } from 'primeng/inputtext';
 import { UserState } from '../../store/user/user.state';
 import { ButtonModule } from 'primeng/button';
 import { EditorModule } from 'primeng/editor';
+import { TimePicker } from '../time-picker/time-picker';
 
 @Component({
   selector: 'app-task-form',
@@ -27,7 +36,8 @@ import { EditorModule } from 'primeng/editor';
     DatePickerModule,
     InputTextModule,
     ButtonModule,
-    EditorModule
+    EditorModule,
+    TimePicker
   ],
   templateUrl: './task-form.html',
   styleUrl: './task-form.css'
@@ -80,7 +90,6 @@ export class TaskForm implements OnInit {
     effect(async () => {
       const formData = this.formChanges();
       if (this.form.dirty) {
-        
         this.valueChanges.emit(formData as Partial<Task>);
       }
     });

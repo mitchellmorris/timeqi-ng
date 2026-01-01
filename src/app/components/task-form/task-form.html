@@ -1,85 +1,108 @@
 @let locked = form.get('locked')?.value;
+@let name = form.get('name');
+@let estimate = form.get('estimate');
 <form [formGroup]="form" 
   (ngSubmit)="onSubmit()">
-  <div class="mb-4 flex justify-between items-center">
-    <label class="text-2xl" for="name">
-        Task
-    </label>
-    <div class="flex gap-6 items-center">
-      @if (!locked) {
-      <div class="text-gray-400">
-        Start Date: {{ taskProjection()?.startDate | date:'mediumDate' }}
-      </div>
-      }
-      <div class="text-gray-400">
-        @if (!taskProjection()?.completedDate) {
-          Last Entry: {{ taskProjection()?.endDate | date:'mediumDate' }}
-        } @else {
-          Completed: {{ taskProjection()?.endDate | date:'mediumDate' }}
-        }
-      </div>
-      <div class="flex gap-2 items-center">
-        <label class="text-lg font-semibold">
-          Mode:
+  <div class="flex gap-6">
+    <div class="grow">
+      <div class="mb-1">
+        <label class="font-thin" for="name">
+            Task Name
         </label>
-        <p-selectbutton 
-          [options]="modeOptions" 
-          formControlName="locked" />
+      </div>
+      <div class="mb-1">
+        <input 
+          pInputText 
+          id="name" 
+          class="w-full"
+          formControlName="name"
+          [invalid]="name?.invalid && (name?.touched || name?.dirty)" 
+        />
+      </div>
+      <div class="text-sm text-red-500 h-5 mb-1">
+      @if (name?.errors?.['required']) {
+        Task Name is required.
+      }
       </div>
     </div>
+    <div>
+      <div class="mb-1">
+        <label class="font-thin" for="locked">
+            Mode
+        </label>
+      </div>
+      <div class="mb-1">
+        <p-selectbutton 
+          [options]="modeOptions" 
+          formControlName="locked" 
+        />
+      </div>
+      <div class="text-sm text-red-500 h-5 mb-1"></div>
+    </div>
   </div>
-  <div class="mb-4">
-    <input 
-      pInputText 
-      id="name" 
-      class="w-full"
-      formControlName="name" 
-      [invalid]="form.get('name')?.invalid && (form.get('name')?.touched || form.get('name')?.dirty)" 
-    />
-  </div>
-  <div class="flex gap-6 mb-4">
+  <div class="flex gap-6">
     @if (locked) {
     <div class="w-1/4">
-      <div class="mb-4">
-        <label class="text-2xl" for="startDate">
+      <div class="mb-1">
+        <label class="font-thin" for="startDate">
             Start Date
         </label>
       </div>
-      <p-datepicker formControlName="startDate" [showIcon]="true"></p-datepicker>
+      <div class="mb-1">
+        <p-datepicker 
+          formControlName="startDate" 
+          [showIcon]="true" 
+          class="w-full"
+        />
+      </div>
+      <div class="text-sm text-red-500 h-5 mb-1"></div>
     </div>
     }
     <div class="w-1/4">
-      <div class="mb-4">
-        <label class="text-2xl" for="estimate">
+      <div class="mb-1">
+        <label class="font-thin" for="estimate">
             Estimate
         </label>
       </div>
-      <p-inputnumber formControlName="estimate" mode="decimal" [showButtons]="true" [min]="0" class="w-full" />
+      <div class="mb-1">
+        <app-time-picker 
+          formControlName="estimate"></app-time-picker>
+      </div>
+      <div class="text-sm text-red-500 h-5 mb-1">
+      @if (estimate?.errors?.['nonZero']) {
+        Estimate must be greater than 0.
+      }
+      </div>
     </div>
     <div [class]="locked ? 'w-1/2' : 'w-3/4'">
-      <div class="mb-4">
-        <label class="text-2xl" for="assignee">
+      <div class="mb-1">
+        <label class="font-thin" for="assignee">
             Assignee
         </label>
       </div>
-      <p-select 
-        formControlName="assignee" 
-        class="w-full"
-        [options]="users()" 
-        placeholder="Select Assignee"
-        [filter]="true" 
-        filterBy="name"
-        [showClear]="true">
-      </p-select>
+      <div class="mb-1">
+        <p-select 
+          formControlName="assignee" 
+          class="w-full"
+          [options]="users()" 
+          placeholder="Select Assignee"
+          [filter]="true" 
+          filterBy="name"
+          [showClear]="true">
+        </p-select>
+      </div>
     </div>
   </div>
-  <div class="mb-4">
-    <div class="mb-4">
-      <label class="text-2xl" for="description">
+  <div>
+    <div class="mb-1">
+      <label class="font-thin" for="description">
           Description
       </label>
     </div>
-    <p-editor formControlName="description" [style]="{ height: '320px' }" />
+    <div class="mb-1">
+      <p-editor formControlName="description" [style]="{ height: '320px' }" />
+    </div>
+    <div class="text-sm text-red-500 h-5 mb-1"></div>
   </div>
   <div class="flex justify-end mb-4 gap-2">
     @if (form.dirty) {

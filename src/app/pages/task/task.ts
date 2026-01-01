@@ -6,6 +6,7 @@ import { TabsModule } from 'primeng/tabs';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { StateUtils } from '../../providers/utils/state';
 import { RouterUtils } from '../../providers/utils/routerUtils';
+import { ProjectLens } from '../../components/project-lens/project-lens';
 
 @Component({
   selector: 'app-task',
@@ -13,6 +14,7 @@ import { RouterUtils } from '../../providers/utils/routerUtils';
     RouterModule,
     ButtonModule,
     TabsModule,
+    ProjectLens,
   ],
   providers: [
     RouterUtils,
@@ -27,8 +29,9 @@ export class Task {
   readonly routerUtils = inject(RouterUtils);
   taskId = this.route.snapshot.paramMap.get('taskId');
   tabs = [
-      { route: "../settings", label: 'Edit Task', icon: 'pi pi-pencil' },
-      // { route: "scheduling", label: 'Scheduling', icon: 'pi pi-calendar' },
+      { route: "./", label: 'Review', icon: 'pi pi-eye' },
+      { route: "edit", label: 'Edit', icon: 'pi pi-pencil' },
+      { route: "scheduling", label: 'Scheduling', icon: 'pi pi-calendar' },
   ];
   tab$ = this.routerUtils.getTabIndexByUrlByLastSegment$(this.tabs);
   tab = toSignal(this.tab$, {initialValue: 0});

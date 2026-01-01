@@ -1,0 +1,30 @@
+<div class="flex gap-1 w-full">
+  <div class="w-6/13">
+    <p-inputnumber 
+      fluid
+      (onInput)="onUpdateHours($event)"
+      (onBlur)="onBlur()"
+      [(ngModel)]="hours"
+      [showButtons]="true"
+      [disabled]="disabled"
+      [invalid]="invalid"
+      [min]="0"
+      [max]="99"
+    />
+  </div>
+  <div class="w-1/13 text-2xl text-center align-middle text-gray-500">:</div>
+  <div class="w-6/13">
+    <p-inputnumber 
+      fluid
+      (onInput)="onUpdateMinutes($event)"
+      (onBlur)="onBlur()"
+      [(ngModel)]="minutes"
+      [showButtons]="true"
+      [disabled]="disabled"
+      [invalid]="invalid"
+      [step]="15"
+      [min]="0"
+      [max]="59"
+    />
+  </div>
+</div>
