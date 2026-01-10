@@ -67,12 +67,16 @@ export class Projection {
       if (!projectPopulated) return;
       // This also includes updates that are only accessible through the taskContext
       const taskUpdated = this.taskContext();
-      // This inserts the updated task into the tasks array at the correct index
-      const projectWithUpdatedTask = upsertTaskIntoProjectTasks(
-        taskUpdated as Task, 
-        projectPopulated
-      );
-      this.store.dispatch(new SetProjectProjection(projectWithUpdatedTask));
+      if (!!taskUpdated) {
+        // This inserts the updated task into the tasks array at the correct index
+        const projectWithUpdatedTask = upsertTaskIntoProjectTasks(
+          taskUpdated as Task, 
+          projectPopulated
+        );
+        this.store.dispatch(new SetProjectProjection(projectWithUpdatedTask));
+      } else {
+        this.store.dispatch(new SetProjectProjection(projectPopulated));
+      }
     });
   }
 }

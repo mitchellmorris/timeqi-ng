@@ -1,13 +1,13 @@
 import { Component, effect, inject, Signal } from '@angular/core';
-import { TimeOffPicker } from '../../../../components/time-off-picker/time-off-picker';
+import { TimeOffPicker } from '../../../components/time-off-picker/time-off-picker';
 import { Store } from '@ngxs/store';
 import { ActivatedRoute } from '@angular/router';
-import { ProjectsState } from '../../../../store/projects/projects.state';
-import { StateUtils } from '../../../../providers/utils/state';
+import { ProjectsState } from '../../../store/projects/projects.state';
+import { StateUtils } from '../../../providers/utils/state';
 import { filter, first, Observable, take } from 'rxjs';
 import { Project, SchedulingSettings } from '@betavc/timeqi-sh';
-import { WorkshiftSchedular } from '../../../../components/workshift-schedular/workshift-schedular';
-import { SaveProjectSchedule } from '../../../../store/projects/projects.actions';
+import { WorkshiftSchedular } from '../../../components/workshift-schedular/workshift-schedular';
+import { SaveProjectSchedule } from '../../../store/projects/projects.actions';
 import { toSignal } from '@angular/core/rxjs-interop';
 
 @Component({

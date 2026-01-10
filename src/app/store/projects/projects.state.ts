@@ -198,6 +198,7 @@ export class ProjectsState {
       action.project,
       0,
       { 
+        relativeTimeOff: this.store.selectSnapshot(TimeOffState.getTimeOffs),
         // convert to IDs only so we store references instead of full objects
         activityIterationCb: (activity: Activity) => {
           activity.entries = activity.entries.map(e => (e as InstanceEntry)._id);
