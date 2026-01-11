@@ -66,7 +66,7 @@ export class TaskForm implements OnInit {
     endDate: [null as ScenarioDate],
     locked: [false],
     estimate: [0],
-    assignee: ['' as string]
+    assignee: ['' as string, Validators.required]
   });
   modeOptions: PrimeNG.SelectOption[] = [
     { label: 'Snap', value: false },

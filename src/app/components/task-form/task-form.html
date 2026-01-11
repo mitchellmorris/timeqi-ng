@@ -1,5 +1,6 @@
 @let locked = form.get('locked')?.value;
 @let name = form.get('name');
+@let assignee = form.get('assignee');
 @let estimate = form.get('estimate');
 <form [formGroup]="form" 
   (ngSubmit)="onSubmit()">
@@ -20,7 +21,7 @@
         />
       </div>
       <div class="text-sm text-red-500 h-5 mb-1">
-      @if (name?.errors?.['required']) {
+      @if (name?.errors?.['required'] && (name?.touched || name?.dirty)) {
         Task Name is required.
       }
       </div>
@@ -69,7 +70,7 @@
           formControlName="estimate"></app-time-picker>
       </div>
       <div class="text-sm text-red-500 h-5 mb-1">
-      @if (estimate?.errors?.['nonZero']) {
+      @if (estimate?.errors?.['nonZero'] && (estimate?.touched || estimate?.dirty)) {
         Estimate must be greater than 0.
       }
       </div>
@@ -88,8 +89,14 @@
           placeholder="Select Assignee"
           [filter]="true" 
           filterBy="name"
-          [showClear]="true">
+          [showClear]="true"
+          [invalid]="assignee?.invalid && (assignee?.touched || assignee?.dirty)">
         </p-select>
+      </div>
+      <div class="text-sm text-red-500 h-5 mb-1">
+      @if (assignee?.errors?.['required'] && (assignee?.touched || assignee?.dirty)) {
+        Assignee is required.
+      }
       </div>
     </div>
   </div>

@@ -7,7 +7,7 @@
       [(ngModel)]="hours"
       [showButtons]="true"
       [disabled]="disabled"
-      [invalid]="invalid"
+      [invalid]="touched && invalid"
       [min]="0"
       [max]="99"
     />
@@ -21,7 +21,7 @@
       [(ngModel)]="minutes"
       [showButtons]="true"
       [disabled]="disabled"
-      [invalid]="invalid"
+      [invalid]="touched && invalid"
       [step]="15"
       [min]="0"
       [max]="59"
