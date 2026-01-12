@@ -4,6 +4,7 @@ import { Organizations } from './pages/organizations/organizations';
 import { Organization } from './pages/organization/organization';
 import { Project } from './pages/project/project';
 import { authGuard } from './providers/auth/auth-guard';
+import { cleanNewTaskGuard } from './providers/pending-changes/clean-new-task.guard';
 import { Task } from './pages/task/task';
 import { EditTask } from './pages/task/edit-task/edit-task';
 import { ProjectScheduling } from './pages/project/project-scheduling/project-scheduling';
@@ -74,6 +75,7 @@ export const routes: Routes = [
       }, {
         path: 'add-task',
         component: AddTask,
+        canDeactivate: [cleanNewTaskGuard]
       }]
     }]
   },

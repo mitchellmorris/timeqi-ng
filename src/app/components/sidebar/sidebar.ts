@@ -72,7 +72,7 @@ export class Sidebar {
           }, {
             label: "Add Task",
             icon: 'pi pi-plus-circle',
-            routerLink: ['project', 'add-task']
+            routerLink: ['project', project._id, 'add-task']
           }, {
             label: "Edit Project",
             icon: 'pi pi-pen-to-square',

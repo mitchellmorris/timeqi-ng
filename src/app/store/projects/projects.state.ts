@@ -200,14 +200,13 @@ export class ProjectsState {
       { 
         relativeTimeOff: this.store.selectSnapshot(TimeOffState.getTimeOffs),
         // convert to IDs only so we store references instead of full objects
-        activityIterationCb: (activity: Activity) => {
-          activity.entries = activity.entries.map(e => (e as InstanceEntry)._id);
-          activity.timeOff = activity.timeOff.map(t => (t as InstanceTimeOff)._id);
-          return Promise.resolve(activity);
-        }
+        // activityIterationCb: (activity: Activity) => {
+        //   activity.entries = activity.entries.map(e => (e as InstanceEntry)._id);
+        //   activity.timeOff = activity.timeOff.map(t => (t as InstanceTimeOff)._id);
+        //   return Promise.resolve(activity);
+        // }
       }
     ).then((processedProject) => {
-      // this.store.dispatch(new SetProjectProjection(processedProject));
       const dispatches = [];
       const state = ctx.getState();
       const task = this.store.selectSnapshot(state => state.tasks.task);
@@ -239,10 +238,12 @@ export class ProjectsState {
       dispatches.push(new SetProjectTasksProjections(processedProject.tasks as InstanceTask[]));
       if (task && isNotEmpty(processedProject.tasks)) {
         const taskProjection = processedProject.tasks![task.index] as Task;
-        dispatches.push(
-          new SetProjectTaskProjection(taskProjection),
-          new SetProjectTaskActivity(taskProjection.activity || [])
-        );
+        if (!!taskProjection) {
+          dispatches.push(
+            new SetProjectTaskProjection(taskProjection),
+            new SetProjectTaskActivity(taskProjection.activity || [])
+          );
+        }
       } else if (processedProject.tasks) {
         const projectActivity = pipe(
           reduce(

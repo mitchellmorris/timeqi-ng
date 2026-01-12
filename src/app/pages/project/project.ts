@@ -5,12 +5,14 @@ import { TabsModule } from 'primeng/tabs';
 import { Store } from '@ngxs/store';
 import { RouterUtils } from '../../providers/utils/routerUtils';
 import { toSignal } from '@angular/core/rxjs-interop';
+import { ProjectLens } from '../../components/project-lens/project-lens';
 
 @Component({
   selector: 'app-project',
   imports: [
     RouterModule,
     TabsModule,
+    ProjectLens,
   ],
   templateUrl: './project.html',
   styleUrl: './project.css'

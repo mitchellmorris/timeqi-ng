@@ -1,9 +1,12 @@
 import { computed, effect, inject, Injectable, signal, Signal, untracked, WritableSignal } from '@angular/core';
 import { ProjectsState } from '../../store/projects/projects.state';
 import { 
+  isTaskProjectionCandidate,
+  hasDifferences,
   InstanceTask, 
   Project,
   Task,
+  TASK_PROJECTION_SCALAR_FIELDS,
   upsertTaskIntoProjectTasks,
 } from '@betavc/timeqi-sh';
 import { Store } from '@ngxs/store';
@@ -55,8 +58,6 @@ export class Projection {
     const taskModel = this.debouncedTaskModel();
 
     if (!task && !taskModel) return null;
-    if (!taskModel) return task;
-    if (!task) return taskModel;
 
     return { ...task, ...taskModel };
   });
@@ -67,7 +68,7 @@ export class Projection {
       if (!projectPopulated) return;
       // This also includes updates that are only accessible through the taskContext
       const taskUpdated = this.taskContext();
-      if (!!taskUpdated) {
+      if (!!taskUpdated && isTaskProjectionCandidate(taskUpdated)) {
         // This inserts the updated task into the tasks array at the correct index
         const projectWithUpdatedTask = upsertTaskIntoProjectTasks(
           taskUpdated as Task, 

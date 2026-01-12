@@ -4,9 +4,17 @@
     <div class="font-semibold mb-1">
       {{ projectProjection()?.name }}
     </div>
-    <div class="text-sm flex mb-1">
+    <div class="text-sm flex">
       <div class="w-5/12 font-semibold">Start Date</div>
       <div class="w-7/12">{{ projectProjection()?.startDate | date:'EEEE, MMM d, y' }}</div>
+    </div>
+    <div class="text-sm flex">
+      <div class="w-5/12">Target Date</div>
+      <div class="w-7/12">{{ projectProjection()?.targetDate | date:'EEEE, MMM d, y' }}</div>
+    </div>
+    <div class="text-sm flex mb-1">
+      <div class="w-5/12">Projected Date</div>
+      <div class="w-7/12">{{ projectProjection()?.projectedDate | date:'EEEE, MMM d, y' }}</div>
     </div>
     <div class="text-sm flex">
       <div class="w-5/12 font-semibold">Project Estimate</div>
@@ -14,6 +22,7 @@
     </div>
   </div>
 </div>
+@if (!!taskProjection()) {
 <h3 class="text-lg font-semibold mb-4">Task</h3>
 <div class="text-gray-400">
   <div class="mb-4">
@@ -141,3 +150,4 @@
     </div>
   </div>
 </div>
+}

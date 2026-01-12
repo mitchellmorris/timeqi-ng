@@ -3,6 +3,7 @@ import {
   effect,
   inject,
   input,
+  model,
   OnInit,
   output,
   Signal,
@@ -47,7 +48,7 @@ export class TaskForm implements OnInit {
   readonly fb = inject(FormBuilder);
   taskProjection: Signal<Task | null> = this.store.selectSignal(TasksState.getProjection);
   users: Signal<PrimeNG.SelectOption[]> = this.store.selectSignal(UserState.getUserSelectOptions);
-  data = input<Partial<Task> | null>({
+  data = model<Partial<Task> | null>({
     name: '',
     description: '',
     startDate: null,
@@ -89,7 +90,7 @@ export class TaskForm implements OnInit {
     // Effect that runs whenever form changes (with filtering)
     effect(async () => {
       const formData = this.formChanges();
-      if (this.form.dirty) {
+      if (this.form.dirty && this.form.valid) {
         this.valueChanges.emit(formData as Partial<Task>);
       }
     });

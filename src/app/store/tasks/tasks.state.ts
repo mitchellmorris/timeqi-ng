@@ -8,7 +8,9 @@ import {
   SetTask, 
   SetProjectTaskProjection, 
   SetProjectTasksProjections, 
-  UpdateTask 
+  UpdateTask, 
+  SetNewTask,
+  CleanNewTask
 } from './tasks.actions';
 import { 
   getId, 
@@ -16,7 +18,8 @@ import {
   Task, 
   TASK_PROJECTION_SCALAR_FIELDS, 
   TASK_PROJECTION_RELATIONAL_FIELDS,
-  TasksStateModel 
+  TasksStateModel, 
+  isTaskProjectionCandidate
 } from '@betavc/timeqi-sh';
 import { Tasks as TasksService } from './tasks';
 import { catchError, map, mergeMap, of, tap } from 'rxjs';
@@ -55,6 +58,8 @@ export class TasksState {
   @Selector()
   static getProjection(state: TasksStateModel): Task | null { 
     if (!state.task) return null;
+    const projection = { ...state.task, ...state.projection };
+    if (!isTaskProjectionCandidate(projection)) return null;
     return { ...state.task, ...state.projection } as Task;
   }
 
@@ -113,6 +118,44 @@ export class TasksState {
         return ctx.dispatch(dispatches);
       })
     );
+  }
+
+  @Action(SetNewTask)
+  setNewTask(ctx: StateContext<TasksStateModel>, action: SetNewTask) {
+    const state = ctx.getState();
+    const tasks = state.tasks;
+    const newTask: Task = {
+      ...action.task,
+      index: action.index ?? tasks.length,
+    } as Task;
+    tasks.splice(action.index ?? tasks.length, 0, omit(
+      TASK_PROJECTION_RELATIONAL_FIELDS as (keyof Task)[], newTask
+    ) as Task);
+    ctx.setState({
+      ...state,
+      tasks,
+      task: omit(
+        TASK_PROJECTION_RELATIONAL_FIELDS as (keyof Task)[], newTask
+      ) as Task
+    });
+  }
+
+  @Action(CleanNewTask)
+  cleanNewTask(ctx: StateContext<TasksStateModel>) {
+    const state = ctx.getState();
+    const tasks = state.tasks;
+    const task = state.task;
+    if (task && task._id && task._id.startsWith('new-task-')) {
+      const index = tasks.findIndex(t => t._id === task._id);
+      if (index >= 0) tasks.splice(index, 1);
+    }
+    ctx.setState({
+      ...state,
+      tasks,
+      task: null,
+      projections: [],
+      projection: null,
+    });
   }
 
   @Action(UpdateTask)
