@@ -10,7 +10,9 @@ import {
   SetProjectTasksProjections, 
   UpdateTask, 
   SetNewTask,
-  CleanNewTask
+  CleanNewTask,
+  CleanTaskProjections,
+  CleanProjectTaskProjections
 } from './tasks.actions';
 import { 
   getId, 
@@ -19,11 +21,12 @@ import {
   TASK_PROJECTION_SCALAR_FIELDS, 
   TASK_PROJECTION_RELATIONAL_FIELDS,
   TasksStateModel, 
-  isTaskProjectionCandidate
+  isTaskProjectionCandidate,
+  InstanceTask
 } from '@betavc/timeqi-sh';
 import { Tasks as TasksService } from './tasks';
 import { catchError, map, mergeMap, of, tap } from 'rxjs';
-import { equals, omit, pickBy } from 'ramda';
+import { omit } from 'ramda';
 import { SetTaskProject } from '../projects/projects.actions';
 import { CleanTaskActivity } from '../activity/activity.actions';
 import { CleanTaskTimeOff, SetTaskTimeOff } from '../time-off/time-off.actions';
@@ -183,32 +186,21 @@ export class TasksState {
   @Action(SetProjectTaskProjection)
   setTaskProjection(ctx: StateContext<TasksStateModel>, action: SetProjectTaskProjection) {
     const state = ctx.getState();
+    const omittedFields = TASK_PROJECTION_RELATIONAL_FIELDS as readonly (keyof Task)[];
     ctx.setState({
       ...state,
-      projection: pickBy(
-          (value, key) => {
-            return !equals(value, state.task![key]) &&
-            // exclude these
-            TASK_PROJECTION_RELATIONAL_FIELDS.indexOf(key) === -1;
-          }, 
-          action.taskProjection
-        )
+      projection: omit(omittedFields, action.taskProjection)
     });
   }
 
   @Action(SetProjectTasksProjections)
   setTasksProjections(ctx: StateContext<TasksStateModel>, action: SetProjectTasksProjections) {
     const state = ctx.getState();
+    const omittedFields = TASK_PROJECTION_RELATIONAL_FIELDS as readonly (keyof InstanceTask)[];
     ctx.setState({
       ...state,
       projections: action.projections.map((task) => {
-        return pickBy(
-          (value, key) => {
-            // only include these keys
-            return TASK_PROJECTION_SCALAR_FIELDS.indexOf(key) >= 0;
-          }, 
-          task
-        )
+        return omit(omittedFields, task);
       })
     });
   }
@@ -227,16 +219,26 @@ export class TasksState {
       new CleanTaskActivity()
     ]);
   }
+  @Action(CleanTaskProjections)
+  @Action(CleanProjectTaskProjections)
+  cleanTaskProjections(ctx: StateContext<TasksStateModel>) {
+    const state = ctx.getState();
+    ctx.setState({
+      ...state,
+      projections: [],
+      projection: null,
+    });
+  };
 
   @Action(CleanProjectTasks)
   cleanTasks(ctx: StateContext<TasksStateModel>) {
     const state = ctx.getState();
     ctx.setState({
       ...state,
-      tasks: [],
-      projections: []
+      tasks: []
     });
     return ctx.dispatch([
+      new CleanTaskProjections(),
       new NullifyTask(),
     ]);
   }

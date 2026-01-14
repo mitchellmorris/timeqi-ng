@@ -45,6 +45,16 @@ export class NullifyTask {
   constructor() { }
 }
 
+export class CleanTaskProjections {
+  static readonly type = '[Task] Clean Task Projections';
+  constructor() { }
+}
+
+export class CleanProjectTaskProjections {
+  static readonly type = '[Project] Clean Project Task Projections';
+  constructor() { }
+}
+
 export class CleanProjectTasks {
   static readonly type = '[Project] Clean Project Tasks';
   constructor() { }

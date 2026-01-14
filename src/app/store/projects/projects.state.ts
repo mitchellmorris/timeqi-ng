@@ -17,7 +17,8 @@ import {
   InstanceTask, 
   InstanceTimeOff, 
   processProjectProjection, 
-  Project, 
+  Project,  
+  PROJECT_PROJECTION_RELATIONAL_FIELDS,
   ProjectsStateModel,
   Task
 } from '@betavc/timeqi-sh';
@@ -32,7 +33,6 @@ import {
   equals, 
   isNotEmpty, 
   omit, 
-  pickBy, 
   pipe, 
   prop, 
   reduce, 
@@ -43,7 +43,8 @@ import {
   NullifyProjectTask, 
   SetProjectTasks, 
   SetProjectTaskProjection, 
-  SetProjectTasksProjections 
+  SetProjectTasksProjections, 
+  CleanProjectTaskProjections
 } from '../tasks/tasks.actions';
 import { SetProjectOrganization } from '../organizations/organizations.actions';
 import { CleanProjectTimeOff, SetProjectTasksTimeOff, SetProjectTimeOff } from '../time-off/time-off.actions';
@@ -199,52 +200,51 @@ export class ProjectsState {
       0,
       { 
         relativeTimeOff: this.store.selectSnapshot(TimeOffState.getTimeOffs),
-        // convert to IDs only so we store references instead of full objects
-        // activityIterationCb: (activity: Activity) => {
-        //   activity.entries = activity.entries.map(e => (e as InstanceEntry)._id);
-        //   activity.timeOff = activity.timeOff.map(t => (t as InstanceTimeOff)._id);
-        //   return Promise.resolve(activity);
-        // }
       }
     ).then((processedProject) => {
       const dispatches = [];
       const state = ctx.getState();
       const task = this.store.selectSnapshot(state => state.tasks.task);
+      const omittedFields = PROJECT_PROJECTION_RELATIONAL_FIELDS as readonly (keyof Project)[];
       ctx.setState({
         ...state,
         // tasks are not stored in the projection
         // we only pick the fields that have changed and are not arrays
-        projection: pickBy(
-          (value, key) => {
-            return (
-              !equals(value, state.project![key]) &&
-              // exclude these keys
-              [
-                'tasks',
-                'timeOff',
-                'users',
-              ].indexOf(key) === -1
-            ) ||
-            // always include these keys
-            [
-              'estimate',
-              'elapsedHours',
-              'projectedDate'
-            ].indexOf(key) !== -1;
-          }, 
-          processedProject
-        )
+        projection: omit(omittedFields, processedProject),
       });
+      // set tasks projections
       dispatches.push(new SetProjectTasksProjections(processedProject.tasks as InstanceTask[]));
+      // set task projection if a task is selected
+      // we match by index
+      // and include activity
+      // only dispatch if the working copy matches the original task
+      // this should always be true unless the user has switched tasks
       if (task && isNotEmpty(processedProject.tasks)) {
-        const taskProjection = processedProject.tasks![task.index] as Task;
-        if (!!taskProjection) {
-          dispatches.push(
-            new SetProjectTaskProjection(taskProjection),
-            new SetProjectTaskActivity(taskProjection.activity || [])
-          );
-        }
+          // fetch the projection for the current task
+          // by the index property
+          // we assume that the tasks are in order
+          const taskProjection = processedProject.tasks![task.index] as InstanceTask;
+          // when false this might just mean that it's a new task
+          // that hasn't been fully populated yet
+          // in which case we skip setting the projection
+          // and we shouldn't populate the project activity either
+          if (taskProjection) {
+            if (taskProjection._id === task._id) {
+              dispatches.push(
+                new SetProjectTaskProjection(taskProjection),
+                new SetProjectTaskActivity(taskProjection.activity || [])
+              );
+            } else {
+              console.warn('warning: Task projection _id does not match the selected task _id, skipping setting task projection.');
+            }
+          }
+      /**
+       * Set project activity from all tasks
+       * if there is no selected task
+       */
       } else if (processedProject.tasks) {
+        // set project activity from all tasks
+        // for this project
         const projectActivity = pipe(
           reduce(
             (acc: Activity[], task: InstanceTask) => acc.concat(task.activity || []), 
@@ -252,7 +252,10 @@ export class ProjectsState {
           ),
           sortBy(prop('date'))
         )(processedProject.tasks as InstanceTask[]);
-        dispatches.push(new SetProjectActivity(projectActivity));
+        dispatches.push(
+          new SetProjectActivity(projectActivity),
+          new CleanProjectTaskProjections()
+        );
       }
       return ctx.dispatch(dispatches);
     });

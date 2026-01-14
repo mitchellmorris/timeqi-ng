@@ -2,11 +2,8 @@ import { computed, effect, inject, Injectable, signal, Signal, untracked, Writab
 import { ProjectsState } from '../../store/projects/projects.state';
 import { 
   isTaskProjectionCandidate,
-  hasDifferences,
-  InstanceTask, 
   Project,
   Task,
-  TASK_PROJECTION_SCALAR_FIELDS,
   upsertTaskIntoProjectTasks,
 } from '@betavc/timeqi-sh';
 import { Store } from '@ngxs/store';
@@ -21,45 +18,48 @@ import { pick } from 'ramda';
 })
 export class Projection {
   private store = inject(Store);
+  private debouncedModel = <T,>(model: WritableSignal<T | null>) => {
+    return toSignal(
+      toObservable(model).pipe(
+        debounceTime(300)
+      ),
+      { initialValue: null }
+    );
+  }
+  private context = (original: any, workingModel: any) => {
+    if (!original && !workingModel) return null;
+    if (!workingModel) return original;
+    if (!original) return workingModel;
+    return { ...original, ...workingModel };
+  };
   // Current Project
   private projectPopulated: Signal<Project | null> = this.store.selectSignal(ProjectsState.getPopulatedProject);
   // Used to merge in any local changes to the project
   projectModel: WritableSignal<Project | null> = signal(null);
-  private debouncedProjectModel = toSignal(
-    toObservable(this.projectModel).pipe(
-      debounceTime(300)
-    ),
-    { initialValue: null }
-  );
+  // 300ms debounce to avoid rapid updates
+  private debouncedProjectModel = this.debouncedModel(this.projectModel);
   // Merged Project
   private projectContext: Signal<Project | null> = computed(() => {
     const projectPopulated = this.projectPopulated();
     const projectModel = this.debouncedProjectModel();
-
-    if (!projectPopulated && !projectModel) return null;
-    if (!projectModel) return projectPopulated;
-    if (!projectPopulated) return projectModel;
-
-    return { ...projectPopulated, ...projectModel };
+    return this.context(projectPopulated, projectModel);
   });
   // Current Task (when available in the context)
   private task: Signal<Task | null> = this.store.selectSignal(TasksState.getTask);
   // Used to merge in any local changes to the task
   taskModel: WritableSignal<Partial<Task> | null> = signal(null);
-  private debouncedTaskModel = toSignal(
-    toObservable(this.taskModel).pipe(
-      debounceTime(300)
-    ),
-    { initialValue: null }
-  );
+  // 300ms debounce to avoid rapid updates
+  private debouncedTaskModel = this.debouncedModel(this.taskModel);
   // Merged Task
-  private taskContext: Signal<Partial<Task> | null> = computed(() => {
+  private taskContext: Signal<Task | null> = computed(() => {
     const task = this.task();
     const taskModel = this.debouncedTaskModel();
-
-    if (!task && !taskModel) return null;
-
-    return { ...task, ...taskModel };
+    const taskUpdated = this.context(task, taskModel);
+    if (taskUpdated && isTaskProjectionCandidate(taskUpdated)) {
+      return this.context(task, taskModel);
+    } else {
+      return null;
+    }
   });
 
   constructor() {
@@ -68,7 +68,7 @@ export class Projection {
       if (!projectPopulated) return;
       // This also includes updates that are only accessible through the taskContext
       const taskUpdated = this.taskContext();
-      if (!!taskUpdated && isTaskProjectionCandidate(taskUpdated)) {
+      if (!!taskUpdated) {
         // This inserts the updated task into the tasks array at the correct index
         const projectWithUpdatedTask = upsertTaskIntoProjectTasks(
           taskUpdated as Task, 
