@@ -63,8 +63,8 @@
       <div class="w-7/12">{{ taskProjection()?.workedHours }}</div>
     </div>
     <div class="text-sm flex">
-      <div class="w-5/12">Remaining Hours</div>
-      <div class="w-7/12">{{ activity()[0]?.remainingHours }}</div>
+      <div class="w-5/12">Remaining Estimate</div>
+      <div class="w-7/12">{{ taskProjection()?.remainingEstimate }}</div>
     </div>
     <div class="text-sm flex">
       <div class="w-5/12">Elapsed Hours</div>
@@ -72,82 +72,10 @@
     </div>
   </div>
 </div>
-<h3 class="text-lg font-semibold mb-4">
-  <label class="font-semibold mb-1 block" for="activitySlider">Activity ({{ activityCount() }})</label>
-</h3>
-<div class="text-gray-400">
-  <div class="mb-4">
-    <div class="flex">
-      <div class="w-1/11 pt-4 justify-items-center pr-5">
-        <p-slider [(ngModel)]="activityIndex" max="{{ activityCount() - 1 }}" orientation="vertical" class="w-56" />
-      </div>
-      <div class="w-10/11">
-        <div class="text-sm">
-          @for (activity of activity(); track $index) {
-          @if ($index === activityIndex()) {
-          <div class="mb-2">
-            <div class="flex mb-1">
-              <div class="w-4/11 font-semibold">{{ activity.workDay ? 'Workday' : 'Non-Workday' }}</div>
-              <div class="w-7/11">{{ activity.date | date:'EEEE, MMM d, y' }}</div>
-            </div>
-            <div class="flex">
-              <div class="w-4/11">Total Hours</div>
-              <div class="w-7/11">{{ activity.workedHours }}</div>
-            </div>
-            <div class="flex">
-              <div class="w-4/11">Remaining Hours</div>
-              <div class="w-7/11">{{ activity.remainingHours }}</div>
-            </div>
-            @if (activity.elapsedHours > 0) {
-            <div class="flex">
-              <div class="w-4/11">Elapsed Hours</div>
-              <div class="w-7/11">{{ activity.elapsedHours }}</div>
-            </div>
-            }
-            @if (activity.pendingHours > 0) {
-            <div class="flex">
-              <div class="w-4/11">Pending Hours</div>
-              <div class="w-7/11">{{ activity.pendingHours }}</div>
-            </div>
-            }
-            @if (activity.overrun > 0) {
-            <div class="flex">
-              <div class="w-4/11">Overrun Hours</div>
-              <div class="w-7/11">{{ activity.overrun }}</div>
-            </div>
-            }
-            @if (activity.coverage < 0) {
-            <div class="flex">
-              <div class="w-4/11">Hours Behind</div>
-              <div class="w-7/11">{{ (activity.coverage * -1) }}</div>
-            </div>
-            }
-            <div class="flex mt-1">
-              <div class="w-4/11 font-semibold">Workshift</div>
-              <div class="w-7/11">{{ activity.workshift }}</div>
-            </div>
-            @if (activity.pendingHours <= 0) {
-            <div class="flex mv-1">
-              <div class="w-4/11 font-semibold">Hours</div>
-              <div class="w-7/11">{{ activity.hours }}</div>
-            </div>
-            <div class="flex mb-1">
-              <div class="w-4/11 font-semibold">Entries</div>
-              <div class="w-7/11">{{ activity.entries.length }}</div>
-            </div>
-            }
-            @if (activity.timeOff.length > 0) {
-            <div class="flex mb-1">
-              <div class="w-4/11 font-semibold">Time Off</div>
-              <div class="w-7/11">{{ activity.timeOff.length }}</div>
-            </div>
-            }
-          </div>
-          }
-          }
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
+<app-activity-lens />
+} @else if (!!task()) {
+<h3 class="text-lg font-semibold mb-4">Task</h3>
+<p class="text-gray-400"><span class="font-semibold">Note:</span> This task is not currently eligible for projection. Please provide a name and estimate, and select an assignee before the projection can be calculated.</p>
+} @else {
+<app-activity-lens />
 }

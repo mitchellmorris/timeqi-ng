@@ -224,10 +224,13 @@ export class ProjectsState {
           // by the index property
           // we assume that the tasks are in order
           const taskProjection = processedProject.tasks![task.index] as InstanceTask;
-          // when false this might just mean that it's a new task
-          // that hasn't been fully populated yet
-          // in which case we skip setting the projection
-          // and we shouldn't populate the project activity either
+          /**
+           * when false this might just mean that it's a new task
+           * that hasn't been fully populated yet
+           * in which case we skip setting the projection
+           * and we shouldn't populate the project activity either
+           * for consistency while adding new tasks
+           */
           if (taskProjection) {
             if (taskProjection._id === task._id) {
               dispatches.push(
@@ -260,6 +263,7 @@ export class ProjectsState {
       return ctx.dispatch(dispatches);
     });
   }
+
   @Action(SaveProjectSchedule)
   saveProjectSchedule(ctx: StateContext<ProjectsStateModel>, action: SaveProjectSchedule) {
       const state = ctx.getState();

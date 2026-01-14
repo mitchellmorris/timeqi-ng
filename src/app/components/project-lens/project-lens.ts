@@ -7,14 +7,13 @@ import { DatePipe } from '@angular/common';
 import { SliderModule } from 'primeng/slider';
 import { FormsModule } from '@angular/forms';
 import { ActivityState } from '../../store/activity/activity.state';
-import { min } from 'ramda';
+import { ActivityLens } from './activity-lens/activity-lens';
 
 @Component({
   selector: 'app-project-lens',
   imports: [
-    SliderModule,
-    FormsModule,
-    DatePipe
+    DatePipe,
+    ActivityLens,
   ],
   templateUrl: './project-lens.html',
   styleUrl: './project-lens.css'
@@ -22,18 +21,6 @@ import { min } from 'ramda';
 export class ProjectLens {
   readonly store = inject(Store);
   projectProjection: Signal<Partial<Project> | null> = this.store.selectSignal(ProjectsState.getProjection);
+  task: Signal<Task | null> = this.store.selectSignal(TasksState.getTask);
   taskProjection: Signal<Task | null> = this.store.selectSignal(TasksState.getProjection);
-  activity: Signal<Activity[]> = this.store.selectSignal(ActivityState.getActivity);
-  activityCount: Signal<number> = computed(() => this.activity().length);
-  activityIndex = model<number>(0);
-  // step: Signal<number> = computed(() => min(100, 100 / this.activity().length);
-  
-  constructor() {
-    effect(() => {
-      const activityLength = this.activity().length;
-      if (activityLength > 0) {
-        this.activityIndex.set(activityLength - 1);
-      }
-    });
-  }
 }
