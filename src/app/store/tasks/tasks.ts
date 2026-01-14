@@ -14,6 +14,16 @@ export class Tasks {
     private http: HttpClient
   ) {}
 
+  createTask(task: Partial<Task>): Observable<Task | null> {
+    return this.http.post<Task>(`${this.apiUrl}/task`, task).pipe(
+      map((response: any) => response.newTask),
+      catchError(error => {
+        console.error('Error creating task:', error);
+        return of(null);
+      })
+    );
+  }
+
   getTask(id: string): Observable<Task | null> {
     return this.http.get<{ task: Task, [key: string]: any }>(`${this.apiUrl}/task/${id}`).pipe(
       map(({ existingTask }) => existingTask),

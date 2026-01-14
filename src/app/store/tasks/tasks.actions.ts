@@ -30,6 +30,11 @@ export class SetProjectTasksProjections {
   constructor(readonly projections: Partial<InstanceTask>[]) { }
 }
 
+export class CreateTask {
+  static readonly type = '[Add Task Form] Create Task';
+  constructor(public task: Partial<Task>) { }
+}
+
 export class UpdateTask {
   static readonly type = '[Task Edit Form] Update Task';
   constructor(public id: string, public task: Partial<Task>) { }

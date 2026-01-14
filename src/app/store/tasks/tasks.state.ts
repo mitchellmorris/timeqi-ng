@@ -12,7 +12,8 @@ import {
   SetNewTask,
   CleanNewTask,
   CleanTaskProjections,
-  CleanProjectTaskProjections
+  CleanProjectTaskProjections,
+  CreateTask
 } from './tasks.actions';
 import { 
   getId, 
@@ -141,6 +142,27 @@ export class TasksState {
         TASK_PROJECTION_RELATIONAL_FIELDS as (keyof Task)[], newTask
       ) as Task
     });
+  }
+
+  @Action(CreateTask)
+  createTask(ctx: StateContext<TasksStateModel>, action: CreateTask) {
+    return this.tasksService.createTask(action.task).pipe(
+      tap((newTask) => {
+        if (newTask) {
+          const state = ctx.getState();
+          // Replace the temporary new task with the created task
+          state.tasks.splice(newTask.index, 1, newTask);
+          ctx.setState({
+            ...state,
+            task: newTask
+          });
+        }
+      }),
+      catchError(error => {
+        console.error('Error creating organization schedule:', error);
+        return of(null);
+      })
+    );
   }
 
   @Action(CleanNewTask)

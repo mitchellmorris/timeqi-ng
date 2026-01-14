@@ -1,6 +1,6 @@
 import { Component, inject, OnDestroy, OnInit, signal, Signal } from '@angular/core';
 import { Store } from '@ngxs/store';
-import { CleanNewTask, SetNewTask, UpdateTask } from '../../../store/tasks/tasks.actions';
+import { CleanNewTask, CreateTask, SetNewTask, UpdateTask } from '../../../store/tasks/tasks.actions';
 import { TasksState } from '../../../store/tasks/tasks.state';
 import { hasDifferences, Task, TASK_PROJECTION_SCALAR_FIELDS, Project, TASK_PROJECTION_RELATIONAL_FIELDS } from '@betavc/timeqi-sh';
 import { TaskForm } from '../../../components/task-form/task-form';
@@ -8,8 +8,9 @@ import { ButtonModule } from 'primeng/button';
 import { DatePipe } from '@angular/common';
 import { Projection } from '../../../providers/projection/projection';
 import { ProjectLens } from '../../../components/project-lens/project-lens';
-import { pick } from 'ramda';
+import { omit, pick } from 'ramda';
 import { ProjectsState } from '../../../store/projects/projects.state';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-add-task',
@@ -24,6 +25,7 @@ import { ProjectsState } from '../../../store/projects/projects.state';
 })
 export class AddTask implements OnInit, OnDestroy {
   readonly store = inject(Store);
+  readonly router = inject(Router);
   taskProject: Signal<Project | null> = this.store.selectSignal(ProjectsState.getProject) as Signal<Project | null>;
   tasks: Signal<Task[]> = this.store.selectSignal(TasksState.getTasks);
   task: Signal<Task | null> = this.store.selectSignal(TasksState.getTask);
@@ -62,7 +64,10 @@ export class AddTask implements OnInit, OnDestroy {
 
   // Called by the route guard as a safety net and also used for explicit destroy
   cleanup() {
-    this.store.dispatch(new CleanNewTask());
+    // if we haven't saved the new task, clean it up
+    if (this.task()?._id.startsWith('new-task-')) {
+      this.store.dispatch(new CleanNewTask());
+    }
   }
 
   // Hook for the PendingChangesGuard; return false to block navigation if needed
@@ -71,35 +76,16 @@ export class AddTask implements OnInit, OnDestroy {
   }
 
   onChanges(formData: Partial<Task>) {
-    // Only move forward with certain properties
-    // when they have changed
-    if (!hasDifferences(
-      TASK_PROJECTION_SCALAR_FIELDS, 
-      this.taskProjection() || {}, 
-      formData
-    )) return;
-    
-    // we are only updating the projection
-    // with certain properties
-    const projectionTask = pick(
-      [
-        'name',
-        ...TASK_PROJECTION_SCALAR_FIELDS,
-        ...TASK_PROJECTION_RELATIONAL_FIELDS
-      ] as (keyof Task)[], { 
-        ...this.task(),
-        ...formData
-    });
-    this.projection.taskModel.set(projectionTask);
+    this.projection.taskModel.set({ ...this.task(), ...formData });
   }
 
   onSubmit(formData: Partial<Task>) {
-    // this.store.dispatch(new UpdateTask(
-    //   this.task()!._id,
-    //   {
-    //     ...(this.taskProjection() || {}),
-    //     ...formData
-    //   },
-    // ));
+    this.store.dispatch(new CreateTask(omit(['_id'], {
+      ...(this.taskProjection() || {}),
+      ...formData
+    }))).subscribe(() => {
+      const taskId = this.store.selectSnapshot(TasksState.getTask)?._id;
+      this.router.navigate(['/task', taskId]);
+    });
   }
 }

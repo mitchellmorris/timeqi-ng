@@ -10,7 +10,7 @@ import {
 } from '@angular/core';
 import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { PrimeNG, ScenarioDate, Task } from '@betavc/timeqi-sh';
+import { hasDifferences, PrimeNG, ScenarioDate, Task, TASK_PROJECTION_SCALAR_FIELDS } from '@betavc/timeqi-sh';
 import { debounceTime, distinctUntilChanged, startWith } from 'rxjs';
 import { Projection } from '../../providers/projection/projection';
 import { Store } from '@ngxs/store';
@@ -90,7 +90,15 @@ export class TaskForm implements OnInit {
     // Effect that runs whenever form changes (with filtering)
     effect(async () => {
       const formData = this.formChanges();
-      if (this.form.dirty && this.form.valid) {
+      if (
+        this.form.dirty && 
+        this.form.valid && 
+        hasDifferences(
+          TASK_PROJECTION_SCALAR_FIELDS, 
+          this.taskProjection() || {}, 
+          formData
+        )
+      ) {
         this.valueChanges.emit(formData as Partial<Task>);
       }
     });

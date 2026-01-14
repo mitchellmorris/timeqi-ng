@@ -14,7 +14,6 @@ export const taskResolver: ResolveFn<TasksStateModel> = (route: ActivatedRouteSn
   const taskId = route.paramMap.get('taskId')!;
   if (!taskId)
     throw new Error('No task ID found in route parameters.');
-
   return store.dispatch(new SetTask(taskId)).pipe(
     map(() => stateUtils.getStateSnapshot(TasksState.getTask)),
     filter((task) => !!task),
