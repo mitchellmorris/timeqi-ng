@@ -43,4 +43,14 @@ export class Tasks {
       })
     );
   }
+
+  deleteTask(id: string): Observable<boolean> {
+    return this.http.delete<{ success: boolean }>(`${this.apiUrl}/task/${id}`).pipe(
+      map(response => response.success),
+      catchError(error => {
+        console.error('Error deleting task:', error);
+        return of(false);
+      })
+    );
+  }
 }

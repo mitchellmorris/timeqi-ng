@@ -1,7 +1,7 @@
 import { Component, inject, Signal } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { Store } from '@ngxs/store';
-import { UpdateTask } from '../../../store/tasks/tasks.actions';
+import { DeleteTask, UpdateTask } from '../../../store/tasks/tasks.actions';
 import { TasksState } from '../../../store/tasks/tasks.state';
 import { hasDifferences, Task, TASK_PROJECTION_SCALAR_FIELDS } from '@betavc/timeqi-sh';
 import { TaskForm } from '../../../components/task-form/task-form';
@@ -33,21 +33,13 @@ export class EditTask {
   ) {}
 
   onChanges(formData: Partial<Task>) {
-    // Only move forward with certain properties
-    // when they have changed
-    if (!hasDifferences(
-      TASK_PROJECTION_SCALAR_FIELDS, 
-      this.taskProjection() || {}, 
-      formData
-    )) return;
-    // we are only updating the projection
-    // with certain properties
-    const projectionTask = pick(
-      TASK_PROJECTION_SCALAR_FIELDS as (keyof Task)[], { 
-        ...this.task(), 
-        ...formData
-    });
-    this.projection.taskModel.set(projectionTask);
+    this.projection.taskModel.set({ ...this.task(), ...formData });
+  }
+
+  onDelete() {
+    this.store.dispatch(new DeleteTask(
+      this.task()!._id
+    ));
   }
 
   onSubmit(formData: Partial<Task>) {

@@ -40,6 +40,16 @@ export class UpdateTask {
   constructor(public id: string, public task: Partial<Task>) { }
 }
 
+export class DeleteTask {
+  static readonly type = '[Task] Delete Task';
+  constructor(public id: string) { }
+}
+
+export class DeleteProjectTask {
+  static readonly type = '[Project] Delete Project Task';
+  constructor(public id: string) { }
+}
+
 export class NullifyProjectTask {
   static readonly type = '[Project] Nullify Project Task';
   constructor() { }

@@ -13,7 +13,9 @@ import {
   CleanNewTask,
   CleanTaskProjections,
   CleanProjectTaskProjections,
-  CreateTask
+  CreateTask,
+  DeleteTask,
+  DeleteProjectTask
 } from './tasks.actions';
 import { 
   getId, 
@@ -160,6 +162,30 @@ export class TasksState {
       }),
       catchError(error => {
         console.error('Error creating organization schedule:', error);
+        return of(null);
+      })
+    );
+  }
+
+  @Action(DeleteTask)
+  @Action(DeleteProjectTask)
+  deleteTask(ctx: StateContext<TasksStateModel>, action: DeleteTask) {
+    return this.tasksService.deleteTask(action.id).pipe(
+      tap((success) => {
+        if (success) {
+          const state = ctx.getState();
+          const tasks = state.tasks.filter(t => t._id !== action.id);
+          ctx.setState({
+            ...state,
+            tasks,
+            task: null,
+            projections: [],
+            projection: null,
+          });
+        }
+      }),
+      catchError(error => {
+        console.error('Error deleting task:', error);
         return of(null);
       })
     );

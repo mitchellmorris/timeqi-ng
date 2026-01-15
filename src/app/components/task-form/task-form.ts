@@ -48,6 +48,7 @@ export class TaskForm implements OnInit {
   readonly fb = inject(FormBuilder);
   taskProjection: Signal<Task | null> = this.store.selectSignal(TasksState.getProjection);
   users: Signal<PrimeNG.SelectOption[]> = this.store.selectSignal(UserState.getUserSelectOptions);
+  canDelete = input<boolean>(false);
   data = model<Partial<Task> | null>({
     name: '',
     description: '',
@@ -57,8 +58,8 @@ export class TaskForm implements OnInit {
     estimate: 0,
     assignee: '' as string
   });
-  // @Output() formSubmit = new EventEmitter<Partial<Task>>();
   formSubmit = output<Partial<Task>>();
+  taskDelete = output<Partial<Task>>();
   valueChanges = output<Partial<Task>>();
   form = this.fb.group({
     name: ['', Validators.required],
@@ -114,6 +115,10 @@ export class TaskForm implements OnInit {
       assignee: data.assignee as string
     });
     this.form.markAsPristine();
+  }
+
+  onDelete() {
+    this.taskDelete.emit(this.form.value as Partial<Task>);
   }
   
   onSubmit() {

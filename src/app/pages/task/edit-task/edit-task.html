@@ -1,6 +1,8 @@
 <app-task-form
   [data]="task()"
+  [canDelete]="true"
   (valueChanges)="onChanges($event)"
   (formSubmit)="onSubmit($event)"
+  (taskDelete)="onDelete()"
 >
 </app-task-form>
