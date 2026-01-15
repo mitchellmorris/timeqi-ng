@@ -23,10 +23,11 @@ export class Project {
   readonly routerUtils = inject(RouterUtils);
   taskId = this.route.snapshot.paramMap.get('taskId');
   tabs = [
-      { route: "./", label: 'Tasks', icon: 'pi pi-eye' },
-      { route: "edit", label: 'Edit', icon: 'pi pi-pencil' },
-      { route: "scheduling", label: 'Scheduling', icon: 'pi pi-calendar' },
+      { route: "./", label: 'Overview', icon: 'pi pi-eye' },
+      { route: "tasks", label: 'Tasks', icon: 'pi pi-list-check' },
       { route: "add-task", label: 'Add Task', icon: 'pi pi-plus' },
+      { route: "edit", label: 'Edit Project', icon: 'pi pi-pencil' },
+      { route: "scheduling", label: 'Scheduling', icon: 'pi pi-calendar' },
   ];
   tab$ = this.routerUtils.getTabIndexByUrlByLastSegment$(this.tabs);
   tab = toSignal(this.tab$, {initialValue: 0});

@@ -19,6 +19,7 @@ import { TaskScheduling } from './pages/task/task-scheduling/task-scheduling';
 import { TaskDetail } from './pages/task/task-detail/task-detail';
 import { AddTask } from './pages/project/add-task/add-task';
 import { ProjectTasks } from './pages/project/project-tasks/project-tasks';
+import { ProjectOverview } from './pages/project/project-overview/project-overview';
 
 export const routes: Routes = [
   {
@@ -65,6 +66,9 @@ export const routes: Routes = [
       },
       children: [{
         path: '',
+        component: ProjectOverview
+      }, {
+        path: 'tasks',
         component: ProjectTasks
       }, {
         path: 'edit',
